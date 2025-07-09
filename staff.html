@@ -511,7 +511,7 @@
         <p>&copy; AMDF.GROUP</p>
     </footer>
 
-<!-- Firebase SDK (Compat v9.x) -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -524,28 +524,28 @@
     authDomain: "tamplatedoc.firebaseapp.com",
     databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "tamplatedoc",
-    storageBucket: "tamplatedoc.appspot.com",
+    storageBucket: "tamplatedoc.firebasestorage.app",
     messagingSenderId: "264966107720",
     appId: "1:264966107720:web:da19f6109e71390740de7d",
     measurementId: "G-PFK8VQBFCV"
   };
 
-  // Init Firebase
+  // Inisialisasi Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
   const storage = firebase.storage();
 
-  // Staff Valid PINs (Client-side validation)
+  // ID dan PIN staff (client-side validasi)
   const validStaffCredentials = {
     'AMDF067': '200716',
     'NBLA025': '700261'
   };
 
-  // Cloud Function Endpoint
-  const cloudFunctionURL = "https://us-central1-tamplatedoc.cloudfunctions.net/createCustomToken"; // GANTI jika perlu
+  // Endpoint Cloud Function
+  const cloudFunctionURL = "https://us-central1-tamplatedoc.cloudfunctions.net/createCustomToken";
 
-  // Cek session saat halaman dimuat
+  // Cek sesi saat halaman dimuat
   document.addEventListener('DOMContentLoaded', () => {
     const session = JSON.parse(localStorage.getItem('staffSession') || 'null');
     if (session && session.expiresAt > Date.now()) {
@@ -557,7 +557,7 @@
     }
   });
 
-  // Fungsi Validasi PIN
+  // Validasi ID & PIN staff
   async function validateStaffPin(staffId, pin) {
     if (!validStaffCredentials[staffId] || validStaffCredentials[staffId] !== pin) {
       return { isValid: false, error: 'ID atau PIN tidak valid' };
@@ -565,7 +565,7 @@
     return { isValid: true };
   }
 
-  // Handle Login Submit
+  // Submit login staff
   document.getElementById('staffLoginForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const staffId = document.getElementById('staffId').value.trim();
@@ -581,21 +581,23 @@
       const validation = await validateStaffPin(staffId, pin);
       if (!validation.isValid) throw new Error(validation.error);
 
-      // Panggil Cloud Function untuk dapatkan token
+      // Minta custom token ke Cloud Function
       const response = await fetch(cloudFunctionURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ staffId, isValidated: true })
       });
 
-      if (!response.ok) throw new Error("Gagal membuat token. Error " + response.status);
+      if (!response.ok) {
+        throw new Error("Gagal membuat token. Error " + response.status);
+      }
 
       const { token } = await response.json();
 
-      // Login pakai token
+      // Login ke Firebase pakai token
       const userCredential = await auth.signInWithCustomToken(token);
 
-      // Simpan session
+      // Simpan sesi login di localStorage
       const session = {
         uid: userCredential.user.uid,
         staffId: staffId,
@@ -606,7 +608,7 @@
 
       document.getElementById('staffLogin')?.classList.add('hidden');
       errorDisplay.textContent = '';
-      alert("Login staff berhasil");
+      alert("Login staff berhasil!");
 
     } catch (err) {
       console.error("Login gagal:", err);
@@ -614,7 +616,7 @@
     }
   });
 
-  // Logout
+  // Tombol logout staff
   document.getElementById('staffLogoutButton')?.addEventListener('click', async () => {
     try {
       await auth.signOut();
@@ -627,6 +629,7 @@
     }
   });
 </script>
+
 
 </body>
 </html>
