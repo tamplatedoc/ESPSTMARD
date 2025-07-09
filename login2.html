@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register - AMDF.GROUP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-start: #0a0a0f;
+            --background-end: #1a1a2e;
+            --form-background: #1f2038;
+            --input-background: #282a46;
+            --text-color: #e0e0e0;
+            --accent-color: #8c7ae6;
+            --gradient-1-start: #8c7ae6;
+            --gradient-1-end: #6c5ce7;
+            --border-color: #3f425b;
+            --light-mode-background-start: #e0e0e0;
+            --light-mode-background-end: #f0f0f0;
+            --light-mode-form-background: #ffffff;
+            --light-mode-input-background: #f8f8f8;
+            --light-mode-text-color: #333333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
+            color: var(--light-mode-text-color);
+        }
+
+        .container {
+            background-color: var(--form-background);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        body.light-mode .container {
+            background-color: var(--light-mode-form-background);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .container h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2em;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(140, 122, 230, 0.6);
+        }
+
+        body.light-mode .container h1 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+        }
+
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.1em;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .tab-button:hover {
+            color: var(--accent-color);
+        }
+
+        .tab-button.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            font-weight: bold;
+        }
+
+        body.light-mode .tab-button {
+            color: var(--light-mode-text-color);
+        }
+
+        body.light-mode .tab-button.active {
+            color: var(--light-mode-text-color);
+            border-bottom: 2px solid var(--light-mode-text-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group input[type="text"],
+        .form-group input[type="tel"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-background);
+            color: var(--text-color);
+            font-size: 1em;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        body.light-mode .form-group input {
+            background-color: var(--light-mode-input-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--light-mode-text-color);
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(140, 122, 230, 0.4);
+            outline: none;
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(140, 122, 230, 0.5);
+        }
+
+        .back-to-home {
+            display: block;
+            margin-top: 25px;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.2s ease;
+        }
+
+        .back-to-home:hover {
+            color: #a29bfe;
+        }
+
+        body.light-mode .back-to-home {
+            color: var(--light-mode-text-color);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+
+            .container h1 {
+                font-size: 1.8em;
+            }
+
+            .tab-button {
+                font-size: 1em;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Creator Access</h1>
+
+        <div class="tab-buttons">
+            <button class="tab-button active" id="loginTab">Login</button>
+            <button class="tab-button" id="registerTab">Register</button>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input type="email" id="loginEmail" placeholder="your.email@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPin">Custom PIN</label>
+                <input type="password" id="loginPin" placeholder="Your 6-digit PIN" pattern="\d{6}" maxlength="6" required>
+            </div>
+            <button type="submit">Login as Creator</button>
+        </form>
+
+        <form id="registerForm" style="display: none;">
+            <div class="form-group">
+                <label for="registerEmail">Email Address</label>
+                <input type="email" id="registerEmail" placeholder="your.email@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="registerPin">Custom PIN (6 Digits)</label>
+                <input type="password" id="registerPin" placeholder="Choose a 6-digit PIN" pattern="\d{6}" maxlength="6" required>
+                <small style="color: #ccc;">* PIN must be exactly 6 digits.</small>
+            </div>
+            <div class="form-group">
+                <label for="authorName">Author Name</label>
+                <input type="text" id="authorName" placeholder="Your creative pseudonym" required>
+            </div>
+            <div class="form-group">
+                <label for="whatsappNumber">WhatsApp Number</label>
+                <input type="tel" id="whatsappNumber" placeholder="+62 812 3456 7890" pattern="^\+?[0-9\s\-]{8,15}$" required>
+                <small style="color: #ccc;">* Include country code (e.g., +62).</small>
+            </div>
+            <button type="submit">Register as Creator</button>
+        </form>
+
+        <a href="/" class="back-to-home">Back to Home Catalog</a>
+        <button id="themeToggle" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5em; cursor: pointer;">💡</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+        // === KONFIGURASI DAN INISIALISASI FIREBASE ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+            authDomain: "tamplatedoc.firebaseapp.com",
+            databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "tamplatedoc",
+            storageBucket: "tamplatedoc.firebasestorage.app",
+            messagingSenderId: "264966107720",
+            appId: "1:264966107720:web:da19f6109e71390740de7d",
+            measurementId: "G-PFK8VQBFCV"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // === THEME TOGGLE ===
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.classList.add(savedTheme);
+            themeToggle.textContent = savedTheme === 'light-mode' ? '🌙' : '💡';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark-mode');
+                themeToggle.textContent = '💡';
+            } else {
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light-mode');
+                themeToggle.textContent = '🌙';
+            }
+        });
+
+        // === TAB SWITCHING LOGIC ===
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        });
+
+        // === REGISTER FORM SUBMISSION ===
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('registerEmail').value;
+            const pin = document.getElementById('registerPin').value; // Ini akan menjadi password di Firebase Auth
+            const authorName = document.getElementById('authorName').value;
+            const whatsappNumber = document.getElementById('whatsappNumber').value;
+
+            // Basic validation
+            if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+                alert('PIN must be exactly 6 digits.');
+                return;
+            }
+
+            try {
+                // 1. Buat pengguna di Firebase Authentication
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pin);
+                const user = userCredential.user;
+                const firebaseAuthUid = user.uid; // Ini adalah User ID unik dari Firebase Auth
+
+                // 2. Buat Creator ID kustom (4 karakter)
+                function generateCreatorId() {
+                    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    let result = '';
+                    for (let i = 0; i < 4; i++) {
+                        result += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    return result;
+                }
+                const creatorId = generateCreatorId();
+
+                // 3. Simpan data kreator tambahan di Firestore menggunakan firebaseAuthUid sebagai ID dokumen
+                // Ini akan menautkan data profil dengan akun autentikasi Firebase
+                await db.collection('authors').doc(firebaseAuthUid).set({
+                    creatorId: creatorId, // ID kustom Anda
+                    name: authorName,
+                    email: email, // Simpan juga email di Firestore untuk kemudahan pencarian
+                    whatsapp: whatsappNumber,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isBlocked: false // Status awal, bisa diubah oleh Staff
+                });
+
+                alert('Registration successful! Your custom Creator ID is: ' + creatorId + '. Please remember your Email and PIN.');
+                // Redirect ke halaman kreator setelah registrasi berhasil
+                // Anda akan meneruskan firebaseAuthUid, bukan creatorId kustom, untuk keamanan.
+                window.location.href = `/creator.html?uid=${firebaseAuthUid}`;
+
+            } catch (error) {
+                console.error('Registration failed:', error);
+                let errorMessage = 'Registration failed. Please try again.';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'This email address is already registered.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'PIN is too weak (min 6 characters).'; // Firebase Auth enforces min 6 chars
+                }
+                alert(errorMessage + ' Error: ' + error.message);
+            }
+        });
+
+        // === LOGIN FORM SUBMISSION ===
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const pin = document.getElementById('loginPin').value; // Ini adalah password di Firebase Auth
+
+            // Basic validation
+            if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+                alert('PIN must be exactly 6 digits.');
+                return;
+            }
+
+            try {
+                // 1. Lakukan login dengan Firebase Authentication
+                const userCredential = await auth.signInWithEmailAndPassword(email, pin);
+                const user = userCredential.user;
+                const firebaseAuthUid = user.uid;
+
+                // 2. Ambil data kreator tambahan dari Firestore berdasarkan firebaseAuthUid
+                const authorDoc = await db.collection('authors').doc(firebaseAuthUid).get();
+
+                if (!authorDoc.exists) {
+                    // Ini bisa terjadi jika pengguna terautentikasi tetapi tidak ada data profil penulis di Firestore
+                    // Mungkin perlu tindakan lebih lanjut atau error handling
+                    console.warn("Author profile not found for authenticated user:", firebaseAuthUid);
+                    alert("Login successful, but author profile not found. Contact support.");
+                    // Mungkin tetap redirect ke dashboard, tetapi dengan peringatan
+                    window.location.href = `/creator.html?uid=${firebaseAuthUid}`;
+                    return;
+                }
+
+                const authorData = authorDoc.data();
+
+                // Cek apakah kreator diblokir
+                if (authorData.isBlocked) {
+                    await auth.signOut(); // Logout jika diblokir
+                    alert('Your account has been blocked. Please contact staff for more information.');
+                    return;
+                }
+
+                alert('Login successful! Welcome, ' + authorData.name || authorData.creatorId || 'Creator!');
+                // Redirect ke halaman kreator setelah login berhasil
+                // Penting: Teruskan firebaseAuthUid, bukan creatorId kustom, untuk otorisasi yang lebih aman.
+             window.location.href = `/ESPSTMARD/staff.html ;
+
+
+
+            } catch (error) {
+                console.error('Login failed:', error);
+                let errorMessage = 'Login failed. Please check your email and PIN.';
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = 'Invalid email or PIN.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address format.';
+                }
+                alert(errorMessage + ' Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
