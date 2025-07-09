@@ -152,10 +152,34 @@
         </form>
     </div>
 
-    <!-- Load Firebase SDK dengan async untuk menghindari blocking -->
-    <script async src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script async src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-    <script async src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+    <!-- Gunakan satu dari dua opsi berikut: -->
+
+    <!-- Opsi 1: Compat SDK (Rekomendasi untuk browser compatibility) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <!-- Opsi 2: Modern SDK (untuk browser modern) -->
+    <!--
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Inisialisasi Firebase
+        const app = initializeApp({
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        });
+
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+    </script>
+    -->
 
     <script>
         // Tambahkan error handling untuk memudahkan debugging
@@ -166,16 +190,14 @@
         // Inisialisasi Firebase setelah semua SDK dimuat
         document.addEventListener('DOMContentLoaded', function() {
             // Konfigurasi Firebase
-           const firebaseConfig = {
-  apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-  authDomain: "tamplatedoc.firebaseapp.com",
-  databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "tamplatedoc",
-  storageBucket: "tamplatedoc.firebasestorage.app",
-  messagingSenderId: "264966107720",
-  appId: "1:264966107720:web:da19f6109e71390740de7d",
-  measurementId: "G-PFK8VQBFCV"
-};
+            const firebaseConfig = {
+                apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+                authDomain: "tamplatedoc.firebaseapp.com",
+                projectId: "tamplatedoc",
+                storageBucket: "tamplatedoc.firebasestorage.app",
+                messagingSenderId: "264966107720",
+                appId: "1:264966107720:web:da19f6109e71390740de7d"
+            };
 
             // Inisialisasi Firebase dengan error handling
             try {
