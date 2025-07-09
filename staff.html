@@ -565,15 +565,14 @@ const firebaseConfig = {
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // Check staff login status
-        auth.onAuthStateChanged(user => {
-            if (!user) {
-                // No user is signed in, redirect to login
-                window.location.href = '/ESPSTMARD/login2.html'; // Assuming your login page is login.html
-            }
-            // Optionally, check if the logged-in user has staff privileges
-            // You might have a 'roles' collection or a custom claim for staff
-        });
+// Ubah fungsi pertama untuk menggunakan login2.html
+auth.onAuthStateChanged(user => {
+    if (!user) {
+        window.location.href = '/ESPSTMARD/login2.html';
+    }
+});
+
+
 
         // Light/Dark Mode (re-used for consistency)
         const body = document.body;
@@ -582,17 +581,17 @@ const firebaseConfig = {
             body.classList.add(savedTheme);
         }
 
-        // Logout functionality
-        document.getElementById('staffLogoutButton').addEventListener('click', async () => {
-            try {
-                await auth.signOut();
-                alert('Staff logging out...');
-                window.location.href = '/ESPSTMARD/login2.html'; // Redirect to login page
-            } catch (error) {
-                console.error("Error signing out:", error);
-                alert("Error logging out: " + error.message);
-            }
-        });
+// Fungsi kedua sudah benar, tidak perlu diubah
+document.getElementById('staffLogoutButton').addEventListener('click', async () => {
+    try {
+        await auth.signOut();
+        alert('Staff logging out...');
+        window.location.href = '/ESPSTMARD/login2.html';
+    } catch (error) {
+        console.error("Error signing out:", error);
+        alert("Error logging out: " + error.message);
+    }
+});
 
         // Search Forms Handlers
 
