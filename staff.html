@@ -569,7 +569,7 @@ const firebaseConfig = {
         auth.onAuthStateChanged(user => {
             if (!user) {
                 // No user is signed in, redirect to login
-                window.location.href = '/ESPSTMARD/login.html'; // Assuming your login page is login.html
+                window.location.href = '/ESPSTMARD/login2.html'; // Assuming your login page is login.html
             }
             // Optionally, check if the logged-in user has staff privileges
             // You might have a 'roles' collection or a custom claim for staff
@@ -587,7 +587,7 @@ const firebaseConfig = {
             try {
                 await auth.signOut();
                 alert('Staff logging out...');
-                window.location.href = '/ESPSTMARD/login.html'; // Redirect to login page
+                window.location.href = '/ESPSTMARD/login2.html'; // Redirect to login page
             } catch (error) {
                 console.error("Error signing out:", error);
                 alert("Error logging out: " + error.message);
