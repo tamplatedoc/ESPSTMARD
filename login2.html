@@ -358,7 +358,7 @@
                 alert('Registration successful! Your custom Creator ID is: ' + creatorId + '. Please remember your Email and PIN.');
                 // Redirect ke halaman kreator setelah registrasi berhasil
                 // Anda akan meneruskan firebaseAuthUid, bukan creatorId kustom, untuk keamanan.
-                window.location.href = `/creator.html?uid=${firebaseAuthUid}`;
+                window.location.href = '/ESPSTMARD/staff.html';
 
             } catch (error) {
                 console.error('Registration failed:', error);
@@ -400,7 +400,7 @@
                     console.warn("Author profile not found for authenticated user:", firebaseAuthUid);
                     alert("Login successful, but author profile not found. Contact support.");
                     // Mungkin tetap redirect ke dashboard, tetapi dengan peringatan
-                    window.location.href = `/creator.html?uid=${firebaseAuthUid}`;
+                    window.location.href = '/ESPSTMARD/login2.html';
                     return;
                 }
 
@@ -416,7 +416,7 @@
                 alert('Login successful! Welcome, ' + authorData.name || authorData.creatorId || 'Creator!');
                 // Redirect ke halaman kreator setelah login berhasil
                 // Penting: Teruskan firebaseAuthUid, bukan creatorId kustom, untuk otorisasi yang lebih aman.
-             window.location.href = `/ESPSTMARD/staff.html ;
+             window.location.href = `/ESPSTMARD/staff.html';
 
 
 
