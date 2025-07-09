@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMDF Staff Control Panel</title>
+    <title>Staff Control Panel - AMDF.GROUP</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -17,10 +17,19 @@
             --gradient-1-start: #8c7ae6;
             --gradient-1-end: #6c5ce7;
             --border-color: #3f425b;
-            --status-under-review: #fbc531;
-            --status-approved-blue: #2980b9;
-            --status-error-data-breach: #e74c3c;
-            --status-published: #27ae60;
+            --light-mode-background-start: #e0e0e0;
+            --light-mode-background-end: #f0f0f0;
+            --light-mode-container-background: #ffffff;
+            --light-mode-input-background: #f8f8f8;
+            --light-mode-text-color: #333333;
+
+            /* Status Colors */
+            --status-under-review: #fbc531; /* yellow */
+            --status-approved-blue: #2980b9;    /* blue */
+            --status-error-data-breach: #e74c3c; /* red */
+            --status-published: #27ae60;    /* green */
+
+            /* Action Colors */
             --approve-color: #27ae60;
             --block-color: #e74c3c;
             --edit-color: #fbc531;
@@ -39,45 +48,9 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        .login-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .login-box {
-            background: var(--container-background);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-color);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            background-color: var(--input-background);
-            color: var(--text-color);
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
+            color: var(--light-mode-text-color);
         }
 
         header {
@@ -102,7 +75,7 @@
         }
 
         header .logout-button {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            background: linear-gradient(45deg, #e74c3c, #c0392b); /* Red for logout */
             color: white;
             padding: 8px 15px;
             border-radius: 5px;
@@ -118,6 +91,11 @@
             box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
         }
 
+        body.light-mode header {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
         main {
             flex-grow: 1;
             padding: 20px;
@@ -129,6 +107,12 @@
             border: 1px solid var(--border-color);
         }
 
+        body.light-mode main {
+            background-color: var(--light-mode-container-background);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
         h1 {
             font-family: 'Orbitron', sans-serif;
             font-size: 2.5em;
@@ -136,6 +120,11 @@
             text-align: center;
             margin-bottom: 30px;
             text-shadow: 0 0 12px rgba(140, 122, 230, 0.7);
+        }
+
+        body.light-mode h1 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
         }
 
         .section-title {
@@ -148,6 +137,11 @@
             border-bottom: 1px solid var(--border-color);
             text-shadow: 0 0 5px rgba(140, 122, 230, 0.3);
         }
+        body.light-mode .section-title {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
 
         .search-section, .review-queue-section {
             padding: 20px;
@@ -156,6 +150,11 @@
             border-radius: 10px;
             background-color: var(--input-background);
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        body.light-mode .search-section, body.light-mode .review-queue-section {
+            background-color: var(--light-mode-input-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: none;
         }
 
         .search-form {
@@ -174,6 +173,11 @@
             font-size: 1em;
             outline: none;
         }
+        body.light-mode .search-form input {
+            background-color: var(--light-mode-container-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--light-mode-text-color);
+        }
 
         .search-form button {
             background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
@@ -185,9 +189,16 @@
             font-weight: bold;
             transition: transform 0.2s ease;
         }
-
         .search-form button:hover {
             transform: translateY(-2px);
+        }
+
+        .search-results {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+        body.light-mode .search-results {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .result-item {
@@ -201,12 +212,20 @@
             gap: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+        body.light-mode .result-item {
+            background-color: var(--light-mode-container-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
         .result-item h3 {
             margin: 0 0 5px 0;
             color: var(--accent-color);
             font-family: 'Orbitron', sans-serif;
             font-size: 1.2em;
+        }
+        body.light-mode .result-item h3 {
+            color: var(--light-mode-text-color);
         }
 
         .result-item p {
@@ -230,7 +249,6 @@
             font-weight: bold;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
         .result-actions button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -239,7 +257,7 @@
         .result-actions .btn-block { background-color: var(--block-color); }
         .result-actions .btn-unblock { background-color: var(--approve-color); }
         .result-actions .btn-delete { background-color: var(--delete-color); }
-        .result-actions .btn-edit { background-color: var(--edit-color); color: black; }
+        .result-actions .btn-edit { background-color: var(--edit-color); color: black;} /* Edit for story could be yellow/orange */
 
         .review-queue-list .review-item {
             background-color: var(--container-background);
@@ -251,9 +269,17 @@
             transition: background-color 0.2s ease;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+        body.light-mode .review-queue-list .review-item {
+            background-color: var(--light-mode-container-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
         .review-queue-list .review-item:hover {
             background-color: #282a46;
+        }
+        body.light-mode .review-queue-list .review-item:hover {
+            background-color: #f0f0f0;
         }
 
         .review-queue-list .review-item h3 {
@@ -261,25 +287,32 @@
             color: var(--accent-color);
             font-family: 'Orbitron', sans-serif;
         }
+        body.light-mode .review-queue-list .review-item h3 {
+            color: var(--light-mode-text-color);
+        }
 
         .review-queue-list .review-item p {
             margin: 0;
             font-size: 0.9em;
             color: #ccc;
         }
+        body.light-mode .review-queue-list .review-item p {
+            color: var(--light-mode-text-color);
+        }
+
 
         .story-review-modal {
-            display: none;
-            position: fixed;
-            top: 0;
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
             left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.8);
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
             justify-content: center;
             align-items: center;
-            z-index: 1001;
         }
 
         .modal-content {
@@ -292,8 +325,13 @@
             max-width: 800px;
             position: relative;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: 90vh; /* Limit height to allow scrolling */
+            overflow-y: auto; /* Enable scrolling within modal */
+        }
+        body.light-mode .modal-content {
+            background-color: var(--light-mode-container-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
         .modal-content h2 {
@@ -303,14 +341,26 @@
             text-align: center;
             text-shadow: 0 0 8px rgba(140, 122, 230, 0.3);
         }
+        body.light-mode .modal-content h2 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+        }
 
         .modal-content img {
             width: 100%;
             max-height: 300px;
-            object-fit: contain;
+            object-fit: contain; /* Changed to contain to prevent cropping for review */
             border-radius: 8px;
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
+        }
+        body.light-mode .modal-content img {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content p {
+            margin-bottom: 10px;
+            line-height: 1.6;
         }
 
         .modal-actions {
@@ -329,7 +379,6 @@
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
         .modal-actions button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
@@ -348,7 +397,6 @@
             cursor: pointer;
             transition: color 0.2s ease;
         }
-
         .close-button:hover,
         .close-button:focus {
             color: var(--accent-color);
@@ -377,85 +425,188 @@
             color: var(--accent-color);
         }
 
+        body.light-mode footer {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode footer nav a {
+            color: var(--light-mode-text-color);
+        }
+
+        /* Staff Login Specific Styles */
+        .staff-login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 100px); /* Adjust based on header/footer height */
+            margin-top: -60px; /* Counteract header height */
+        }
+
+        .staff-login-form-card {
+            background-color: var(--container-background);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        body.light-mode .staff-login-form-card {
+            background-color: var(--light-mode-container-background);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .staff-login-form-card h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(140, 122, 230, 0.5);
+        }
+        body.light-mode .staff-login-form-card h2 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+        }
+
+        .staff-login-form-card label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        body.light-mode .staff-login-form-card label {
+            color: var(--light-mode-text-color);
+        }
+
+        .staff-login-form-card input[type="text"],
+        .staff-login-form-card input[type="password"] {
+            width: calc(100% - 22px); /* Account for padding and border */
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--input-background);
+            color: var(--text-color);
+            font-size: 1em;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        body.light-mode .staff-login-form-card input {
+            background-color: var(--light-mode-input-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--light-mode-text-color);
+        }
+
+        .staff-login-form-card input[type="text"]:focus,
+        .staff-login-form-card input[type="password"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(140, 122, 230, 0.6);
+        }
+
+        .staff-login-form-card button {
+            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+        .staff-login-form-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(140, 122, 230, 0.4);
+        }
+
+        .login-error {
+            color: var(--status-error-data-breach);
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* Hide elements based on login status */
+        .hidden {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             main {
                 padding: 15px;
                 margin: 15px auto;
             }
-            
+
             h1 {
                 font-size: 2em;
             }
-            
+
             .section-title {
                 font-size: 1.4em;
                 margin-top: 30px;
             }
-            
+
             .search-form {
                 flex-direction: column;
             }
-            
+
             .result-actions {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .modal-content {
                 width: 95%;
                 padding: 20px;
             }
-            
+
             .modal-actions {
                 flex-direction: column;
             }
-        }
 
-        .error-message {
-            color: var(--block-color);
-            text-align: center;
-            margin-top: 10px;
+            .staff-login-form-card {
+                padding: 30px;
+                margin: 0 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Login Container -->
-    <div id="staffLogin" class="login-container">
-        <div class="login-box">
-            <h2>Login Staff</h2>
-            <form id="staffLoginForm">
-                <div class="form-group">
-                    <label for="staffId">ID Staff</label>
-                    <input type="text" id="staffId" required>
-                </div>
-                <div class="form-group">
-                    <label for="staffPin">PIN</label>
-                    <input type="password" id="staffPin" required>
-                </div>
-                <button type="submit">Masuk</button>
-            </form>
-            <div id="loginError" class="error-message"></div>
-        </div>
-    </div>
-
-    <!-- Header -->
     <header>
         <a href="#" class="logo">AMDF STAFF</a>
         <button class="logout-button" id="staffLogoutButton">Logout</button>
     </header>
 
-    <!-- Main Content -->
-    <main>
+    <div id="staffLogin" class="staff-login-container">
+        <div class="staff-login-form-card">
+            <h2>Staff Login</h2>
+            <form id="staffLoginForm">
+                <label for="staffId">Staff ID:</label>
+                <input type="text" id="staffId" placeholder="Enter your Staff ID" required>
+
+                <label for="staffPin">PIN:</label>
+                <input type="password" id="staffPin" placeholder="Enter your PIN" required>
+
+                <button type="submit">Login</button>
+                <p id="loginError" class="login-error"></p>
+            </form>
+        </div>
+    </div>
+
+    <main id="staffControlPanel" class="hidden">
         <h1>Staff Control Panel</h1>
-        
-        <!-- Search Sections -->
+
         <section class="search-section">
             <h2 class="section-title">Creator Search</h2>
             <form class="search-form" id="creatorSearchForm">
                 <input type="text" id="searchCreatorId" placeholder="Enter Creator ID" required>
                 <button type="submit">Search Creator</button>
             </form>
-            <div class="search-results" id="creatorSearchResults"></div>
+            <div class="search-results" id="creatorSearchResults">
+            </div>
         </section>
 
         <section class="search-section">
@@ -464,7 +615,8 @@
                 <input type="text" id="searchStoryId" placeholder="Enter Story ID" required>
                 <button type="submit">Search Story</button>
             </form>
-            <div class="search-results" id="storySearchResults"></div>
+            <div class="search-results" id="storySearchResults">
+            </div>
         </section>
 
         <section class="search-section">
@@ -473,34 +625,27 @@
                 <input type="text" id="searchCommentId" placeholder="Enter Comment ID" required>
                 <button type="submit">Search Comment</button>
             </form>
-            <div class="search-results" id="commentSearchResults"></div>
+            <div class="search-results" id="commentSearchResults">
+            </div>
         </section>
 
-        <!-- Review Queue -->
         <section class="review-queue-section">
             <h2 class="section-title">Story Review Queue</h2>
-            <div class="review-queue-list" id="reviewQueueList"></div>
+            <div class="review-queue-list" id="reviewQueueList">
+                <div class="review-item" data-story-id="250710EFGH5">
+                    <h3>The Crystal Cave (250710EFGH5)</h3>
+                    <p>Author: Mystery Writer (EFGH)</p>
+                    <p>Status: Under Review</p>
+                </div>
+                <div class="review-item" data-story-id="250711IJKL8">
+                    <h3>Rise of the AI (250711IJKL8)</h3>
+                    <p>Author: Tech Guru (IJKL)</p>
+                    <p>Status: Under Review</p>
+                </div>
+            </div>
         </section>
     </main>
 
-    <!-- Modal -->
-    <div id="storyReviewModal" class="story-review-modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="modalStoryTitle">Story Title</h2>
-            <p><strong>Author:</strong> <span id="modalStoryAuthor"></span> (<span id="modalCreatorId"></span>)</p>
-            <p><strong>Genre:</strong> <span id="modalStoryGenre"></span></p>
-            <img id="modalStoryThumbnail" src="" alt="Story Thumbnail">
-            <div id="modalStoryContent" style="white-space: pre-wrap; margin-bottom: 20px;"></div>
-            <p><strong>Story ID:</strong> <span id="modalStoryId"></span></p>
-            <div class="modal-actions">
-                <button class="btn-approve" id="approveStoryBtn">Approve Story</button>
-                <button class="btn-error" id="errorStoryBtn">Error Data Breach</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer>
         <nav>
             <a href="/about">About Us</a>
@@ -511,125 +656,522 @@
         <p>&copy; AMDF.GROUP</p>
     </footer>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <div id="storyReviewModal" class="story-review-modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalStoryTitle">Story Title</h2>
+            <p><strong>Author:</strong> <span id="modalStoryAuthor"></span> (<span id="modalCreatorId"></span>)</p>
+            <p><strong>Genre:</strong> <span id="modalStoryGenre"></span></p>
+            <img id="modalStoryThumbnail" src="" alt="Story Thumbnail">
+            <div id="modalStoryContent" style="white-space: pre-wrap; margin-bottom: 20px;"></div>
+            <p><strong>Story ID:</strong> <span id="modalStoryId"></span></p>
 
-<script>
-  // Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-    authDomain: "tamplatedoc.firebaseapp.com",
-    databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "tamplatedoc",
-    storageBucket: "tamplatedoc.firebasestorage.app",
-    messagingSenderId: "264966107720",
-    appId: "1:264966107720:web:da19f6109e71390740de7d",
-    measurementId: "G-PFK8VQBFCV"
-  };
+            <div class="modal-actions">
+                <button class="btn-approve" id="approveStoryBtn">Approve Story</button>
+                <button class="btn-error" id="errorStoryBtn">Error Data Breach</button>
+            </div>
+        </div>
+    </div>
 
-  // Inisialisasi Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  const storage = firebase.storage();
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
-  // ID dan PIN staff (client-side validasi)
-  const validStaffCredentials = {
-    'AMDF067': '200716',
-    'NBLA025': '700261'
-  };
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+            authDomain: "tamplatedoc.firebaseapp.com",
+            databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "tamplatedoc",
+            storageBucket: "tamplatedoc.firebasestorage.app",
+            messagingSenderId: "264966107720",
+            appId: "1:264966107720:web:da19f6109e71390740de7d",
+            measurementId: "G-PFK8VQBFCV"
+        };
 
-  // Endpoint Cloud Function
-  const cloudFunctionURL = "https://us-central1-tamplatedoc.cloudfunctions.net/createCustomToken";
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
-  // Cek sesi saat halaman dimuat
-  document.addEventListener('DOMContentLoaded', () => {
-    const session = JSON.parse(localStorage.getItem('staffSession') || 'null');
-    if (session && session.expiresAt > Date.now()) {
-      console.log("Staff login aktif:", session.staffId);
-      document.getElementById('staffLogin')?.classList.add('hidden');
-    } else {
-      localStorage.removeItem('staffSession');
-      document.getElementById('staffLogin')?.classList.remove('hidden');
-    }
-  });
+        // --- DOM Elements ---
+        const staffLoginSection = document.getElementById('staffLogin');
+        const staffControlPanel = document.getElementById('staffControlPanel');
+        const staffLoginForm = document.getElementById('staffLoginForm');
+        const staffIdInput = document.getElementById('staffId');
+        const staffPinInput = document.getElementById('staffPin');
+        const loginErrorDisplay = document.getElementById('loginError');
+        const staffLogoutButton = document.getElementById('staffLogoutButton');
 
-  // Validasi ID & PIN staff
-  async function validateStaffPin(staffId, pin) {
-    if (!validStaffCredentials[staffId] || validStaffCredentials[staffId] !== pin) {
-      return { isValid: false, error: 'ID atau PIN tidak valid' };
-    }
-    return { isValid: true };
-  }
+        // ID and PIN staff (client-side validation - for a quick check before hitting Cloud Function)
+        const validStaffCredentials = {
+            'AMDF067': '200716',
+            'NBLA025': '700261'
+        };
 
-  // Submit login staff
-  document.getElementById('staffLoginForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const staffId = document.getElementById('staffId').value.trim();
-    const pin = document.getElementById('staffPin').value.trim();
-    const errorDisplay = document.getElementById('loginError');
+        // Cloud Function Endpoint (ensure your Cloud Function has CORS enabled for your GitHub Pages domain)
+        const cloudFunctionURL = "https://us-central1-tamplatedoc.cloudfunctions.net/createCustomToken";
 
-    if (!staffId || !pin) {
-      errorDisplay.textContent = 'Mohon isi semua kolom.';
-      return;
-    }
+        // --- Session Management ---
+        function setStaffSession(uid, staffId, expiresInMinutes) {
+            const expiresAt = Date.now() + (expiresInMinutes * 60 * 1000); // Convert minutes to milliseconds
+            const session = { uid, staffId, expiresAt };
+            localStorage.setItem('staffSession', JSON.stringify(session));
+        }
 
-    try {
-      const validation = await validateStaffPin(staffId, pin);
-      if (!validation.isValid) throw new Error(validation.error);
+        function getStaffSession() {
+            const sessionString = localStorage.getItem('staffSession');
+            if (!sessionString) return null;
+            const session = JSON.parse(sessionString);
+            if (session.expiresAt && session.expiresAt > Date.now()) {
+                return session;
+            }
+            localStorage.removeItem('staffSession'); // Session expired
+            return null;
+        }
 
-      // Minta custom token ke Cloud Function
-      const response = await fetch(cloudFunctionURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ staffId, isValidated: true })
-      });
+        function clearStaffSession() {
+            localStorage.removeItem('staffSession');
+            auth.signOut().catch(err => console.error("Firebase signOut error:", err));
+        }
 
-      if (!response.ok) {
-        throw new Error("Gagal membuat token. Error " + response.status);
-      }
+        function renderUIBasedOnSession() {
+            const session = getStaffSession();
+            if (session) {
+                console.log("Staff login aktif:", session.staffId);
+                staffLoginSection.classList.add('hidden');
+                staffControlPanel.classList.remove('hidden');
+                // You might want to update a welcome message with staffId here
+            } else {
+                staffLoginSection.classList.remove('hidden');
+                staffControlPanel.classList.add('hidden');
+            }
+        }
 
-      const { token } = await response.json();
+        // --- Event Listeners ---
 
-      // Login ke Firebase pakai token
-      const userCredential = await auth.signInWithCustomToken(token);
+        // Check session when page loads
+        document.addEventListener('DOMContentLoaded', renderUIBasedOnSession);
 
-      // Simpan sesi login di localStorage
-      const session = {
-        uid: userCredential.user.uid,
-        staffId: staffId,
-        isValidated: true,
-        expiresAt: Date.now() + (30 * 60 * 1000) // 30 menit
-      };
-      localStorage.setItem('staffSession', JSON.stringify(session));
+        // Staff Login Submit Handler
+        staffLoginForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const staffId = staffIdInput.value.trim();
+            const pin = staffPinInput.value.trim();
+            loginErrorDisplay.textContent = ''; // Clear previous errors
 
-      document.getElementById('staffLogin')?.classList.add('hidden');
-      errorDisplay.textContent = '';
-      alert("Login staff berhasil!");
+            if (!staffId || !pin) {
+                loginErrorDisplay.textContent = 'Mohon isi semua kolom.';
+                return;
+            }
 
-    } catch (err) {
-      console.error("Login gagal:", err);
-      errorDisplay.textContent = err.message;
-    }
-  });
+            // Client-side PIN validation (first layer of defense)
+            if (!validStaffCredentials[staffId] || validStaffCredentials[staffId] !== pin) {
+                loginErrorDisplay.textContent = 'ID atau PIN tidak valid.';
+                return;
+            }
 
-  // Tombol logout staff
-  document.getElementById('staffLogoutButton')?.addEventListener('click', async () => {
-    try {
-      await auth.signOut();
-      localStorage.removeItem('staffSession');
-      alert('Logout berhasil');
-      window.location.href = '/ESPSTMARD/login.html';
-    } catch (err) {
-      console.error("Logout error:", err);
-      alert("Gagal logout: " + err.message);
-    }
-  });
-</script>
+            try {
+                // Request custom token from Cloud Function
+                const response = await fetch(cloudFunctionURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ staffId }) // Send staffId to Cloud Function
+                });
 
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: "Unknown error from server." }));
+                    throw new Error(`Gagal membuat token: ${errorData.message || response.statusText}`);
+                }
 
+                const { token } = await response.json();
+                if (!token) {
+                    throw new Error("Token tidak diterima dari server.");
+                }
+
+                // Sign in to Firebase with the custom token
+                const userCredential = await auth.signInWithCustomToken(token);
+                console.log("Firebase login successful!", userCredential.user);
+
+                // Store session (e.g., 30 minutes)
+                setStaffSession(userCredential.user.uid, staffId, 30);
+
+                // Update UI after successful login
+                renderUIBasedOnSession();
+                alert("Login staff berhasil!");
+
+                // Clear form fields
+                staffIdInput.value = '';
+                staffPinInput.value = '';
+
+            } catch (err) {
+                console.error("Login gagal:", err);
+                loginErrorDisplay.textContent = `Login gagal: ${err.message || 'Terjadi kesalahan.'}`;
+            }
+        });
+
+        // Staff Logout Button Handler
+        staffLogoutButton?.addEventListener('click', async () => {
+            try {
+                await auth.signOut(); // Sign out from Firebase
+                clearStaffSession(); // Clear local storage session
+                alert('Logout berhasil!');
+                renderUIBasedOnSession(); // Show login form, hide control panel
+            } catch (err) {
+                console.error("Logout error:", err);
+                alert("Gagal logout: " + err.message);
+            }
+        });
+
+        // Light/Dark Mode (re-used for consistency)
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.classList.add(savedTheme);
+        }
+
+        // Search Forms Handlers (Existing logic, ensure it interacts with Firebase correctly)
+        // These are currently using mock data. You will need to replace them with actual Firebase Firestore/Realtime Database queries.
+
+        document.getElementById('creatorSearchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const creatorId = document.getElementById('searchCreatorId').value.trim();
+            const resultsDiv = document.getElementById('creatorSearchResults');
+            resultsDiv.innerHTML = 'Searching...';
+
+            // --- Replace with actual Firebase Firestore fetch ---
+            try {
+                // Example: Fetch creator data from Firestore
+                const creatorDoc = await db.collection('creators').doc(creatorId).get();
+                if (creatorDoc.exists) {
+                    const creator = creatorDoc.data();
+                    const storiesSnapshot = await db.collection('stories').where('creatorId', '==', creatorId).get();
+                    const storiesHtml = storiesSnapshot.docs.map(doc => {
+                        const story = doc.data();
+                        return `${story.title} (${story.status.charAt(0).toUpperCase() + story.status.slice(1)})`;
+                    }).join(', ');
+
+                    resultsDiv.innerHTML = `
+                        <div class="result-item">
+                            <h3>Creator: ${creator.name || 'N/A'} (${creatorId})</h3>
+                            <p>Email: ${creator.email || 'N/A'}</p>
+                            <p>WhatsApp: ${creator.whatsapp || 'N/A'}</p>
+                            <p>Stories: ${storiesHtml || 'No stories found.'}</p>
+                            <div class="result-actions">
+                                <button class="btn-block" ${creator.isBlocked ? 'style="display:none;"' : ''} data-creator-id="${creatorId}">Block Access</button>
+                                <button class="btn-unblock" ${!creator.isBlocked ? 'style="display:none;"' : ''} data-creator-id="${creatorId}">Unblock Access</button>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.querySelector('.btn-block')?.addEventListener('click', (btnE) => handleCreatorBlock(btnE.target.dataset.creatorId, true));
+                    resultsDiv.querySelector('.btn-unblock')?.addEventListener('click', (btnE) => handleCreatorBlock(btnE.target.dataset.creatorId, false));
+                } else {
+                    resultsDiv.innerHTML = '<p>Creator not found.</p>';
+                }
+            } catch (error) {
+                console.error("Error searching creator:", error);
+                resultsDiv.innerHTML = '<p>Error searching creator. Please try again.</p>';
+            }
+        });
+
+        document.getElementById('storySearchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const storyId = document.getElementById('searchStoryId').value.trim();
+            const resultsDiv = document.getElementById('storySearchResults');
+            resultsDiv.innerHTML = 'Searching...';
+
+            // --- Replace with actual Firebase Firestore fetch ---
+            try {
+                const storyDoc = await db.collection('stories').doc(storyId).get();
+                if (storyDoc.exists) {
+                    const story = storyDoc.data();
+                    resultsDiv.innerHTML = `
+                        <div class="result-item">
+                            <h3>Story: ${story.title || 'N/A'} (${storyId})</h3>
+                            <p>Author: ${story.authorName || 'N/A'} (${story.creatorId || 'N/A'})</p>
+                            <p>Genre: ${story.genre || 'N/A'}</p>
+                            <p>Status: ${story.status ? story.status.charAt(0).toUpperCase() + story.status.slice(1) : 'N/A'}</p>
+                            <div class="result-actions">
+                                <button class="btn-edit" data-story-id="${storyId}">Edit Story</button>
+                                <button class="btn-delete" data-story-id="${storyId}">Delete Story</button>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.querySelector('.btn-edit')?.addEventListener('click', (btnE) => alert('Edit story ' + btnE.target.dataset.storyId + ' (functionality to be implemented)'));
+                    resultsDiv.querySelector('.btn-delete')?.addEventListener('click', (btnE) => handleDeleteStory(btnE.target.dataset.storyId));
+                } else {
+                    resultsDiv.innerHTML = '<p>Story not found.</p>';
+                }
+            } catch (error) {
+                console.error("Error searching story:", error);
+                resultsDiv.innerHTML = '<p>Error searching story. Please try again.</p>';
+            }
+        });
+
+        document.getElementById('commentSearchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const commentId = document.getElementById('searchCommentId').value.trim();
+            const resultsDiv = document.getElementById('commentSearchResults');
+            resultsDiv.innerHTML = 'Searching...';
+
+            // --- Replace with actual Firebase Firestore fetch ---
+            try {
+                const commentDoc = await db.collection('comments').doc(commentId).get(); // Assuming 'comments' collection
+                if (commentDoc.exists) {
+                    const comment = commentDoc.data();
+                    resultsDiv.innerHTML = `
+                        <div class="result-item">
+                            <h3>Comment ID: ${commentId}</h3>
+                            <p>Story ID: ${comment.storyId || 'N/A'}</p>
+                            <p>Content: "${comment.content || 'N/A'}"</p>
+                            <div class="result-actions">
+                                <button class="btn-delete" data-comment-id="${commentId}">Delete Comment</button>
+                            </div>
+                        </div>
+                    `;
+                    resultsDiv.querySelector('.btn-delete')?.addEventListener('click', (btnE) => handleDeleteComment(btnE.target.dataset.commentId));
+                } else {
+                    resultsDiv.innerHTML = '<p>Comment not found.</p>';
+                }
+            } catch (error) {
+                console.error("Error searching comment:", error);
+                resultsDiv.innerHTML = '<p>Error searching comment. Please try again.</p>';
+            }
+        });
+
+        // Handle Creator Block/Unblock
+        async function handleCreatorBlock(creatorId, blockStatus) {
+            console.log(`Attempting to ${blockStatus ? 'block' : 'unblock'} creator: ${creatorId}`);
+            if (confirm(`Are you sure you want to ${blockStatus ? 'block' : 'unblock'} creator ${creatorId}?`)) {
+                try {
+                    await db.collection('creators').doc(creatorId).update({ isBlocked: blockStatus });
+                    alert(`Creator ${creatorId} access ${blockStatus ? 'blocked' : 'unblocked'} successfully.`);
+                    document.getElementById('creatorSearchForm').requestSubmit(); // Refresh search results
+                } catch (error) {
+                    console.error("Error updating creator block status:", error);
+                    alert("Failed to update creator access: " + error.message);
+                }
+            }
+        }
+
+        // Handle Delete Story
+        async function handleDeleteStory(storyId) {
+            if (confirm(`Are you sure you want to delete story: ${storyId}? This action cannot be undone!`)) {
+                console.log(`Deleting story: ${storyId}`);
+                try {
+                    // Delete story thumbnail from Storage (if applicable)
+                    // const thumbnailRef = storage.ref().child(`story_thumbnails/${storyId}.jpg`); // Adjust path as needed
+                    // await thumbnailRef.delete().catch(err => console.warn("No thumbnail to delete or error deleting thumbnail:", err));
+
+                    // Delete story document from 'stories' collection
+                    await db.collection('stories').doc(storyId).delete();
+                    // Also delete from 'stories_under_review' if it exists there
+                    await db.collection('stories_under_review').doc(storyId).delete().catch(err => console.warn("Story not in review queue or error deleting from review queue:", err));
+
+                    alert(`Story ${storyId} deleted successfully.`);
+                    document.getElementById('storySearchForm').requestSubmit(); // Refresh
+                } catch (error) {
+                    console.error("Error deleting story:", error);
+                    alert("Failed to delete story: " + error.message);
+                }
+            }
+        }
+
+        // Handle Delete Comment
+        async function handleDeleteComment(commentId) {
+            if (confirm(`Are you sure you want to delete comment: ${commentId}?`)) {
+                console.log(`Deleting comment: ${commentId}`);
+                try {
+                    await db.collection('comments').doc(commentId).delete(); // Assuming 'comments' collection
+                    alert(`Comment ${commentId} deleted successfully.`);
+                    document.getElementById('commentSearchForm').requestSubmit(); // Refresh
+                } catch (error) {
+                    console.error("Error deleting comment:", error);
+                    alert("Failed to delete comment: " + error.message);
+                }
+            }
+        }
+
+        // Story Review Modal Logic
+        const storyReviewModal = document.getElementById('storyReviewModal');
+        const closeModalBtn = storyReviewModal.querySelector('.close-button');
+        const modalStoryTitle = document.getElementById('modalStoryTitle');
+        const modalStoryAuthor = document.getElementById('modalStoryAuthor');
+        const modalCreatorId = document.getElementById('modalCreatorId');
+        const modalStoryGenre = document.getElementById('modalStoryGenre');
+        const modalStoryThumbnail = document.getElementById('modalStoryThumbnail');
+        const modalStoryContent = document.getElementById('modalStoryContent');
+        const modalStoryId = document.getElementById('modalStoryId');
+        const approveStoryBtn = document.getElementById('approveStoryBtn');
+        const errorStoryBtn = document.getElementById('errorStoryBtn');
+
+        let currentReviewStory = null; // To hold the data of the story being reviewed
+
+        // Open modal when a review item is clicked
+        document.getElementById('reviewQueueList').addEventListener('click', async (e) => {
+            const reviewItem = e.target.closest('.review-item');
+            if (reviewItem) {
+                const storyId = reviewItem.dataset.storyId;
+                console.log('Fetching story for review:', storyId);
+
+                try {
+                    const storyDoc = await db.collection('stories_under_review').doc(storyId).get();
+                    if (storyDoc.exists) {
+                        currentReviewStory = storyDoc.data();
+                        modalStoryTitle.textContent = currentReviewStory.title;
+                        modalStoryAuthor.textContent = currentReviewStory.authorName;
+                        modalCreatorId.textContent = currentReviewStory.creatorId;
+                        modalStoryGenre.textContent = currentReviewStory.genre;
+                        modalStoryThumbnail.src = currentReviewStory.thumbnailUrl || 'https://via.placeholder.com/800x450/cccccc/000000?text=No+Thumbnail'; // Fallback
+                        modalStoryContent.innerHTML = currentReviewStory.content ? currentReviewStory.content.replace(/\n/g, '<p>') : 'No content available.'; // Display content with paragraphs
+                        modalStoryId.textContent = currentReviewStory.id;
+
+                        storyReviewModal.style.display = 'flex'; // Show the modal
+                    } else {
+                        alert("Story not found in review queue.");
+                        // Potentially refresh the queue if it was removed by another staff member
+                        fetchReviewQueue();
+                    }
+                } catch (error) {
+                    console.error("Error fetching story for review:", error);
+                    alert("Failed to load story for review: " + error.message);
+                }
+            }
+        });
+
+        // Close modal
+        closeModalBtn.addEventListener('click', () => {
+            storyReviewModal.style.display = 'none';
+            currentReviewStory = null; // Clear current story
+        });
+
+        // Close modal if user clicks outside of it
+        window.addEventListener('click', (event) => {
+            if (event.target === storyReviewModal) {
+                storyReviewModal.style.display = 'none';
+                currentReviewStory = null;
+            }
+        });
+
+        // Handle Approve Story
+        approveStoryBtn.addEventListener('click', async () => {
+            if (!currentReviewStory) return;
+
+            if (confirm(`Approve story "${currentReviewStory.title}"?`)) {
+                try {
+                    // Move story from 'stories_under_review' to 'stories' and set status to 'published'
+                    // Firestore transactions are good for this to ensure atomicity
+                    const batch = db.batch();
+
+                    const reviewStoryRef = db.collection('stories_under_review').doc(currentReviewStory.id);
+                    const mainStoryRef = db.collection('stories').doc(currentReviewStory.id);
+
+                    // Create the data for the main 'stories' collection
+                    const storyToPublish = {
+                        ...currentReviewStory,
+                        status: 'published', // Set status to published
+                        publishedAt: firebase.firestore.FieldValue.serverTimestamp(), // Add timestamp
+                        // Remove fields specific to review if any (e.g., staffNotes)
+                    };
+                    delete storyToPublish.whatsapp; // Assuming these are not needed in public 'stories'
+                    delete storyToPublish.email;
+
+                    batch.set(mainStoryRef, storyToPublish); // Use set to create or overwrite
+                    batch.delete(reviewStoryRef); // Delete from review queue
+
+                    await batch.commit();
+
+                    alert(`Story "${currentReviewStory.title}" approved and published!`);
+                    storyReviewModal.style.display = 'none';
+                    currentReviewStory = null;
+                    fetchReviewQueue(); // Refresh the review queue
+                } catch (error) {
+                    console.error("Error approving story:", error);
+                    alert("Failed to approve story: " + error.message);
+                }
+            }
+        });
+
+        // Handle Error Data Breach (or reject story)
+        errorStoryBtn.addEventListener('click', async () => {
+            if (!currentReviewStory) return;
+
+            const reason = prompt(`Reason for rejecting story "${currentReviewStory.title}" (e.g., "Data Breach", "Inappropriate Content"):`);
+            if (reason === null) return; // User cancelled
+
+            if (confirm(`Reject story "${currentReviewStory.title}" for reason: "${reason}"?`)) {
+                try {
+                    // You might move it to a 'rejected_stories' collection or just delete it
+                    // and log the reason, or set its status to 'rejected' in the main stories collection.
+                    // For simplicity, let's delete it from review and update its status if it's already in 'stories'.
+
+                    const batch = db.batch();
+                    const reviewStoryRef = db.collection('stories_under_review').doc(currentReviewStory.id);
+                    const mainStoryRef = db.collection('stories').doc(currentReviewStory.id);
+
+                    // Try to update main story status if it exists, otherwise just delete from review
+                    const mainStoryDoc = await mainStoryRef.get();
+                    if (mainStoryDoc.exists) {
+                        batch.update(mainStoryRef, { status: 'rejected', rejectionReason: reason, rejectedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    }
+                    batch.delete(reviewStoryRef); // Always delete from review queue
+
+                    await batch.commit();
+
+                    // Optional: Notify creator (e.g., via Cloud Function + SendGrid/Twilio)
+                    alert(`Story "${currentReviewStory.title}" rejected. Reason: "${reason}"`);
+                    storyReviewModal.style.display = 'none';
+                    currentReviewStory = null;
+                    fetchReviewQueue(); // Refresh the review queue
+                } catch (error) {
+                    console.error("Error rejecting story:", error);
+                    alert("Failed to reject story: " + error.message);
+                }
+            }
+        });
+
+        // Fetch Review Queue - Dynamically populate the list
+        async function fetchReviewQueue() {
+            const reviewQueueList = document.getElementById('reviewQueueList');
+            reviewQueueList.innerHTML = '<p>Loading review queue...</p>'; // Loading indicator
+
+            try {
+                const querySnapshot = await db.collection('stories_under_review').orderBy('submittedAt', 'asc').get(); // Assuming a 'submittedAt' field
+                if (querySnapshot.empty) {
+                    reviewQueueList.innerHTML = '<p>No stories currently under review.</p>';
+                    return;
+                }
+
+                reviewQueueList.innerHTML = ''; // Clear previous items
+                querySnapshot.forEach(doc => {
+                    const story = doc.data();
+                    const itemHtml = `
+                        <div class="review-item" data-story-id="${story.id}">
+                            <h3>${story.title || 'Untitled Story'} (${story.id})</h3>
+                            <p>Author: ${story.authorName || 'Unknown Author'} (${story.creatorId || 'N/A'})</p>
+                            <p>Status: Under Review</p>
+                        </div>
+                    `;
+                    reviewQueueList.insertAdjacentHTML('beforeend', itemHtml);
+                });
+            } catch (error) {
+                console.error("Error fetching review queue:", error);
+                reviewQueueList.innerHTML = '<p>Error loading review queue. Please try again.</p>';
+            }
+        }
+
+        // Fetch review queue on page load
+        // Ensure this is called AFTER Firebase is initialized and UI elements are ready
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUIBasedOnSession(); // This will determine whether to show login or dashboard
+            if (getStaffSession()) { // Only fetch if already logged in
+                fetchReviewQueue();
+            }
+        });
+
+    </script>
 </body>
 </html>
