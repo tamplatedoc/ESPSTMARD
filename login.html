@@ -416,7 +416,7 @@
                 alert('Login successful! Welcome, ' + authorData.name || authorData.creatorId || 'Creator!');
                 // Redirect ke halaman kreator setelah login berhasil
                 // Penting: Teruskan firebaseAuthUid, bukan creatorId kustom, untuk otorisasi yang lebih aman.
-                window.location.href = `creator-dashboard.html?uid=${firebaseAuthUid}`;
+                window.location.href = "creator-dashboard.html";
 
             } catch (error) {
                 console.error('Login failed:', error);
