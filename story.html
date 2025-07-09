@@ -1,15 +1,18 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Title - AMDF.GROUP</title>
+    <title id="storyPageTitle">Loading Story...</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <style>
+        /* Anda bisa menyalin CSS dari halaman katalog atau mendefinisikan yang baru */
+        /* Contoh CSS untuk halaman detail cerita */
         :root {
             --background-start: #0a0a0f;
             --background-end: #1a1a2e;
-            --card-background: #1f2038;
+            --container-background: #1f2038;
+            --input-background: #282a46;
             --text-color: #e0e0e0;
             --accent-color: #8c7ae6;
             --gradient-1-start: #8c7ae6;
@@ -17,10 +20,11 @@
             --border-color: #3f425b;
             --light-mode-background-start: #e0e0e0;
             --light-mode-background-end: #f0f0f0;
-            --light-mode-card-background: #ffffff;
+            --light-mode-container-background: #ffffff;
+            --light-mode-input-background: #f8f8f8;
             --light-mode-text-color: #333333;
-            --comment-background: #282a46;
-            --light-mode-comment-background: #f0f0f0;
+            --star-filled: #FFD700; /* Gold */
+            --star-empty: #ccc;
         }
 
         body {
@@ -60,53 +64,32 @@
             text-decoration: none;
             text-shadow: 0 0 8px rgba(140, 122, 230, 0.6);
         }
-
-        header .back-button {
-            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        body.light-mode header .logo {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
         }
 
-        header .back-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
-        }
-
-        body.light-mode header {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
 
         main {
             flex-grow: 1;
             padding: 20px;
             max-width: 900px;
             margin: 20px auto;
-            background-color: var(--card-background);
+            background-color: var(--container-background);
             border-radius: 12px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border-color);
         }
 
         body.light-mode main {
-            background-color: var(--light-mode-card-background);
+            background-color: var(--light-mode-container-background);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .story-header {
             text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-
-        body.light-mode .story-header {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
         }
 
         .story-header h1 {
@@ -116,198 +99,173 @@
             text-shadow: 0 0 10px rgba(140, 122, 230, 0.6);
             margin-bottom: 10px;
         }
-
         body.light-mode .story-header h1 {
             color: var(--light-mode-text-color);
             text-shadow: none;
         }
 
-        .story-header p {
-            margin: 5px 0;
-            font-size: 1.1em;
-            color: var(--text-color);
-        }
 
+        .story-header p {
+            font-size: 1.1em;
+            color: #ccc;
+        }
         body.light-mode .story-header p {
             color: var(--light-mode-text-color);
         }
 
+
         .story-thumbnail {
             width: 100%;
-            max-width: 600px;
-            display: block;
-            margin: 20px auto;
+            max-height: 400px;
+            object-fit: cover;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
             border: 1px solid var(--border-color);
         }
-
         body.light-mode .story-thumbnail {
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .story-content {
-            font-size: 1.1em;
+            font-size: 1.05em;
             line-height: 1.8;
-            text-align: justify;
-            margin-bottom: 30px;
-            padding: 0 15px;
+            margin-bottom: 40px;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
         }
 
-        .story-actions {
+        .story-stats {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 0 15px;
-            flex-wrap: wrap;
-            gap: 15px;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+            color: var(--text-color);
         }
 
-        .story-actions .speaker-button {
-            background: linear-gradient(45deg, #00cec9, #00b894);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .story-actions .speaker-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 206, 201, 0.4);
-        }
-
-        .rating-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .rating-section .stars {
-            font-size: 1.8em;
-            color: #ccc; /* Default star color */
-            cursor: pointer;
-        }
-
-        .rating-section .stars .fas.fa-star {
-            color: gold; /* Filled star color */
-        }
-
-        .rating-section .stars i {
-            transition: color 0.2s ease;
-        }
-
-        .rating-section .stars i:hover {
-            color: lightgray;
-        }
-
-        .rating-section .stars i.active {
-            color: gold;
-        }
-
-        .comment-section {
-            padding: 0 15px;
-        }
-
-        .comment-section h2 {
-            font-family: 'Orbitron', sans-serif;
+        .story-stats span .icon {
+            margin-right: 8px;
             color: var(--accent-color);
-            margin-bottom: 20px;
+        }
+
+        .rating-section, .comments-section {
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 30px;
+        }
+        body.light-mode .rating-section, body.light-mode .comments-section {
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .rating-section h2, .comments-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8em;
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 25px;
             text-shadow: 0 0 8px rgba(140, 122, 230, 0.3);
         }
-
-        body.light-mode .comment-section h2 {
+        body.light-mode .rating-section h2, body.light-mode .comments-section h2 {
             color: var(--light-mode-text-color);
             text-shadow: none;
         }
 
-        .comment-form {
+
+        .stars {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 30px;
+            justify-content: center;
+            gap: 5px;
+            font-size: 2.5em;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .star {
+            color: var(--star-empty);
+            transition: color 0.2s ease;
+        }
+
+        .star.filled {
+            color: var(--star-filled);
         }
 
         .comment-form textarea {
-            background-color: var(--comment-background);
+            width: calc(100% - 20px);
+            padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 10px;
+            background-color: var(--input-background);
             color: var(--text-color);
-            resize: vertical;
-            min-height: 80px;
             font-size: 1em;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 15px;
         }
-
         body.light-mode .comment-form textarea {
-            background-color: var(--light-mode-comment-background);
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--light-mode-input-background);
+            border: 1px solid rgba(0,0,0,0.1);
             color: var(--light-mode-text-color);
         }
 
-        .comment-form textarea::placeholder {
-            color: #aaa;
-        }
 
         .comment-form button {
             background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1em;
             cursor: pointer;
-            align-self: flex-end;
+            font-weight: bold;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: block;
+            width: 100%;
         }
-
         .comment-form button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
+            box-shadow: 0 6px 20px rgba(140, 122, 230, 0.5);
         }
 
-        .comments-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        .comment-list {
+            margin-top: 30px;
         }
 
         .comment-item {
-            background-color: var(--comment-background);
+            background-color: var(--input-background);
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             border: 1px solid var(--border-color);
-            position: relative;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
-
         body.light-mode .comment-item {
-            background-color: var(--light-mode-comment-background);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            background-color: var(--light-mode-input-background);
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .comment-item .comment-id {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 0.8em;
-            color: #999;
-            font-family: 'Orbitron', sans-serif;
+
+        .comment-item strong {
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            display: block;
         }
+        body.light-mode .comment-item strong {
+            color: var(--light-mode-text-color);
+        }
+
 
         .comment-item p {
-            margin: 0;
-            white-space: pre-wrap; /* Preserve line breaks and spaces */
-            word-wrap: break-word; /* Break long words */
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .comment-item small {
+            display: block;
+            text-align: right;
+            color: #aaa;
+            font-size: 0.8em;
+            margin-top: 10px;
         }
 
         footer {
@@ -347,26 +305,11 @@
             }
 
             .story-header h1 {
-                font-size: 1.8em;
+                font-size: 2em;
             }
 
-            .story-header p {
-                font-size: 1em;
-            }
-
-            .story-content {
-                font-size: 1em;
-                padding: 0 10px;
-            }
-
-            .story-actions {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 0 10px;
-            }
-
-            .comment-section, .comment-form {
-                padding: 0 10px;
+            .stars {
+                font-size: 2em;
             }
         }
     </style>
@@ -374,62 +317,48 @@
 <body>
     <header>
         <a href="/" class="logo">AMDF EBOOK</a>
-        <a href="/" class="back-button">Back to Home</a>
+        <button id="themeToggle">💡</button>
     </header>
 
     <main>
         <div class="story-header">
-            <h1 id="storyTitle">The Last Starship</h1>
-            <p>Author: <span id="storyAuthor">Jane Doe</span></p>
-            <p>Genre: <span id="storyGenre">Science Fiction</span></p>
+            <h1 id="storyTitle">Loading Story Title...</h1>
+            <p>Author: <span id="storyAuthor">Loading...</span> | Genre: <span id="storyGenre">Loading...</span></p>
         </div>
 
-        <img src="https://via.placeholder.com/800x450/00cec9/ffffff?text=Story+Thumbnail" alt="Story Thumbnail" class="story-thumbnail" id="storyThumbnail">
-
-        <div class="story-actions">
-            <button class="speaker-button" id="ttsButton">
-                <i class="fas fa-volume-up"></i> Listen to Story
-            </button>
-            <div class="rating-section">
-                <span>Rate this story:</span>
-                <div class="stars" id="ratingStars">
-                    <i class="far fa-star" data-value="1"></i>
-                    <i class="far fa-star" data-value="2"></i>
-                    <i class="far fa-star" data-value="3"></i>
-                    <i class="far fa-star" data-value="4"></i>
-                    <i class="far fa-star" data-value="5"></i>
-                </div>
-            </div>
-        </div>
+        <img id="storyThumbnail" src="https://via.placeholder.com/800x450/cccccc/000000?text=Loading+Thumbnail" alt="Story Thumbnail" class="story-thumbnail">
 
         <div class="story-content" id="storyContent">
-            <p>The year is 2342. Earth is but a distant memory, a blue marble seen only in historical simulations. Humanity, fractured and scattered across a hundred star systems, clings to survival on colony worlds, each vying for resources and influence. It has been centuries since the Great Exodus, a desperate flight from a dying sun, and the legend of the 'Last Starship' has become just that – a legend.</p>
-            <p>But for Elara Vance, a young astrogator on the desolate mining outpost of Kepler-186f, the legend is a personal quest. Her grandfather, a renowned xeno-archeologist, had dedicated his life to proving the Last Starship wasn't just a myth, but a final, desperate attempt by a remnant of Earth's greatest minds to preserve true human heritage. He believed it held the key to reuniting the disparate factions of humanity.</p>
-            <p>One fateful night, while sifting through corrupted data logs from an ancient, derelict orbital station, Elara stumbled upon a fragmented signal. It was faint, almost imperceptible, but it contained patterns that mirrored her grandfather's cryptic notes. Coordinates. Coordinates that pointed far beyond the known boundaries of charted space, into the swirling, uncharted nebulae of the Perseus Arm.</p>
-            <p>Against the stern warnings of her superiors and the skepticism of her peers, Elara knew she had to follow it. With a rusty, barely space-worthy cargo vessel, the 'Stardust Drifter', and a motley crew of misfits – a cynical engineer with a knack for explosives, a silent, hyper-competent pilot who communicated primarily through grunts, and a former historian turned black market dealer with an encyclopedic knowledge of forgotten cultures – she set out. Their mission: to find the Last Starship, and with it, perhaps, humanity's last hope.</p>
-            <p>The journey was perilous. They navigated asteroid fields that shredded lesser ships, outran rogue AI constructs, and evaded the patrols of the ruthless Orion Syndicate, who would stop at nothing to claim any lost technology for themselves. Each jump through hyperspace felt like a roll of the dice, the shimmering void outside their viewport a constant reminder of the vast, uncaring cosmos.</p>
-            <p>Deep within the Perseus Arm, hidden behind a cosmic dust cloud that distorted all scans, they found it. Not a majestic vessel of gleaming chrome and advanced weaponry, but a battered, ancient ship, its hull scarred by millennia of cosmic radiation and micrometeoroid impacts. Yet, it pulsed with a faint energy signature, a beacon of defiance against the ages.</p>
-            <p>Boarding the Last Starship was like stepping into a time capsule. Dust-laden corridors, silent laboratories, and a bridge with controls that predated modern interfaces. But within its core, guarded by an intricate network of puzzles and environmental hazards, was the treasure: the Earth Archive. A vast repository of knowledge, art, music, and history, preserved for a future generation, a true testament to what humanity once was, and what it could be again.</p>
-            <p>Elara knew their journey was far from over. Getting the Archive back, convincing the warring factions to listen, to unite under a common heritage – that would be the true challenge. But as she stood on the bridge of the Last Starship, gazing out at the starfield, she felt a profound sense of hope. The legend was real. And with it, a chance for humanity to find its way home, not to a planet, but to itself.</p>
+            <p>Loading story content...</p>
         </div>
 
-        <div class="comment-section">
-            <h2>Comments</h2>
-            <form class="comment-form" id="commentForm">
-                <textarea id="commentInput" placeholder="Add your comment (max 100 characters)" maxlength="100"></textarea>
-                <button type="submit">Send Comment</button>
-            </form>
-            <div class="comments-list" id="commentsList">
-                <div class="comment-item">
-                    <p>Wow, what an incredible story! I was hooked from the start. Love the characters!</p>
-                    <span class="comment-id">A1B</span>
-                </div>
-                <div class="comment-item">
-                    <p>I loved the world-building, truly immersive. Can't wait for more stories like this!</p>
-                    <span class="comment-id">C2D</span>
-                </div>
-            </div>
+        <div class="story-stats">
+            <span><span class="icon">👁️</span> Views: <span id="storyViews">0</span></span>
+            <span><span class="icon">⭐</span> Rating: <span id="storyRating">0.0</span> (<span id="storyRatingCount">0</span>)</span>
         </div>
+
+        <section class="rating-section">
+            <h2>Rate This Story</h2>
+            <div class="stars" id="ratingStars">
+                <i class="fa-solid fa-star star" data-value="1"></i>
+                <i class="fa-solid fa-star star" data-value="2"></i>
+                <i class="fa-solid fa-star star" data-value="3"></i>
+                <i class="fa-solid fa-star star" data-value="4"></i>
+                <i class="fa-solid fa-star star" data-value="5"></i>
+            </div>
+            <p id="ratingMessage" style="text-align: center; color: #ccc;"></p>
+        </section>
+
+        <section class="comments-section">
+            <h2>Comments</h2>
+            <form id="commentForm" class="comment-form">
+                <textarea id="commentContent" placeholder="Write your comment here..." required></textarea>
+                <button type="submit">Post Comment</button>
+            </form>
+            <div id="commentList" class="comment-list">
+                <p>No comments yet. Be the first to comment!</p>
+                </div>
+        </section>
     </main>
 
     <footer>
@@ -442,148 +371,291 @@
         <p>&copy; AMDF.GROUP</p>
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> <script>
+        // === KONFIGURASI DAN INISIALISASI FIREBASE ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+            authDomain: "tamplatedoc.firebaseapp.com",
+            databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "tamplatedoc",
+            storageBucket: "tamplatedoc.firebasestorage.app",
+            messagingSenderId: "264966107720",
+            appId: "1:264966107720:web:da19f6109e71390740de7d",
+            measurementId: "G-PFK8VQBFCV"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const rtdb = firebase.database();
+        const auth = firebase.auth(); // Untuk mendapatkan user ID saat rating/komentar
+    </script>
+
     <script>
-        // Light/Dark Mode (re-used from main catalog page)
+        // === THEME TOGGLE ===
+        const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
+
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             body.classList.add(savedTheme);
+            themeToggle.textContent = savedTheme === 'light-mode' ? '🌙' : '💡';
         }
 
-        // Text-to-Speech (TTS) functionality
-        const ttsButton = document.getElementById('ttsButton');
-        const storyContent = document.getElementById('storyContent');
-        let speechSynthesisUtterance = null; // To hold the utterance instance
-
-        ttsButton.addEventListener('click', () => {
-            if (speechSynthesisUtterance && window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel(); // Stop if already speaking
-                ttsButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story';
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark-mode');
+                themeToggle.textContent = '💡';
             } else {
-                const textToSpeak = storyContent.innerText;
-                speechSynthesisUtterance = new SpeechSynthesisUtterance(textToSpeak);
-                speechSynthesisUtterance.lang = 'id-ID'; // Default to Indonesian
-                
-                // Event listener to change button text when speaking starts/ends
-                speechSynthesisUtterance.onstart = () => {
-                    ttsButton.innerHTML = '<i class="fas fa-volume-mute"></i> Stop Listening';
-                };
-                speechSynthesisUtterance.onend = () => {
-                    ttsButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story';
-                };
-                speechSynthesisUtterance.onerror = (event) => {
-                    console.error('SpeechSynthesisUtterance.onerror', event);
-                    ttsButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story (Error)';
-                };
-
-                window.speechSynthesis.speak(speechSynthesisUtterance);
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light-mode');
+                themeToggle.textContent = '🌙';
             }
         });
 
-        // Rating System
-        const ratingStars = document.getElementById('ratingStars');
-        let currentRating = 0; // To store the user's selected rating
+        // === GET STORY ID FROM URL ===
+        const urlParams = new URLSearchParams(window.location.search);
+        const storyId = urlParams.get('storyId');
 
-        ratingStars.addEventListener('mouseover', (e) => {
-            const hoveredValue = e.target.dataset.value;
-            if (hoveredValue) {
-                // Highlight stars up to the hovered one
-                Array.from(ratingStars.children).forEach(star => {
-                    if (star.dataset.value <= hoveredValue) {
-                        star.classList.add('fas');
-                        star.classList.remove('far');
-                    } else {
-                        star.classList.add('far');
-                        star.classList.remove('fas');
-                    }
-                });
-            }
-        });
-
-        ratingStars.addEventListener('mouseout', () => {
-            // Revert to currentRating or default if no rating selected
-            Array.from(ratingStars.children).forEach(star => {
-                if (star.dataset.value <= currentRating) {
-                    star.classList.add('fas');
-                    star.classList.remove('far');
-                } else {
-                    star.classList.add('far');
-                    star.classList.remove('fas');
-                }
-            });
-        });
-
-        ratingStars.addEventListener('click', (e) => {
-            const clickedValue = e.target.dataset.value;
-            if (clickedValue) {
-                currentRating = parseInt(clickedValue);
-                // Update the visual stars immediately
-                Array.from(ratingStars.children).forEach(star => {
-                    if (star.dataset.value <= currentRating) {
-                        star.classList.add('fas');
-                        star.classList.remove('far');
-                    } else {
-                        star.classList.add('far');
-                        star.classList.remove('fas');
-                    }
-                });
-                console.log('User rated:', currentRating, 'stars');
-                // *** In a real application, send this `currentRating` to Firebase Realtime Database ***
-                // Example: sendRatingToFirebase(storyId, currentRating);
-            }
-        });
-
-        // Comment Section
+        // === ELEMENTS ===
+        const storyPageTitle = document.getElementById('storyPageTitle');
+        const storyTitleElem = document.getElementById('storyTitle');
+        const storyAuthorElem = document.getElementById('storyAuthor');
+        const storyGenreElem = document.getElementById('storyGenre');
+        const storyThumbnailElem = document.getElementById('storyThumbnail');
+        const storyContentElem = document.getElementById('storyContent');
+        const storyViewsElem = document.getElementById('storyViews');
+        const storyRatingElem = document.getElementById('storyRating');
+        const storyRatingCountElem = document.getElementById('storyRatingCount');
+        const ratingStarsContainer = document.getElementById('ratingStars');
+        const ratingMessage = document.getElementById('ratingMessage');
         const commentForm = document.getElementById('commentForm');
-        const commentInput = document.getElementById('commentInput');
-        const commentsList = document.getElementById('commentsList');
+        const commentContentInput = document.getElementById('commentContent');
+        const commentListElem = document.getElementById('commentList');
 
-        commentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const commentText = commentInput.value.trim();
+        let currentUser = null; // Akan menyimpan user yang sedang login (jika ada)
 
-            if (commentText) {
-                const randomId = generateRandomId(3); // Generate 3-char random ID
-                const newCommentHtml = `
-                    <div class="comment-item">
-                        <p>${commentText}</p>
-                        <span class="comment-id">${randomId}</span>
-                    </div>
-                `;
-                commentsList.insertAdjacentHTML('afterbegin', newCommentHtml); // Add new comment at the top
-
-                // *** In a real application, send this `commentText` and `randomId` to Firestore Database ***
-                // Example: saveCommentToFirestore(storyId, commentText, randomId);
-
-                commentInput.value = ''; // Clear the input field
+        // --- AUTH STATE LISTENER ---
+        // Ini penting untuk mengetahui apakah user sudah login saat memberikan rating/komentar
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                console.log("User is logged in:", user.uid);
+                ratingMessage.textContent = "Click a star to rate!";
             } else {
-                alert('Comment cannot be empty!');
+                currentUser = null;
+                console.log("No user is logged in.");
+                ratingMessage.textContent = "Login to rate and comment.";
+                // Disable rating and comment if not logged in
+                ratingStarsContainer.style.pointerEvents = 'none';
+                commentForm.style.pointerEvents = 'none';
+                commentForm.querySelector('button').textContent = "Login to comment";
             }
         });
 
-        function generateRandomId(length) {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            const charactersLength = characters.length;
-            for (let i = 0; i < length; i++) {
-                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+
+        // === LOAD STORY DETAILS, VIEWS, AND RATINGS ===
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!storyId) {
+                storyTitleElem.textContent = 'Story Not Found';
+                storyContentElem.innerHTML = '<p>No story ID provided in the URL.</p>';
+                storyPageTitle.textContent = 'Error - AMDF Ebook';
+                return;
             }
-            return result;
+
+            try {
+                // Fetch Story Details from Firestore
+                const storyDoc = await db.collection('stories').doc(storyId).get();
+
+                if (!storyDoc.exists) {
+                    storyTitleElem.textContent = 'Story Not Found';
+                    storyContentElem.innerHTML = '<p>The story you are looking for does not exist.</p>';
+                    storyPageTitle.textContent = 'Not Found - AMDF Ebook';
+                    return;
+                }
+
+                const storyData = storyDoc.data();
+                storyPageTitle.textContent = storyData.title + ' - AMDF Ebook';
+                storyTitleElem.textContent = storyData.title;
+                storyAuthorElem.textContent = storyData.authorName;
+                storyGenreElem.textContent = storyData.genre;
+                storyThumbnailElem.src = storyData.thumbnailUrl || 'https://via.placeholder.com/800x450/cccccc/000000?text=No+Image';
+                // Use innerHTML for rich text content, and replace \n with <br> for line breaks
+                storyContentElem.innerHTML = storyData.content.replace(/\n/g, '<br>');
+
+
+                // Increment Views in Realtime Database
+                const viewsRef = rtdb.ref(`stories_stats/${storyId}/views`);
+                viewsRef.transaction((currentViews) => {
+                    return (currentViews || 0) + 1;
+                }, (error, committed, snapshot) => {
+                    if (error) {
+                        console.error("Transaction failed: ", error);
+                    } else if (committed) {
+                        console.log("Views incremented!");
+                        storyViewsElem.textContent = snapshot.val(); // Update displayed views
+                    } else {
+                        console.log("Views not incremented (transaction aborted).");
+                    }
+                });
+
+                // Load Initial Views and Ratings (if transaction fails or for initial display)
+                viewsRef.on('value', (snapshot) => {
+                    storyViewsElem.textContent = snapshot.val() || 0;
+                });
+
+                const ratingsRef = rtdb.ref(`stories_stats/${storyId}/ratings`);
+                ratingsRef.on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        let totalRating = 0;
+                        let count = 0;
+                        snapshot.forEach(childSnap => {
+                            totalRating += childSnap.val();
+                            count++;
+                        });
+                        storyRatingElem.textContent = (totalRating / count).toFixed(1);
+                        storyRatingCountElem.textContent = count;
+                    } else {
+                        storyRatingElem.textContent = '0.0';
+                        storyRatingCountElem.textContent = '0';
+                    }
+                });
+
+                // Load Comments
+                loadComments(storyId);
+
+            } catch (error) {
+                console.error("Error loading story details:", error);
+                storyTitleElem.textContent = 'Error Loading Story';
+                storyContentElem.innerHTML = '<p>An error occurred while loading the story. Please try again.</p>';
+                storyPageTitle.textContent = 'Error - AMDF Ebook';
+            }
+        });
+
+        // === RATING LOGIC ===
+        ratingStarsContainer.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('star')) {
+                const value = parseInt(e.target.dataset.value);
+                Array.from(ratingStarsContainer.children).forEach(star => {
+                    star.classList.toggle('filled', parseInt(star.dataset.value) <= value);
+                });
+            }
+        });
+
+        ratingStarsContainer.addEventListener('mouseout', () => {
+            // Reset to current average rating or no fill if no rating given
+            // For now, simply clear the hover effect if no current user rating is displayed
+            updateStarDisplay(storyRatingElem.textContent.split('.')[0] || 0); // Re-fill based on current average or 0
+        });
+
+        ratingStarsContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('star')) {
+                if (!currentUser) {
+                    alert('Please log in to submit a rating.');
+                    return;
+                }
+
+                const ratingValue = parseInt(e.target.dataset.value);
+                const userId = currentUser.uid; // Menggunakan UID Firebase Auth sebagai ID pengguna
+
+                try {
+                    // Save rating to Realtime Database
+                    await rtdb.ref(`stories_stats/${storyId}/ratings/${userId}`).set(ratingValue);
+                    alert(`Thanks for rating ${ratingValue} stars!`);
+                    ratingMessage.textContent = `You rated: ${ratingValue} stars!`;
+                    // The 'on value' listener for ratingsRef will automatically update the display
+                } catch (error) {
+                    console.error("Error submitting rating:", error);
+                    alert("Failed to submit rating. Please try again.");
+                }
+            }
+        });
+
+        function updateStarDisplay(averageRating) {
+            Array.from(ratingStarsContainer.children).forEach(star => {
+                star.classList.toggle('filled', parseInt(star.dataset.value) <= Math.round(averageRating));
+            });
         }
 
-        // Placeholder for dynamic content loading (e.g., from Firestore/Storage)
-        document.addEventListener('DOMContentLoaded', () => {
-            // In a real application, you'd extract the story ID from the URL (e.g., /story/id_cerita_12345)
-            // Then, use that ID to fetch story data from Firestore and comments from Firestore.
-            // And update the elements:
-            // document.getElementById('storyTitle').textContent = storyData.title;
-            // document.getElementById('storyAuthor').textContent = storyData.authorName;
-            // document.getElementById('storyGenre').textContent = storyData.genre;
-            // document.getElementById('storyThumbnail').src = storyData.thumbnailUrl;
-            // document.getElementById('storyContent').innerHTML = storyData.content.replace(/\n/g, '<p>'); // Convert newlines to paragraphs
-            // // For comments, loop through fetched comments and append to commentsList
-            // // For rating, display average rating from Realtime Database if available.
+
+        // === COMMENT LOGIC ===
+        commentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser) {
+                alert('Please log in to post a comment.');
+                return;
+            }
+
+            const commentContent = commentContentInput.value.trim();
+            if (!commentContent) {
+                alert('Comment cannot be empty.');
+                return;
+            }
+
+            const username = currentUser.email ? currentUser.email.split('@')[0] : 'Anonymous User'; // Contoh nama pengguna
+            // Anda mungkin ingin mengambil nama pengguna yang lebih ramah dari Firestore 'users' collection jika ada
+            // Misalnya: const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            // const username = userDoc.exists ? userDoc.data().displayName : 'Anonymous User';
+
+
+            try {
+                // Save comment to Firestore
+                await db.collection('comments').add({
+                    storyId: storyId,
+                    userId: currentUser.uid,
+                    username: username,
+                    content: commentContent,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp() // Firestore Timestamp
+                });
+
+                alert('Comment posted successfully!');
+                commentContentInput.value = ''; // Clear input
+                loadComments(storyId); // Reload comments to show new one
+
+            } catch (error) {
+                console.error("Error posting comment:", error);
+                alert("Failed to post comment. Please try again.");
+            }
         });
+
+        async function loadComments(storyId) {
+            commentListElem.innerHTML = '<p>Loading comments...</p>'; // Show loading message
+
+            try {
+                const commentsSnapshot = await db.collection('comments')
+                                                .where('storyId', '==', storyId)
+                                                .orderBy('timestamp', 'desc')
+                                                .get();
+
+                if (commentsSnapshot.empty) {
+                    commentListElem.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                    return;
+                }
+
+                commentListElem.innerHTML = ''; // Clear loading message
+                commentsSnapshot.forEach(doc => {
+                    const comment = doc.data();
+                    const timestamp = comment.timestamp ? comment.timestamp.toDate().toLocaleString() : 'N/A'; // Format timestamp
+
+                    const commentItem = document.createElement('div');
+                    commentItem.className = 'comment-item';
+                    commentItem.innerHTML = `
+                        <strong>${comment.username || 'Anonymous'}</strong>
+                        <p>${comment.content}</p>
+                        <small>${timestamp}</small>
+                    `;
+                    commentListElem.appendChild(commentItem);
+                });
+
+            } catch (error) {
+                console.error("Error loading comments:", error);
+                commentListElem.innerHTML = '<p>Failed to load comments.</p>';
+            }
+        }
     </script>
 </body>
 </html>
