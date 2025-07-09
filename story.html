@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Title - AMDF.GROUP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <style>
+        :root {
+            --background-start: #0a0a0f;
+            --background-end: #1a1a2e;
+            --card-background: #1f2038;
+            --text-color: #e0e0e0;
+            --accent-color: #8c7ae6;
+            --gradient-1-start: #8c7ae6;
+            --gradient-1-end: #6c5ce7;
+            --border-color: #3f425b;
+            --light-mode-background-start: #e0e0e0;
+            --light-mode-background-end: #f0f0f0;
+            --light-mode-card-background: #ffffff;
+            --light-mode-text-color: #333333;
+            --comment-background: #282a46;
+            --light-mode-comment-background: #f0f0f0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
+            color: var(--light-mode-text-color);
+        }
+
+        header {
+            background-color: rgba(31, 32, 56, 0.8);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8em;
+            color: var(--accent-color);
+            text-decoration: none;
+            text-shadow: 0 0 8px rgba(140, 122, 230, 0.6);
+        }
+
+        header .back-button {
+            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        header .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
+        }
+
+        body.light-mode header {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+        }
+
+        body.light-mode main {
+            background-color: var(--light-mode-card-background);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .story-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        body.light-mode .story-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .story-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(140, 122, 230, 0.6);
+            margin-bottom: 10px;
+        }
+
+        body.light-mode .story-header h1 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+        }
+
+        .story-header p {
+            margin: 5px 0;
+            font-size: 1.1em;
+            color: var(--text-color);
+        }
+
+        body.light-mode .story-header p {
+            color: var(--light-mode-text-color);
+        }
+
+        .story-thumbnail {
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        body.light-mode .story-thumbnail {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .story-content {
+            font-size: 1.1em;
+            line-height: 1.8;
+            text-align: justify;
+            margin-bottom: 30px;
+            padding: 0 15px;
+        }
+
+        .story-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .story-actions .speaker-button {
+            background: linear-gradient(45deg, #00cec9, #00b894);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .story-actions .speaker-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 206, 201, 0.4);
+        }
+
+        .rating-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rating-section .stars {
+            font-size: 1.8em;
+            color: #ccc; /* Default star color */
+            cursor: pointer;
+        }
+
+        .rating-section .stars .fas.fa-star {
+            color: gold; /* Filled star color */
+        }
+
+        .rating-section .stars i {
+            transition: color 0.2s ease;
+        }
+
+        .rating-section .stars i:hover {
+            color: lightgray;
+        }
+
+        .rating-section .stars i.active {
+            color: gold;
+        }
+
+        .comment-section {
+            padding: 0 15px;
+        }
+
+        .comment-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(140, 122, 230, 0.3);
+        }
+
+        body.light-mode .comment-section h2 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .comment-form textarea {
+            background-color: var(--comment-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text-color);
+            resize: vertical;
+            min-height: 80px;
+            font-size: 1em;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-mode .comment-form textarea {
+            background-color: var(--light-mode-comment-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--light-mode-text-color);
+        }
+
+        .comment-form textarea::placeholder {
+            color: #aaa;
+        }
+
+        .comment-form button {
+            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            align-self: flex-end;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .comment-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .comment-item {
+            background-color: var(--comment-background);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-mode .comment-item {
+            background-color: var(--light-mode-comment-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .comment-item .comment-id {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.8em;
+            color: #999;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .comment-item p {
+            margin: 0;
+            white-space: pre-wrap; /* Preserve line breaks and spaces */
+            word-wrap: break-word; /* Break long words */
+        }
+
+        footer {
+            background-color: rgba(31, 32, 56, 0.8);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 40px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        footer nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s ease;
+        }
+
+        footer nav a:hover {
+            color: var(--accent-color);
+        }
+
+        body.light-mode footer {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode footer nav a {
+            color: var(--light-mode-text-color);
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 15px;
+                margin: 15px auto;
+            }
+
+            .story-header h1 {
+                font-size: 1.8em;
+            }
+
+            .story-header p {
+                font-size: 1em;
+            }
+
+            .story-content {
+                font-size: 1em;
+                padding: 0 10px;
+            }
+
+            .story-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0 10px;
+            }
+
+            .comment-section, .comment-form {
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">AMDF EBOOK</a>
+        <a href="/" class="back-button">Back to Home</a>
+    </header>
+
+    <main>
+        <div class="story-header">
+            <h1 id="storyTitle">The Last Starship</h1>
+            <p>Author: <span id="storyAuthor">Jane Doe</span></p>
+            <p>Genre: <span id="storyGenre">Science Fiction</span></p>
+        </div>
+
+        <img src="https://via.placeholder.com/800x450/00cec9/ffffff?text=Story+Thumbnail" alt="Story Thumbnail" class="story-thumbnail" id="storyThumbnail">
+
+        <div class="story-actions">
+            <button class="speaker-button" id="ttsButton">
+                <i class="fas fa-volume-up"></i> Listen to Story
+            </button>
+            <div class="rating-section">
+                <span>Rate this story:</span>
+                <div class="stars" id="ratingStars">
+                    <i class="far fa-star" data-value="1"></i>
+                    <i class="far fa-star" data-value="2"></i>
+                    <i class="far fa-star" data-value="3"></i>
+                    <i class="far fa-star" data-value="4"></i>
+                    <i class="far fa-star" data-value="5"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="story-content" id="storyContent">
+            <p>The year is 2342. Earth is but a distant memory, a blue marble seen only in historical simulations. Humanity, fractured and scattered across a hundred star systems, clings to survival on colony worlds, each vying for resources and influence. It has been centuries since the Great Exodus, a desperate flight from a dying sun, and the legend of the 'Last Starship' has become just that – a legend.</p>
+            <p>But for Elara Vance, a young astrogator on the desolate mining outpost of Kepler-186f, the legend is a personal quest. Her grandfather, a renowned xeno-archeologist, had dedicated his life to proving the Last Starship wasn't just a myth, but a final, desperate attempt by a remnant of Earth's greatest minds to preserve true human heritage. He believed it held the key to reuniting the disparate factions of humanity.</p>
+            <p>One fateful night, while sifting through corrupted data logs from an ancient, derelict orbital station, Elara stumbled upon a fragmented signal. It was faint, almost imperceptible, but it contained patterns that mirrored her grandfather's cryptic notes. Coordinates. Coordinates that pointed far beyond the known boundaries of charted space, into the swirling, uncharted nebulae of the Perseus Arm.</p>
+            <p>Against the stern warnings of her superiors and the skepticism of her peers, Elara knew she had to follow it. With a rusty, barely space-worthy cargo vessel, the 'Stardust Drifter', and a motley crew of misfits – a cynical engineer with a knack for explosives, a silent, hyper-competent pilot who communicated primarily through grunts, and a former historian turned black market dealer with an encyclopedic knowledge of forgotten cultures – she set out. Their mission: to find the Last Starship, and with it, perhaps, humanity's last hope.</p>
+            <p>The journey was perilous. They navigated asteroid fields that shredded lesser ships, outran rogue AI constructs, and evaded the patrols of the ruthless Orion Syndicate, who would stop at nothing to claim any lost technology for themselves. Each jump through hyperspace felt like a roll of the dice, the shimmering void outside their viewport a constant reminder of the vast, uncaring cosmos.</p>
+            <p>Deep within the Perseus Arm, hidden behind a cosmic dust cloud that distorted all scans, they found it. Not a majestic vessel of gleaming chrome and advanced weaponry, but a battered, ancient ship, its hull scarred by millennia of cosmic radiation and micrometeoroid impacts. Yet, it pulsed with a faint energy signature, a beacon of defiance against the ages.</p>
+            <p>Boarding the Last Starship was like stepping into a time capsule. Dust-laden corridors, silent laboratories, and a bridge with controls that predated modern interfaces. But within its core, guarded by an intricate network of puzzles and environmental hazards, was the treasure: the Earth Archive. A vast repository of knowledge, art, music, and history, preserved for a future generation, a true testament to what humanity once was, and what it could be again.</p>
+            <p>Elara knew their journey was far from over. Getting the Archive back, convincing the warring factions to listen, to unite under a common heritage – that would be the true challenge. But as she stood on the bridge of the Last Starship, gazing out at the starfield, she felt a profound sense of hope. The legend was real. And with it, a chance for humanity to find its way home, not to a planet, but to itself.</p>
+        </div>
+
+        <div class="comment-section">
+            <h2>Comments</h2>
+            <form class="comment-form" id="commentForm">
+                <textarea id="commentInput" placeholder="Add your comment (max 100 characters)" maxlength="100"></textarea>
+                <button type="submit">Send Comment</button>
+            </form>
+            <div class="comments-list" id="commentsList">
+                <div class="comment-item">
+                    <p>Wow, what an incredible story! I was hooked from the start. Love the characters!</p>
+                    <span class="comment-id">A1B</span>
+                </div>
+                <div class="comment-item">
+                    <p>I loved the world-building, truly immersive. Can't wait for more stories like this!</p>
+                    <span class="comment-id">C2D</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <nav>
+            <a href="/about">About Us</a>
+            <a href="/privacy-policy">Privacy Policy</a>
+            <a href="/terms-of-service">Terms of Service</a>
+            <a href="/contact">Contact</a>
+        </nav>
+        <p>&copy; AMDF.GROUP</p>
+    </footer>
+
+    <script>
+        // Light/Dark Mode (re-used from main catalog page)
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.classList.add(savedTheme);
+        }
+
+        // Text-to-Speech (TTS) functionality
+        const ttsButton = document.getElementById('ttsButton');
+        const storyContent = document.getElementById('storyContent');
+        let speechSynthesisUtterance = null; // To hold the utterance instance
+
+        ttsButton.addEventListener('click', () => {
+            if (speechSynthesisUtterance && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel(); // Stop if already speaking
+                ttsButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story';
+            } else {
+                const textToSpeak = storyContent.innerText;
+                speechSynthesisUtterance = new SpeechSynthesisUtterance(textToSpeak);
+                speechSynthesisUtterance.lang = 'id-ID'; // Default to Indonesian
+                
+                // Event listener to change button text when speaking starts/ends
+                speechSynthesisUtterance.onstart = () => {
+                    ttsButton.innerHTML = '<i class="fas fa-volume-mute"></i> Stop Listening';
+                };
+                speechSynthesisUtterance.onend = () => {
+                    ttsButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story';
+                };
+                speechSynthesisUtterance.onerror = (event) => {
+                    console.error('SpeechSynthesisUtterance.onerror', event);
+                    ttsButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story (Error)';
+                };
+
+                window.speechSynthesis.speak(speechSynthesisUtterance);
+            }
+        });
+
+        // Rating System
+        const ratingStars = document.getElementById('ratingStars');
+        let currentRating = 0; // To store the user's selected rating
+
+        ratingStars.addEventListener('mouseover', (e) => {
+            const hoveredValue = e.target.dataset.value;
+            if (hoveredValue) {
+                // Highlight stars up to the hovered one
+                Array.from(ratingStars.children).forEach(star => {
+                    if (star.dataset.value <= hoveredValue) {
+                        star.classList.add('fas');
+                        star.classList.remove('far');
+                    } else {
+                        star.classList.add('far');
+                        star.classList.remove('fas');
+                    }
+                });
+            }
+        });
+
+        ratingStars.addEventListener('mouseout', () => {
+            // Revert to currentRating or default if no rating selected
+            Array.from(ratingStars.children).forEach(star => {
+                if (star.dataset.value <= currentRating) {
+                    star.classList.add('fas');
+                    star.classList.remove('far');
+                } else {
+                    star.classList.add('far');
+                    star.classList.remove('fas');
+                }
+            });
+        });
+
+        ratingStars.addEventListener('click', (e) => {
+            const clickedValue = e.target.dataset.value;
+            if (clickedValue) {
+                currentRating = parseInt(clickedValue);
+                // Update the visual stars immediately
+                Array.from(ratingStars.children).forEach(star => {
+                    if (star.dataset.value <= currentRating) {
+                        star.classList.add('fas');
+                        star.classList.remove('far');
+                    } else {
+                        star.classList.add('far');
+                        star.classList.remove('fas');
+                    }
+                });
+                console.log('User rated:', currentRating, 'stars');
+                // *** In a real application, send this `currentRating` to Firebase Realtime Database ***
+                // Example: sendRatingToFirebase(storyId, currentRating);
+            }
+        });
+
+        // Comment Section
+        const commentForm = document.getElementById('commentForm');
+        const commentInput = document.getElementById('commentInput');
+        const commentsList = document.getElementById('commentsList');
+
+        commentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const commentText = commentInput.value.trim();
+
+            if (commentText) {
+                const randomId = generateRandomId(3); // Generate 3-char random ID
+                const newCommentHtml = `
+                    <div class="comment-item">
+                        <p>${commentText}</p>
+                        <span class="comment-id">${randomId}</span>
+                    </div>
+                `;
+                commentsList.insertAdjacentHTML('afterbegin', newCommentHtml); // Add new comment at the top
+
+                // *** In a real application, send this `commentText` and `randomId` to Firestore Database ***
+                // Example: saveCommentToFirestore(storyId, commentText, randomId);
+
+                commentInput.value = ''; // Clear the input field
+            } else {
+                alert('Comment cannot be empty!');
+            }
+        });
+
+        function generateRandomId(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            const charactersLength = characters.length;
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+
+        // Placeholder for dynamic content loading (e.g., from Firestore/Storage)
+        document.addEventListener('DOMContentLoaded', () => {
+            // In a real application, you'd extract the story ID from the URL (e.g., /story/id_cerita_12345)
+            // Then, use that ID to fetch story data from Firestore and comments from Firestore.
+            // And update the elements:
+            // document.getElementById('storyTitle').textContent = storyData.title;
+            // document.getElementById('storyAuthor').textContent = storyData.authorName;
+            // document.getElementById('storyGenre').textContent = storyData.genre;
+            // document.getElementById('storyThumbnail').src = storyData.thumbnailUrl;
+            // document.getElementById('storyContent').innerHTML = storyData.content.replace(/\n/g, '<p>'); // Convert newlines to paragraphs
+            // // For comments, loop through fetched comments and append to commentsList
+            // // For rating, display average rating from Realtime Database if available.
+        });
+    </script>
+</body>
+</html>
