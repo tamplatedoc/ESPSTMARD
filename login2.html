@@ -152,9 +152,21 @@
         </form>
     </div>
 
+    <!-- Load Firebase SDK dengan async untuk menghindari blocking -->
+    <script async src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+    <script async src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+    <script async src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+
     <script>
-        // === KONFIGURASI FIREBASE ===
-const firebaseConfig = {
+        // Tambahkan error handling untuk memudahkan debugging
+        window.addEventListener('error', function(event) {
+            console.error('Error:', event.error);
+        });
+
+        // Inisialisasi Firebase setelah semua SDK dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Konfigurasi Firebase
+           const firebaseConfig = {
   apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
   authDomain: "tamplatedoc.firebaseapp.com",
   databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -165,51 +177,52 @@ const firebaseConfig = {
   measurementId: "G-PFK8VQBFCV"
 };
 
-        // === INISIALISASI FIREBASE ===
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // === PENGECEKAN CORS ===
-        db.enablePersistence({ synchronizeTabs: true })
-            .catch(err => {
-                if (err.code === 'failed-precondition') {
-                    console.log('Multiple tabs open, persistence disabled');
-                } else if (err.code === 'unimplemented') {
-                    console.log('Persistence not available');
-                }
-            });
-
-        // === PENGELOLAAN FORM LOGIN ===
-        const loginForm = document.getElementById('loginForm');
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const pin = document.getElementById('loginPin').value;
-
+            // Inisialisasi Firebase dengan error handling
             try {
-                // Menggunakan signInWithCustomToken untuk menghindari CORS
-                const customToken = await fetch('/api/get-custom-token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, pin })
-                }).then(res => res.json());
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
 
-                const userCredential = await signInWithCustomToken(auth, customToken);
-                const user = userCredential.user;
+                // Cek apakah Firebase sudah terinisialisasi
+                if (!app || !auth || !db) {
+                    throw new Error('Firebase initialization failed');
+                }
 
-                // Simpan token di localStorage untuk autentikasi berikutnya
-                localStorage.setItem('staffToken', customToken);
+                // Setup login form handler
+                const loginForm = document.getElementById('loginForm');
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('loginEmail').value;
+                    const pin = document.getElementById('loginPin').value;
 
-                // Redirect ke halaman staff
-                window.location.href = '/ESPSTMARD/staff.html';
+                    try {
+                        // Menggunakan signInWithCustomToken untuk menghindari CORS
+                        const customToken = await fetch('/api/get-custom-token', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ email, pin })
+                        }).then(res => res.json());
 
+                        const userCredential = await signInWithCustomToken(auth, customToken);
+                        const user = userCredential.user;
+
+                        // Simpan token di localStorage untuk autentikasi berikutnya
+                        localStorage.setItem('staffToken', customToken);
+
+                        // Redirect ke halaman staff
+                        window.location.href = '/ESPSTMARD/staff.html';
+
+                    } catch (error) {
+                        console.error('Login failed:', error);
+                        alert('Login failed: ' + error.message);
+                    }
+                });
             } catch (error) {
-                console.error('Login failed:', error);
-                alert('Login failed: ' + error.message);
+                console.error('Firebase initialization failed:', error);
+                alert('Firebase initialization failed. Please try again later.');
             }
         });
     </script>
