@@ -511,125 +511,122 @@
         <p>&copy; AMDF.GROUP</p>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    
-    <script>
-        // Firebase Configuration
-      const firebaseConfig = {
-  apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-  authDomain: "tamplatedoc.firebaseapp.com",
-  databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "tamplatedoc",
-  storageBucket: "tamplatedoc.firebasestorage.app",
-  messagingSenderId: "264966107720",
-  appId: "1:264966107720:web:da19f6109e71390740de7d",
-  measurementId: "G-PFK8VQBFCV"
-};
+<!-- Firebase SDK (Compat v9.x) -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+    authDomain: "tamplatedoc.firebaseapp.com",
+    databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "tamplatedoc",
+    storageBucket: "tamplatedoc.appspot.com",
+    messagingSenderId: "264966107720",
+    appId: "1:264966107720:web:da19f6109e71390740de7d",
+    measurementId: "G-PFK8VQBFCV"
+  };
 
-        // Validasi PIN staff
-        const validStaffCredentials = {
-            'AMDF067': '200716',
-            'NBLA025': '700261'
-        };
+  // Init Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-        // Login functionality
-        async function validateStaffPin(staffId, pin) {
-            if (!validStaffCredentials[staffId] || validStaffCredentials[staffId] !== pin) {
-                return { isValid: false, error: 'ID atau PIN tidak valid' };
-            }
-            return { isValid: true };
-        }
+  // Staff Valid PINs (Client-side validation)
+  const validStaffCredentials = {
+    'AMDF067': '200716',
+    'NBLA025': '700261'
+  };
 
-        // Handle login form submission
-        document.getElementById('staffLoginForm')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const staffId = document.getElementById('staffId').value.trim();
-            const pin = document.getElementById('staffPin').value.trim();
-            
-            if (!staffId || !pin) {
-                document.getElementById('loginError').textContent = 'Mohon isi semua field';
-                return;
-            }
+  // Cloud Function Endpoint
+  const cloudFunctionURL = "https://us-central1-tamplatedoc.cloudfunctions.net/createCustomToken"; // GANTI jika perlu
 
-            try {
-                const validation = await validateStaffPin(staffId, pin);
-                
-                if (!validation.isValid) {
-                    throw new Error(validation.error);
-                }
+  // Cek session saat halaman dimuat
+  document.addEventListener('DOMContentLoaded', () => {
+    const session = JSON.parse(localStorage.getItem('staffSession') || 'null');
+    if (session && session.expiresAt > Date.now()) {
+      console.log("Staff login aktif:", session.staffId);
+      document.getElementById('staffLogin')?.classList.add('hidden');
+    } else {
+      localStorage.removeItem('staffSession');
+      document.getElementById('staffLogin')?.classList.remove('hidden');
+    }
+  });
 
-                // Generate custom token
-                const customToken = await fetch('YOUR_CLOUD_FUNCTION_ENDPOINT', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        staffId: staffId,
-                        isValidated: true
-                    })
-                });
+  // Fungsi Validasi PIN
+  async function validateStaffPin(staffId, pin) {
+    if (!validStaffCredentials[staffId] || validStaffCredentials[staffId] !== pin) {
+      return { isValid: false, error: 'ID atau PIN tidak valid' };
+    }
+    return { isValid: true };
+  }
 
-                const tokenData = await customToken.json();
-                
-                // Login with custom token
-                const userCredential = await auth.signInWithCustomToken(tokenData.token);
-                
-                // Store session
-                localStorage.setItem('staffSession', JSON.stringify({
-                    uid: userCredential.user.uid,
-                    staffId: staffId,
-                    isValidated: true,
-                    expiresAt: Date.now() + (30 * 60 * 1000) // 30 menit
-                }));
+  // Handle Login Submit
+  document.getElementById('staffLoginForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const staffId = document.getElementById('staffId').value.trim();
+    const pin = document.getElementById('staffPin').value.trim();
+    const errorDisplay = document.getElementById('loginError');
 
-                // Hide login modal and load control panel
-                document.getElementById('staffLogin').style.display = 'none';
+    if (!staffId || !pin) {
+      errorDisplay.textContent = 'Mohon isi semua kolom.';
+      return;
+    }
 
-            } catch (error) {
-                document.getElementById('loginError').textContent = error.message;
-            }
-        });
+    try {
+      const validation = await validateStaffPin(staffId, pin);
+      if (!validation.isValid) throw new Error(validation.error);
 
-        // Logout functionality
-        document.getElementById('staffLogoutButton')?.addEventListener('click', async () => {
-            try {
-                localStorage.removeItem('staffSession');
-                await auth.signOut();
-                alert('Staff logging out...');
-                window.location.href = '/ESPSTMARD/login.html';
-            } catch (error) {
-                console.error("Error signing out:", error);
-                alert("Error logging out: " + error.message);
-            }
-        });
+      // Panggil Cloud Function untuk dapatkan token
+      const response = await fetch(cloudFunctionURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ staffId, isValidated: true })
+      });
 
-        // Check session on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const staffSession = localStorage.getItem('staffSession');
-            
-            if (!staffSession) {
-                document.getElementById('staffLogin').style.display = 'flex';
-                return;
-            }
+      if (!response.ok) throw new Error("Gagal membuat token. Error " + response.status);
 
-            const session = JSON.parse(staffSession);
-            if (Date.now() > session.expiresAt) {
-                localStorage.removeItem('staffSession');
-                document.getElementById('staffLogin').style.display = 'flex';
-                return;
-            }
-        });
-    </script>
+      const { token } = await response.json();
+
+      // Login pakai token
+      const userCredential = await auth.signInWithCustomToken(token);
+
+      // Simpan session
+      const session = {
+        uid: userCredential.user.uid,
+        staffId: staffId,
+        isValidated: true,
+        expiresAt: Date.now() + (30 * 60 * 1000) // 30 menit
+      };
+      localStorage.setItem('staffSession', JSON.stringify(session));
+
+      document.getElementById('staffLogin')?.classList.add('hidden');
+      errorDisplay.textContent = '';
+      alert("Login staff berhasil");
+
+    } catch (err) {
+      console.error("Login gagal:", err);
+      errorDisplay.textContent = err.message;
+    }
+  });
+
+  // Logout
+  document.getElementById('staffLogoutButton')?.addEventListener('click', async () => {
+    try {
+      await auth.signOut();
+      localStorage.removeItem('staffSession');
+      alert('Logout berhasil');
+      window.location.href = '/ESPSTMARD/login.html';
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("Gagal logout: " + err.message);
+    }
+  });
+</script>
+
 </body>
 </html>
