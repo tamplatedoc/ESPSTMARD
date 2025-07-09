@@ -348,10 +348,42 @@
     </footer>
 
     <script>
+        // === KONFIGURASI DAN INISIALISASI FIREBASE ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+            authDomain: "tamplatedoc.firebaseapp.com",
+            databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "tamplatedoc",
+            storageBucket: "tamplatedoc.firebasestorage.app",
+            messagingSenderId: "264966107720",
+            appId: "1:264966107720:web:da19f6109e71390740de7d",
+            measurementId: "G-PFK8VQBFCV"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const rtdb = firebase.database(); // Realtime Database untuk views/rating
+    </script>
+
+    <style>
+        /* CSS Anda ada di sini */
+        /* Pastikan CSS untuk .ebook-card, .ebook-info, .ebook-stats, icon, dll. sudah ada */
+    </style>
+</head>
+<body>
+    <main>
+        <section class="catalog-section">
+            <div id="ebookCatalog" class="ebook-grid">
+                <p>Loading ebooks...</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // === LOGIKA THEME TOGGLE ===
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
 
-        // Check for saved theme preference
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             body.classList.add(savedTheme);
@@ -370,30 +402,115 @@
             }
         });
 
-        // Placeholder for dynamic content loading (e.g., from Firestore/Realtime Database)
-        // In a real application, you'd use JavaScript to fetch data and populate the main section.
-        // Example:
-        /*
-        document.addEventListener('DOMContentLoaded', () => {
-            // Fetch data from Firestore and Realtime Database
-            // For each ebook:
-            // const ebookCard = document.createElement('div');
-            // ebookCard.className = 'ebook-card';
-            // ebookCard.onclick = () => location.href = '/story/' + ebook.id;
-            // ebookCard.innerHTML = `
-            //     <img src="${ebook.thumbnailUrl}" alt="Ebook Thumbnail">
-            //     <div class="ebook-info">
-            //         <h3>${ebook.title}</h3>
-            //         <p>Author: ${ebook.authorName}</p>
-            //         <div class="ebook-stats">
-            //             <span><span class="icon">👁️</span> ${ebook.views}</span>
-            //             <span><span class="icon">⭐</span> ${ebook.averageRating} (${ebook.ratingCount})</span>
-            //         </div>
-            //     </div>
-            // `;
-            // document.getElementById('ebookCatalog').appendChild(ebookCard);
+        // === LOGIKA LOADING KONTEN DINAMIS DARI FIREBASE ===
+        document.addEventListener('DOMContentLoaded', async () => {
+            const ebookCatalog = document.getElementById('ebookCatalog');
+            ebookCatalog.innerHTML = '<p>Loading ebooks...</p>'; // Tampilkan pesan loading
+
+            try {
+                // 1. Ambil data cerita dari Firestore
+                // Asumsi koleksi cerita utama Anda bernama 'stories'
+                // Dan hanya ambil cerita yang statusnya 'published'
+                const storiesSnapshot = await db.collection('stories')
+                                                .where('status', '==', 'published')
+                                                .orderBy('createdAt', 'desc') // Urutkan berdasarkan tanggal dibuat
+                                                .get();
+
+                if (storiesSnapshot.empty) {
+                    ebookCatalog.innerHTML = '<p>No ebooks available yet. Please check back later!</p>';
+                    return;
+                }
+
+                const storyPromises = storiesSnapshot.docs.map(async doc => {
+                    const story = doc.data();
+                    const storyId = doc.id; // ID cerita dari Firestore
+
+                    // Ambil rating dan views dari Realtime Database (jika Anda menyimpannya di sana)
+                    // Asumsi struktur RTDB: /{storyId}/views dan /{storyId}/ratings/{userId}
+                    let views = 0;
+                    let averageRating = 0;
+                    let ratingCount = 0;
+
+                    try {
+                        const viewsRef = rtdb.ref(`stories_stats/${storyId}/views`);
+                        const viewsSnapshot = await viewsRef.once('value');
+                        views = viewsSnapshot.val() || 0;
+                    } catch (err) {
+                        console.warn("Could not fetch views for story", storyId, err);
+                    }
+
+                    try {
+                        const ratingsRef = rtdb.ref(`stories_stats/${storyId}/ratings`);
+                        const ratingsSnapshot = await ratingsRef.once('value');
+                        if (ratingsSnapshot.exists()) {
+                            let totalRating = 0;
+                            ratingsSnapshot.forEach(childSnap => {
+                                totalRating += childSnap.val();
+                            });
+                            ratingCount = ratingsSnapshot.numChildren();
+                            averageRating = (totalRating / ratingCount).toFixed(1); // Pembulatan 1 desimal
+                        }
+                    } catch (err) {
+                        console.warn("Could not fetch ratings for story", storyId, err);
+                    }
+
+
+                    // Buat elemen ebook card
+                    const ebookCard = document.createElement('div');
+                    ebookCard.className = 'ebook-card';
+                    // Ketika diklik, arahkan ke halaman detail cerita (belum ada, tapi ini simulasinya)
+                    // URL ini perlu disesuaikan dengan bagaimana Anda akan menampilkan detail cerita
+                    ebookCard.onclick = () => location.href = `/story-detail.html?storyId=${storyId}`; // Contoh: Arahkan ke story-detail.html
+
+                    // Pastikan story.thumbnailUrl ada dan valid
+                    const thumbnailUrl = story.thumbnailUrl || 'https://via.placeholder.com/150/cccccc/000000?text=No+Image'; // Placeholder jika tidak ada thumbnail
+
+                    ebookCard.innerHTML = `
+                        <img src="${thumbnailUrl}" alt="Ebook Thumbnail">
+                        <div class="ebook-info">
+                            <h3>${story.title}</h3>
+                            <p>Author: ${story.authorName}</p>
+                            <div class="ebook-stats">
+                                <span><span class="icon">👁️</span> ${views}</span>
+                                <span><span class="icon">⭐</span> ${averageRating} (${ratingCount})</span>
+                            </div>
+                        </div>
+                    `;
+                    return ebookCard;
+                });
+
+                const ebookCards = await Promise.all(storyPromises);
+                ebookCatalog.innerHTML = ''; // Hapus pesan loading
+                ebookCards.forEach(card => ebookCatalog.appendChild(card));
+
+            } catch (error) {
+                console.error("Error fetching ebooks:", error);
+                ebookCatalog.innerHTML = '<p>Failed to load ebooks. Please try again later.</p>';
+            }
         });
-        */
+
+        // === LOGIKA SEARCH BAR (MASIH SAMA SEPERTI SEBELUMNYA) ===
+        // Anda mungkin ingin menambahkan fungsionalitas pencarian yang sesungguhnya dengan Firebase
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                alert('Searching for: ' + query + ' (Fungsionalitas pencarian akan terhubung ke database)');
+                // Di sini Anda akan menambahkan logika pencarian ke Firestore atau RTDB
+                // Contoh: db.collection('stories').where('title', '>=', query).get();
+            } else {
+                alert('Please enter a search query.');
+            }
+        });
+
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchButton.click();
+            }
+        });
+
     </script>
 </body>
 </html>
