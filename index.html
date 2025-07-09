@@ -1,1123 +1,399 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Control - AMDF.GROUP</title>
-  <style>
-    /* Variables for easy theming */
-:root {
-    --primary-color: #007bff; /* Blue */
-    --secondary-color: #6c757d; /* Gray */
-    --accent-color: #00d4ff; /* Lighter blue/cyan for highlights */
-    --background-color: #1a1a2e; /* Dark blue/purple */
-    --card-background: #16213e; /* Slightly lighter dark blue */
-    --text-color: #e0e0e0; /* Light gray */
-    --text-secondary-color: #a0a0a0; /* Muted gray */
-    --border-color: #0f3460; /* Darker blue for borders */
-    --hover-color: #0056b3; /* Darker primary color on hover */
-
-    /* Status Colors */
-    --status-pending: #ffc107;   /* Yellow */
-    --status-approved: #28a745;  /* Green */
-    --status-rejected: #dc3545;  /* Red */
-    --status-data-breach: #007bff; /* Blue (as per your request for 'error data breach') */
-
-    --border-radius: 8px;
-    --spacing-unit: 16px;
-}
-
-/* Base Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-    overflow-x: hidden; /* Prevent horizontal scroll */
-}
-
-a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: var(--accent-color);
-}
-
-.creator-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: var(--card-background);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-}
-
-/* Header Styles */
-.creator-header {
-    background-color: var(--background-color);
-    padding: var(--spacing-unit);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.header-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.creator-header h1 {
-    margin: 0;
-    color: var(--accent-color);
-    font-size: 2em;
-    letter-spacing: 1px;
-}
-
-.creator-info {
-    font-size: 0.9em;
-    color: var(--text-secondary-color);
-    display: flex;
-    gap: 20px;
-}
-
-.creator-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-}
-
-.creator-nav li a {
-    display: block;
-    padding: 8px 15px;
-    border-radius: 5px;
-    background-color: var(--card-background);
-    color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-weight: bold;
-}
-
-.creator-nav li a:hover,
-.creator-nav li a.active {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-/* Main Content Styles */
-.creator-main {
-    flex-grow: 1;
-    padding: var(--spacing-unit) * 2;
-}
-
-.creator-section {
-    display: none; /* Hidden by default, JavaScript will manage visibility */
-    padding: var(--spacing-unit);
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    margin-bottom: var(--spacing-unit) * 2;
-}
-
-.creator-section.active {
-    display: block;
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.creator-section h2 {
-    color: var(--accent-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: var(--spacing-unit);
-}
-
-/* Dashboard Section */
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-unit);
-}
-
-.stat-card {
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-unit);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-}
-
-.stat-icon {
-    font-size: 2em;
-    color: var(--accent-color);
-}
-
-.stat-info h3 {
-    margin: 0 0 5px 0;
-    color: var(--primary-color);
-    font-size: 1.1em;
-}
-
-.stat-info p {
-    margin: 0;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-/* Form Styles */
-.story-form, .profile-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-unit);
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    margin-bottom: 8px;
-    color: var(--text-secondary-color);
-    font-weight: bold;
-}
-
-.form-group input[type="text"],
-.form-group select,
-.form-group textarea,
-.readonly-input {
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-size: 1em;
-    transition: border-color 0.3s ease;
-}
-
-.form-group input[type="text"]:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-.form-group textarea {
-    min-height: 150px;
-    resize: vertical;
-}
-
-.char-count {
-    font-size: 0.85em;
-    color: var(--text-secondary-color);
-    margin-top: 5px;
-    text-align: right;
-}
-
-.thumbnail-upload input[type="file"] {
-    background-color: var(--background-color);
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    color: var(--text-color);
-    cursor: pointer;
-}
-
-.file-info {
-    font-size: 0.8em;
-    color: var(--text-secondary-color);
-    margin-top: 5px;
-}
-
-.form-actions {
-    display: flex;
-    gap: var(--spacing-unit);
-    justify-content: flex-end;
-    margin-top: var(--spacing-unit);
-}
-
-.btn-primary, .btn-secondary, .btn-edit {
-    padding: 12px 25px;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--hover-color);
-    transform: translateY(-2px);
-}
-
-.btn-secondary {
-    background-color: var(--secondary-color);
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-    transform: translateY(-2px);
-}
-
-.btn-edit {
-    background-color: var(--accent-color);
-    color: var(--background-color);
-    margin-top: var(--spacing-unit);
-}
-
-.btn-edit:hover {
-    background-color: #00aaff;
-    transform: translateY(-2px);
-}
-
-/* Story List Section */
-.story-list-container {
-    background-color: var(--background-color);
-    padding: var(--spacing-unit);
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.story-filter {
-    margin-bottom: var(--spacing-unit);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.story-filter label {
-    color: var(--text-secondary-color);
-    font-weight: bold;
-}
-
-.story-filter select {
-    padding: 8px 12px;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    background-color: var(--card-background);
-    color: var(--text-color);
-}
-
-.story-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--spacing-unit);
-}
-
-.story-card {
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-unit);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Pushes footer to bottom */
-}
-
-.story-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-}
-
-.story-card h3 {
-    margin-top: 0;
-    color: var(--primary-color);
-    font-size: 1.3em;
-    margin-bottom: 10px;
-}
-
-.story-card p {
-    font-size: 0.95em;
-    color: var(--text-secondary-color);
-    margin-bottom: 10px;
-}
-
-.story-card .story-details {
-    margin-bottom: 15px;
-}
-
-.story-card .story-details p span {
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-.story-thumbnail {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: var(--border-radius);
-    margin-bottom: var(--spacing-unit);
-    border: 1px solid var(--border-color);
-}
-
-.story-status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.85em;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 10px; /* Space between content and status */
-}
-
-.status-pending { background-color: var(--status-pending); color: var(--background-color); }
-.status-approved { background-color: var(--status-approved); color: white; }
-.status-rejected { background-color: var(--status-rejected); color: white; }
-.status-datareached { background-color: var(--status-data-breach); color: white; } /* Adjusted name for consistency */
-
-/* Profile Section */
-.profile-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--spacing-unit);
-}
-
-.profile-card {
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: var(--spacing-unit);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.profile-card h3, .profile-stats h3 {
-    color: var(--primary-color);
-    margin-top: 0;
-    margin-bottom: var(--spacing-unit);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
-}
-
-.info-details p, .stats-grid .stat-item {
-    margin-bottom: 10px;
-    color: var(--text-secondary-color);
-}
-
-.info-details p span, .stats-grid .stat-value {
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-.stats-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.stat-item {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 5px;
-    border-bottom: 1px dashed var(--border-color);
-}
-
-.stat-item:last-child {
-    border-bottom: none;
-}
-
-/* Footer Styles */
-.creator-footer {
-    background-color: var(--background-color);
-    padding: var(--spacing-unit);
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-    font-size: 0.9em;
-    color: var(--text-secondary-color);
-}
-
-.footer-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0 0 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-}
-
-.footer-nav li a {
-    color: var(--text-secondary-color);
-}
-
-.footer-nav li a:hover {
-    color: var(--primary-color);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .creator-main {
-        padding: var(--spacing-unit);
-    }
-
-    .header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .creator-nav ul {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .dashboard-stats,
-    .story-grid,
-    .profile-info {
-        grid-template-columns: 1fr;
-    }
-
-    .form-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .btn-primary, .btn-secondary {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .creator-header h1 {
-        font-size: 1.8em;
-    }
-
-    .creator-info {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .creator-nav li a {
-        padding: 6px 10px;
-        font-size: 0.9em;
-    }
-
-    .stat-card {
-        flex-direction: column;
-        text-align: center;
-    }
-    .stat-icon {
-        margin-bottom: 10px;
-    }
-}
- </style>
+    <title>AMDF.GROUP Ebook Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-start: #0a0a0f;
+            --background-end: #1a1a2e;
+            --card-background: #1f2038;
+            --text-color: #e0e0e0;
+            --accent-color: #8c7ae6;
+            --gradient-1-start: #8c7ae6;
+            --gradient-1-end: #6c5ce7;
+            --gradient-2-start: #00cec9;
+            --gradient-2-end: #00b894;
+            --border-color: #3f425b;
+            --dark-mode-background-start: #0a0a0f;
+            --dark-mode-background-end: #1a1a2e;
+            --dark-mode-card-background: #1f2038;
+            --dark-mode-text-color: #e0e0e0;
+            --light-mode-background-start: #e0e0e0;
+            --light-mode-background-end: #f0f0f0;
+            --light-mode-card-background: #ffffff;
+            --light-mode-text-color: #333333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
+            color: var(--light-mode-text-color);
+        }
+
+        header {
+            background-color: rgba(31, 32, 56, 0.8);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8em;
+            color: var(--accent-color);
+            text-decoration: none;
+            text-shadow: 0 0 8px rgba(140, 122, 230, 0.6);
+        }
+
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .auth-section a {
+            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .auth-section a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
+        }
+
+        .auth-section p {
+            font-size: 0.9em;
+            color: var(--text-color);
+            margin: 0;
+            max-width: 180px;
+            text-align: right;
+        }
+
+        body.light-mode header {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .auth-section p {
+            color: var(--light-mode-text-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        body.light-mode .theme-toggle {
+            color: var(--light-mode-text-color);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .ebook-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        body.light-mode .ebook-card {
+            background-color: var(--light-mode-card-background);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .ebook-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .ebook-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        body.light-mode .ebook-card img {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .ebook-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .ebook-info h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+            color: var(--accent-color);
+            text-shadow: 0 0 5px rgba(140, 122, 230, 0.3);
+        }
+
+        body.light-mode .ebook-info h3 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+        }
+
+        .ebook-info p {
+            margin: 0 0 8px 0;
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+
+        body.light-mode .ebook-info p {
+            color: var(--light-mode-text-color);
+        }
+
+        .ebook-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        body.light-mode .ebook-stats {
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .ebook-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+        }
+
+        .ebook-stats .icon {
+            font-size: 1.1em;
+            color: var(--accent-color);
+        }
+
+        footer {
+            background-color: rgba(31, 32, 56, 0.8);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 40px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        footer nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s ease;
+        }
+
+        footer nav a:hover {
+            color: var(--accent-color);
+        }
+
+        body.light-mode footer {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode footer nav a {
+            color: var(--light-mode-text-color);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .auth-section {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .auth-section p {
+                text-align: center;
+                max-width: none;
+            }
+
+            main {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                padding: 15px;
+            }
+
+            .ebook-card img {
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="creator-container">
-        <header class="creator-header">
-            <div class="header-content">
-                <h1>Panel Control</h1>
-                <div class="creator-info">
-                    <span class="creator-id">ID Creator: <span id="displayCreatorId"></span></span>
-                    <span class="creator-name">Nama: <span id="displayCreatorName"></span></span>
-                </div>
-                <nav class="creator-nav">
-                    <ul>
-                        <li><a href="#dashboard" class="nav-link active" data-section="dashboard">Dashboard</a></li>
-                        <li><a href="#create" class="nav-link" data-section="create">Buat Cerita</a></li>
-                        <li><a href="#stories" class="nav-link" data-section="stories">Daftar Cerita</a></li>
-                        <li><a href="#profile" class="nav-link" data-section="profile">Profil</a></li>
-                    </ul>
-                </nav>
+    <header>
+        <a href="#" class="logo">AMDF EBOOK</a>
+        <div class="auth-section">
+            <p>If you want to become a story creator, you can log in/register.</p>
+            <div>
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
             </div>
-        </header>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">💡</button>
+        </div>
+    </header>
 
-        <main class="creator-main">
-            <section id="dashboard" class="creator-section active">
-                <h2>Dashboard</h2>
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <span class="stat-icon">📚</span>
-                        <div class="stat-info">
-                            <h3>Total Cerita</h3>
-                            <p id="totalStories">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">✅</span>
-                        <div class="stat-info">
-                            <h3>Cerita Diterima</h3>
-                            <p id="approvedStories">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">📝</span>
-                        <div class="stat-info">
-                            <h3>Cerita Menunggu</h3>
-                            <p id="pendingStories">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-icon">❌</span>
-                        <div class="stat-info">
-                            <h3>Cerita Ditolak</h3>
-                            <p id="rejectedStories">0</p>
-                        </div>
-                    </div>
+    <main id="ebookCatalog">
+        <div class="ebook-card" onclick="location.href='/story/id_cerita_12345'">
+            <img src="https://via.placeholder.com/400x250/00cec9/ffffff?text=Ebook+Thumbnail+1" alt="Ebook Thumbnail">
+            <div class="ebook-info">
+                <h3>The Last Starship</h3>
+                <p>Author: Jane Doe</p>
+                <div class="ebook-stats">
+                    <span><span class="icon">👁️</span> 1.2K</span>
+                    <span><span class="icon">⭐</span> 4.5 (234)</span>
                 </div>
-            </section>
-
-            <section id="create" class="creator-section">
-                <h2>Buat Cerita Baru</h2>
-                <form id="storyForm" class="story-form">
-                    <div class="form-group">
-                        <label for="title">Judul Cerita</label>
-                        <input
-                            type="text"
-                            id="title"
-                            name="title"
-                            required
-                            maxlength="100"
-                            placeholder="Masukkan judul cerita..."
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="genre">Genre</label>
-                        <select id="genre" name="genre" required>
-                            <option value="">Pilih Genre</option>
-                            <option value="romance">Romance</option>
-                            <option value="mystery">Mystery</option>
-                            <option value="sci-fi">Science Fiction</option>
-                            <option value="fantasy">Fantasy</option>
-                            <option value="horror">Horror</option>
-                            <option value="adventure">Adventure</option>
-                            <option value="historical">Historical</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="content">Isi Cerita</label>
-                        <textarea
-                            id="content"
-                            name="content"
-                            required
-                            maxlength="2600"
-                            placeholder="Tulis cerita Anda di sini..."
-                        ></textarea>
-                        <small class="char-count">Sisa karakter: <span id="charCount">2600</span></small>
-                    </div>
-                     <div class="form-group">
-                        <label for="authorName">Nama Penulis</label>
-                        <input
-                            type="text"
-                            id="authorName"
-                            name="authorName"
-                            readonly
-                            class="readonly-input"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="thumbnail">Thumbnail</label>
-                        <div class="thumbnail-upload">
-                            <input
-                                type="file"
-                                id="thumbnail"
-                                name="thumbnail"
-                                accept=".webp"
-                                required
-                            >
-                            <small class="file-info">Format: WEBP, Max size: 200KB</small>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="storyIdDisplay">ID Cerita</label>
-                        <input type="text" id="storyIdDisplay" readonly class="readonly-input">
-                        <small class="file-info">ID ini akan dibuat otomatis setelah cerita diterbitkan.</small>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Terbitkan Cerita</button>
-                        <button type="reset" class="btn-secondary">Reset</button>
-                    </div>
-                </form>
-            </section>
-
-            <section id="stories" class="creator-section">
-                <h2>Daftar Cerita Saya</h2>
-                <div class="story-list-container">
-                    <div class="story-filter">
-                        <label for="storyStatus">Filter Status:</label>
-                        <select id="storyStatus">
-                            <option value="all">Semua Status</option>
-                            <option value="pending">Menunggu Review</option>
-                            <option value="approved">Diterima</option>
-                            <option value="rejected">Ditolak</option>
-                        </select>
-                    </div>
-                    <div id="storyList" class="story-grid">
-                        <p id="noStoriesMessage" style="text-align: center; color: var(--text-secondary-color);">Belum ada cerita yang tersedia.</p>
-                    </div>
+            </div>
+        </div>
+        <div class="ebook-card" onclick="location.href='/story/id_cerita_12346'">
+            <img src="https://via.placeholder.com/400x250/8c7ae6/ffffff?text=Ebook+Thumbnail+2" alt="Ebook Thumbnail">
+            <div class="ebook-info">
+                <h3>Secrets of the Forgotten City</h3>
+                <p>Author: John Smith</p>
+                <div class="ebook-stats">
+                    <span><span class="icon">👁️</span> 850</span>
+                    <span><span class="icon">⭐</span> 4.2 (150)</span>
                 </div>
-            </section>
+            </div>
+        </div>
 
-            <section id="profile" class="creator-section">
-                <h2>Profil Saya</h2>
-                <div class="profile-info">
-                    <div class="profile-card">
-                        <h3>Informasi Akun</h3>
-                        <div class="info-details">
-                            <p>ID Creator: <span id="profileCreatorId"></span></p>
-                            <p>Nama: <span id="profileCreatorName"></span></p>
-                            <p>Email: <span id="profileEmail"></span></p>
-                            <p>WhatsApp: <span id="profileWa"></span></p>
-                        </div>
-                        <button class="btn-edit" id="btnEditProfile">Edit Profil</button>
-                    </div>
-                    <div class="profile-stats">
-                        <h3>Statistik Akun</h3>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <span class="stat-label">Total View</span>
-                                <span id="totalViews" class="stat-value">0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Rata-rata Rating</span>
-                                <span id="avgRating" class="stat-value">0.0</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-label">Total Komentar</span>
-                                <span id="totalComments" class="stat-value">0</span>
-                            </div>
-                        </div>
-                    </div>
+        <div class="ebook-card" onclick="location.href='/story/id_cerita_12347'">
+            <img src="https://via.placeholder.com/400x250/ff7675/ffffff?text=Ebook+Thumbnail+3" alt="Ebook Thumbnail">
+            <div class="ebook-info">
+                <h3>Chronicles of Eldoria: Vol 1</h3>
+                <p>Author: Alice Wonderland</p>
+                <div class="ebook-stats">
+                    <span><span class="icon">👁️</span> 2.1K</span>
+                    <span><span class="icon">⭐</span> 4.8 (300)</span>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
 
-        <footer class="creator-footer">
-            <p>© 2025 AMDF.GROUP. All rights reserved.</p>
-            <nav class="footer-nav">
-                <ul>
-                    <li><a href="#">Tentang Kami</a></li>
-                    <li><a href="#">Kebijakan Privasi</a></li>
-                    <li><a href="#">Syarat & Ketentuan</a></li>
-                    <li><a href="#">Bantuan</a></li>
-                </ul>
-            </nav>
-        </footer>
-    </div>
-    <script>// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-import { getDatabase, ref, push, set, onValue, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+        <div class="ebook-card" onclick="location.href='/story/id_cerita_12348'">
+            <img src="https://via.placeholder.com/400x250/fdcb6e/ffffff?text=Ebook+Thumbnail+4" alt="Ebook Thumbnail">
+            <div class="ebook-info">
+                <h3>The Quantum Paradox</h3>
+                <p>Author: Robert Oppenheimer</p>
+                <div class="ebook-stats">
+                    <span><span class="icon">👁️</span> 600</span>
+                    <span><span class="icon">⭐</span> 3.9 (90)</span>
+                </div>
+            </div>
+        </div>
+    </main>
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-    authDomain: "tamplatedoc.firebaseapp.com",
-    databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "tamplatedoc",
-    storageBucket: "tamplatedoc.firebasestorage.app",
-    messagingSenderId: "264966107720",
-    appId: "1:264966107720:web:da19f6109e71390740de7d",
-    measurementId: "G-PFK8VQBFCV"
-};
+    <footer>
+        <nav>
+            <a href="/about">About Us</a>
+            <a href="/privacy-policy">Privacy Policy</a>
+            <a href="/terms-of-service">Terms of Service</a>
+            <a href="/contact">Contact</a>
+        </nav>
+        <p>&copy; AMDF.GROUP</p>
+    </footer>
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const database = getDatabase(app);
-const storage = getStorage(app);
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
 
-// --- Global Variables (Simulating User Session) ---
-// In a real app, these would come from actual user authentication (e.g., Firebase Auth)
-const CURRENT_CREATOR = {
-    id: "C001", // Example Creator ID
-    name: "John Doe", // Example Creator Name
-    email: "john.doe@example.com",
-    wa: "+6281234567890"
-};
-let creatorStoriesCount = 0; // To track how many stories this creator has. This would ideally be fetched from a user profile in DB.
-
-// --- DOM Elements ---
-const navLinks = document.querySelectorAll('.nav-link');
-const sections = document.querySelectorAll('.creator-section');
-
-// Header Info
-const displayCreatorId = document.getElementById('displayCreatorId');
-const displayCreatorName = document.getElementById('displayCreatorName');
-
-// Dashboard Stats
-const totalStoriesEl = document.getElementById('totalStories');
-const approvedStoriesEl = document.getElementById('approvedStories');
-const pendingStoriesEl = document.getElementById('pendingStories');
-const rejectedStoriesEl = document.getElementById('rejectedStories');
-
-// Create Story Form
-const storyForm = document.getElementById('storyForm');
-const contentTextarea = document.getElementById('content');
-const charCountSpan = document.getElementById('charCount');
-const authorNameInput = document.getElementById('authorName');
-const thumbnailInput = document.getElementById('thumbnail');
-const storyIdDisplayInput = document.getElementById('storyIdDisplay');
-
-// Story List
-const storyStatusFilter = document.getElementById('storyStatus');
-const storyListDiv = document.getElementById('storyList');
-const noStoriesMessage = document.getElementById('noStoriesMessage');
-
-// Profile Section
-const profileCreatorId = document.getElementById('profileCreatorId');
-const profileCreatorName = document.getElementById('profileCreatorName');
-const profileEmail = document.getElementById('profileEmail');
-const profileWa = document.getElementById('profileWa');
-const totalViewsEl = document.getElementById('totalViews');
-const avgRatingEl = document.getElementById('avgRating');
-const totalCommentsEl = document.getElementById('totalComments');
-const btnEditProfile = document.getElementById('btnEditProfile');
-
-
-// --- Initial Setup and Event Listeners ---
-document.addEventListener('DOMContentLoaded', () => {
-    // Set creator info in header and profile
-    displayCreatorId.textContent = CURRENT_CREATOR.id;
-    displayCreatorName.textContent = CURRENT_CREATOR.name;
-    authorNameInput.value = CURRENT_CREATOR.name; // Auto-fill author name
-    profileCreatorId.textContent = CURRENT_CREATOR.id;
-    profileCreatorName.textContent = CURRENT_CREATOR.name;
-    profileEmail.textContent = CURRENT_CREATOR.email;
-    profileWa.textContent = CURRENT_CREATOR.wa;
-
-    // Load initial data for dashboard and stories
-    loadDashboardStats();
-    loadCreatorStories();
-    loadProfileStats();
-
-    // Set initial active section (Dashboard)
-    document.querySelector('.creator-section.active').style.display = 'block';
-});
-
-// Navigation logic
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        // Remove 'active' from current link and hide current section
-        document.querySelector('.nav-link.active').classList.remove('active');
-        document.querySelector('.creator-section.active').classList.remove('active');
-
-        // Add 'active' to clicked link
-        link.classList.add('active');
-
-        // Show the corresponding section
-        const targetSectionId = link.dataset.section;
-        const targetSection = document.getElementById(targetSectionId);
-        targetSection.classList.add('active'); // Add active class to display with animation
-
-        // Special handling for story list to refresh on view
-        if (targetSectionId === 'stories') {
-            loadCreatorStories(storyStatusFilter.value);
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.classList.add(savedTheme);
+            themeToggle.textContent = savedTheme === 'light-mode' ? '🌙' : '💡';
         }
-        if (targetSectionId === 'dashboard') {
-            loadDashboardStats();
-        }
-        if (targetSectionId === 'profile') {
-            loadProfileStats();
-        }
-    });
-});
 
-// Character count for textarea
-contentTextarea.addEventListener('input', () => {
-    const maxLength = parseInt(contentTextarea.maxLength);
-    const currentLength = contentTextarea.value.length;
-    charCountSpan.textContent = maxLength - currentLength;
-});
-
-// Form submission handler
-storyForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const title = document.getElementById('title').value;
-    const genre = document.getElementById('genre').value;
-    const content = contentTextarea.value;
-    const authorName = authorNameInput.value;
-    const thumbnailFile = thumbnailInput.files[0];
-
-    // Basic validation for thumbnail
-    if (!thumbnailFile) {
-        alert('Mohon unggah thumbnail.');
-        return;
-    }
-    if (thumbnailFile.type !== 'image/webp') {
-        alert('Format gambar harus WEBP.');
-        return;
-    }
-    if (thumbnailFile.size > 200 * 1024) { // 200KB in bytes
-        alert('Ukuran gambar tidak boleh lebih dari 200KB.');
-        return;
-    }
-
-    try {
-        // Disable submit button during upload/save
-        const submitButton = storyForm.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = 'Menerbitkan...';
-
-        // 1. Upload Thumbnail to Firebase Storage
-        const thumbnailRef = storageRef(storage, `thumbnails/${Date.now()}_${thumbnailFile.name}`);
-        const uploadTask = await uploadBytes(thumbnailRef, thumbnailFile);
-        const thumbnailUrl = await getDownloadURL(uploadTask.ref);
-
-        // 2. Generate Story ID
-        // Fetch current stories count for this creator to generate the last digit
-        const storiesRef = ref(database, 'stories');
-        const creatorStoriesQuery = query(storiesRef, orderByChild('creatorId'), equalTo(CURRENT_CREATOR.id));
-        const snapshot = await get(creatorStoriesQuery);
-        creatorStoriesCount = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
-        
-        const now = new Date();
-        const year = String(now.getFullYear()).slice(2); // '25' for 2025
-        const month = String(now.getMonth() + 1).padStart(2, '0'); // '07' for July
-        const day = String(now.getDate()).padStart(2, '0'); // '09' for 9
-        const creatorIdPart = CURRENT_CREATOR.id.replace('C', '').padStart(4, '0'); // '0001' for C001
-        const storyIndex = String(creatorStoriesCount + 1).padStart(2, '0'); // e.g., '01', '02'
-
-        const storyId = `${year}${month}${day}${creatorIdPart}${storyIndex}`;
-
-        // 3. Save Story Data to Firebase Realtime Database
-        const newStoryRef = push(storiesRef); // Generate a unique key for the story
-        await set(newStoryRef, {
-            storyId: storyId,
-            creatorId: CURRENT_CREATOR.id,
-            creatorName: authorName,
-            title: title,
-            genre: genre,
-            content: content,
-            thumbnailUrl: thumbnailUrl,
-            status: 'pending', // Initial status
-            createdAt: new Date().toISOString(),
-            views: 0,
-            rating: 0,
-            commentsCount: 0
+        themeToggle.addEventListener('click', () => {
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark-mode');
+                themeToggle.textContent = '💡';
+            } else {
+                body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light-mode');
+                themeToggle.textContent = '🌙';
+            }
         });
 
-        alert('Cerita berhasil diterbitkan dan sedang menunggu review!');
-        storyIdDisplayInput.value = storyId; // Display the generated ID
-        storyForm.reset(); // Reset the form
-        charCountSpan.textContent = contentTextarea.maxLength; // Reset char count
-
-        // Re-enable button
-        submitButton.disabled = false;
-        submitButton.textContent = 'Terbitkan Cerita';
-
-        // Optionally, navigate to "Daftar Cerita" or refresh dashboard
-        loadDashboardStats();
-        loadCreatorStories();
-
-    } catch (error) {
-        console.error("Error publishing story:", error);
-        alert('Gagal menerbitkan cerita. Silakan coba lagi. ' + error.message);
-        // Re-enable button on error
-        const submitButton = storyForm.querySelector('button[type="submit"]');
-        submitButton.disabled = false;
-        submitButton.textContent = 'Terbitkan Cerita';
-    }
-});
-
-// Filter stories by status
-storyStatusFilter.addEventListener('change', () => {
-    loadCreatorStories(storyStatusFilter.value);
-});
-
-// Handle edit profile button (for future implementation)
-btnEditProfile.addEventListener('click', () => {
-    alert('Fitur edit profil akan segera hadir!');
-    // In a real application, this would open a modal or navigate to an edit form
-});
-
-
-// --- Firebase Data Loading Functions ---
-
-async function loadDashboardStats() {
-    const storiesRef = ref(database, 'stories');
-    const creatorStoriesQuery = query(storiesRef, orderByChild('creatorId'), equalTo(CURRENT_CREATOR.id));
-
-    onValue(creatorStoriesQuery, (snapshot) => {
-        let total = 0;
-        let approved = 0;
-        let pending = 0;
-        let rejected = 0;
-
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const story = childSnapshot.val();
-                total++;
-                if (story.status === 'approved') {
-                    approved++;
-                } else if (story.status === 'pending') {
-                    pending++;
-                } else if (story.status === 'rejected') {
-                    rejected++;
-                }
-            });
-        }
-
-        totalStoriesEl.textContent = total;
-        approvedStoriesEl.textContent = approved;
-        pendingStoriesEl.textContent = pending;
-        rejectedStoriesEl.textContent = rejected;
-        creatorStoriesCount = total; // Update global count
-    });
-}
-
-function loadCreatorStories(filterStatus = 'all') {
-    const storiesRef = ref(database, 'stories');
-    let storiesQuery;
-
-    if (filterStatus === 'all') {
-        storiesQuery = query(storiesRef, orderByChild('creatorId'), equalTo(CURRENT_CREATOR.id));
-    } else {
-        storiesQuery = query(storiesRef, orderByChild('status'), equalTo(filterStatus));
-    }
-
-    onValue(storiesQuery, (snapshot) => {
-        storyListDiv.innerHTML = ''; // Clear previous stories
-        const storiesData = [];
-
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const story = childSnapshot.val();
-                // Ensure the story belongs to the current creator if filter is not 'all' or if filter is 'all'
-                if (filterStatus === 'all' && story.creatorId === CURRENT_CREATOR.id) {
-                    storiesData.push(story);
-                } else if (filterStatus !== 'all' && story.creatorId === CURRENT_CREATOR.id && story.status === filterStatus) {
-                    storiesData.push(story);
-                } else if (filterStatus === 'pending' && story.creatorId === CURRENT_CREATOR.id && story.status === 'pending') {
-                    storiesData.push(story);
-                }
-            });
-        }
-
-        if (storiesData.length === 0) {
-            noStoriesMessage.style.display = 'block';
-        } else {
-            noStoriesMessage.style.display = 'none';
-            storiesData.forEach(story => {
-                const storyCard = createStoryCard(story);
-                storyListDiv.appendChild(storyCard);
-            });
-        }
-    });
-}
-
-function createStoryCard(story) {
-    const card = document.createElement('div');
-    card.classList.add('story-card');
-
-    let statusClass = '';
-    let statusText = '';
-
-    switch (story.status) {
-        case 'pending':
-            statusClass = 'status-pending';
-            statusText = 'Menunggu Review';
-            break;
-        case 'approved':
-            statusClass = 'status-approved';
-            statusText = 'Diterima';
-            break;
-        case 'rejected':
-            statusClass = 'status-rejected';
-            statusText = 'Ditolak';
-            break;
-        // Assuming 'error data breach' is a specific status. I'll use a placeholder for now.
-        // If it's not a status but a condition, you'd handle it differently.
-        default:
-            statusClass = 'status-datareached'; // Using this for the blue status you mentioned
-            statusText = 'Error Data Breach'; // Or 'Published' for accepted stories? Clarify if needed
-            break;
-    }
-    
-    // Fallback if status is approved but you want a separate "Data Breach" type
-    // This part needs clarification from your side. For now, I'll map 'error data breach' to the blue.
-    if (story.status === 'data-breach-error') { // Placeholder for a specific error status
-        statusClass = 'status-datareached';
-        statusText = 'Error Data Breach';
-    }
-
-
-    card.innerHTML = `
-        <img src="${story.thumbnailUrl || 'https://via.placeholder.com/300x180?text=No+Thumbnail'}" alt="${story.title}" class="story-thumbnail">
-        <div class="story-details">
-            <h3>${story.title}</h3>
-            <p>ID Cerita: <span>${story.storyId || 'N/A'}</span></p>
-            <p>Genre: <span>${story.genre}</span></p>
-            <p>Penulis: <span>${story.creatorName}</span></p>
-            <p>Dibuat: <span>${new Date(story.createdAt).toLocaleDateString('id-ID')}</span></p>
-            <p>Views: <span>${story.views || 0}</span></p>
-            <p>Rating: <span>${story.rating || 0}/5</span></p>
-            <p>Komentar: <span>${story.commentsCount || 0}</span></p>
-        </div>
-        <div class="story-status ${statusClass}">${statusText}</div>
-    `;
-    return card;
-}
-
-function loadProfileStats() {
-    // In a real application, you might have a separate 'users' or 'profiles' node
-    // in your database that stores aggregated stats for each creator.
-    // For this example, we'll sum up from their stories.
-
-    const storiesRef = ref(database, 'stories');
-    const creatorStoriesQuery = query(storiesRef, orderByChild('creatorId'), equalTo(CURRENT_CREATOR.id));
-
-    onValue(creatorStoriesQuery, (snapshot) => {
-        let totalViews = 0;
-        let totalRatingSum = 0;
-        let ratedStoriesCount = 0;
-        let totalComments = 0;
-
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const story = childSnapshot.val();
-                totalViews += (story.views || 0);
-                totalComments += (story.commentsCount || 0);
-                if (story.rating && story.rating > 0) {
-                    totalRatingSum += story.rating;
-                    ratedStoriesCount++;
-                }
-            });
-        }
-
-        totalViewsEl.textContent = totalViews;
-        avgRatingEl.textContent = ratedStoriesCount > 0 ? (totalRatingSum / ratedStoriesCount).toFixed(1) : '0.0';
-        totalCommentsEl.textContent = totalComments;
-    });
-}
+        // Placeholder for dynamic content loading (e.g., from Firestore/Realtime Database)
+        // In a real application, you'd use JavaScript to fetch data and populate the main section.
+        // Example:
+        /*
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch data from Firestore and Realtime Database
+            // For each ebook:
+            // const ebookCard = document.createElement('div');
+            // ebookCard.className = 'ebook-card';
+            // ebookCard.onclick = () => location.href = '/story/' + ebook.id;
+            // ebookCard.innerHTML = `
+            //     <img src="${ebook.thumbnailUrl}" alt="Ebook Thumbnail">
+            //     <div class="ebook-info">
+            //         <h3>${ebook.title}</h3>
+            //         <p>Author: ${ebook.authorName}</p>
+            //         <div class="ebook-stats">
+            //             <span><span class="icon">👁️</span> ${ebook.views}</span>
+            //             <span><span class="icon">⭐</span> ${ebook.averageRating} (${ebook.ratingCount})</span>
+            //         </div>
+            //     </div>
+            // `;
+            // document.getElementById('ebookCatalog').appendChild(ebookCard);
+        });
+        */
     </script>
 </body>
 </html>
