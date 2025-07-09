@@ -1,0 +1,197 @@
+    <style>
+        :root {
+            --background-start: #0a0a0f;
+            --background-end: #1a1a2e;
+            --form-background: #1f2038;
+            --input-background: #282a46;
+            --text-color: #e0e0e0;
+            --accent-color: #8c7ae6;
+            --gradient-1-start: #8c7ae6;
+            --gradient-1-end: #6c5ce7;
+            --border-color: #3f425b;
+            --light-mode-background-start: #e0e0e0;
+            --light-mode-background-end: #f0f0f0;
+            --light-mode-form-background: #ffffff;
+            --light-mode-input-background: #f8f8f8;
+            --light-mode-text-color: #333333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
+            color: var(--light-mode-text-color);
+        }
+
+        .container {
+            background-color: var(--form-background);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        body.light-mode .container {
+            background-color: var(--light-mode-form-background);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .container h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2em;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(140, 122, 230, 0.6);
+        }
+
+        body.light-mode .container h1 {
+            color: var(--light-mode-text-color);
+            text-shadow: none;
+        }
+
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.1em;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .tab-button:hover {
+            color: var(--accent-color);
+        }
+
+        .tab-button.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            font-weight: bold;
+        }
+
+        body.light-mode .tab-button {
+            color: var(--light-mode-text-color);
+        }
+
+        body.light-mode .tab-button.active {
+            color: var(--light-mode-text-color);
+            border-bottom: 2px solid var(--light-mode-text-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group input[type="text"],
+        .form-group input[type="tel"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-background);
+            color: var(--text-color);
+            font-size: 1em;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        body.light-mode .form-group input {
+            background-color: var(--light-mode-input-background);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--light-mode-text-color);
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(140, 122, 230, 0.4);
+            outline: none;
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(140, 122, 230, 0.5);
+        }
+
+        .back-to-home {
+            display: block;
+            margin-top: 25px;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.2s ease;
+        }
+
+        .back-to-home:hover {
+            color: #a29bfe;
+        }
+
+        body.light-mode .back-to-home {
+            color: var(--light-mode-text-color);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+
+            .container h1 {
+                font-size: 1.8em;
+            }
+
+            .tab-button {
+                font-size: 1em;
+                padding: 8px 15px;
+            }
+        }
+    </style>
