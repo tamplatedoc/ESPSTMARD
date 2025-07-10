@@ -89,6 +89,11 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
+        body.light-mode header .logout-button {
+            background: linear-gradient(45deg, #e74c3c, #c0392b); /* Red for logout */
+        }
+
+
         main {
             flex-grow: 1;
             padding: 20px;
@@ -390,6 +395,25 @@
             color: var(--light-mode-text-color);
         }
 
+        /* Styles for new elements */
+        .hidden {
+            display: none !important;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .error-message {
+            color: var(--status-error-data-breach); /* Merah untuk pesan error */
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .loading-message {
+            color: var(--accent-color); /* Warna aksen untuk pesan loading */
+            margin-top: 50px;
+            font-size: 1.3em;
+            font-family: 'Orbitron', sans-serif;
+        }
+
         @media (max-width: 768px) {
             main {
                 padding: 15px;
@@ -418,29 +442,33 @@
     </header>
 
     <main>
-        <div id="not-logged-in-message" style="display:none; text-align: center; color: var(--status-error-data-breach); font-size: 1.2em; margin-top: 50px;">
-            You are not logged in. Please log in to access the dashboard. Redirecting...
+        <div id="loading-spinner" class="text-center loading-message">
+            Memverifikasi status login...
         </div>
 
-        <div id="dashboard-content" style="display:none;">
+        <div id="not-logged-in-message" class="hidden text-center error-message">
+            Anda belum login. Silakan login untuk mengakses dashboard. Mengarahkan...
+        </div>
+
+        <div id="dashboard-content" class="hidden">
             <h1>Creator Dashboard</h1>
 
             <div class="creator-info">
-                <span>Creator ID: <strong id="displayCreatorId">Loading...</strong></span>
-                <span>Author Name: <strong id="displayAuthorName">Loading...</strong></span>
+                <span>Creator ID: <strong id="displayCreatorId">Memuat...</strong></span>
+                <span>Nama Penulis: <strong id="displayAuthorName">Memuat...</strong></span>
             </div>
 
             <div class="form-section">
-                <h2>Add New Story</h2>
+                <h2>Tambah Cerita Baru</h2>
                 <form id="addStoryForm">
                     <div class="form-group">
-                        <label for="storyTitle">Story Title</label>
-                        <input type="text" id="storyTitle" placeholder="Enter story title" required>
+                        <label for="storyTitle">Judul Cerita</label>
+                        <input type="text" id="storyTitle" placeholder="Masukkan judul cerita" required>
                     </div>
                     <div class="form-group">
                         <label for="storyGenre">Genre</label>
                         <select id="storyGenre" required>
-                            <option value="">Select a Genre</option>
+                            <option value="">Pilih Genre</option>
                             <option value="Science Fiction">Science Fiction</option>
                             <option value="Fantasy">Fantasy</option>
                             <option value="Horror">Horror</option>
@@ -455,50 +483,51 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="storyContent">Story Content</label>
-                        <textarea id="storyContent" placeholder="Write your story here..." maxlength="2600" required></textarea>
-                        <small>Max 2600 characters.</small>
+                        <label for="storyContent">Konten Cerita</label>
+                        <textarea id="storyContent" placeholder="Tulis cerita Anda di sini..." maxlength="2600" required></textarea>
+                        <small>Maksimal 2600 karakter.</small>
                     </div>
                     <div class="form-group">
-                        <label for="authorNameReadonly">Author Name (Automatically Set)</label>
-                        <input type="text" id="authorNameReadonly" value="Loading Author..." readonly disabled>
+                        <label for="authorNameReadonly">Nama Penulis (Otomatis)</label>
+                        <input type="text" id="authorNameReadonly" value="Memuat Penulis..." readonly disabled>
                     </div>
                     <div class="form-group">
-                        <label for="storyImage">Thumbnail Image</label>
+                        <label for="storyImage">Gambar Thumbnail</label>
                         <input type="file" id="storyImage" accept=".webp" required>
-                        <small>Only .webp format, max 200KB.</small>
+                        <small>Hanya format .webp, maks 200KB.</small>
                     </div>
 
                     <div class="action-buttons">
-                        <button type="submit" id="createStoryButton">Create Story (Send for Review)</button>
+                        <button type="submit" id="createStoryButton">Buat Cerita (Kirim untuk Review)</button>
                     </div>
-                    <div id="storyIdDisplay" style="display: none;">Your Story ID: <span id="generatedStoryId"></span></div>
+                    <div id="storyIdDisplay" class="hidden">ID Cerita Anda: <span id="generatedStoryId"></span></div>
                 </form>
             </div>
 
             <div class="story-status-section">
-                <h2>Your Created Stories Status</h2>
+                <h2>Status Cerita Anda</h2>
                 <div class="story-list" id="creatorStoryList">
-                    <p style="text-align: center; color: #aaa;">Loading your stories...</p>
+                    <p style="text-align: center; color: #aaa;">Memuat cerita Anda...</p>
                 </div>
             </div>
         </div> </main>
 
     <footer>
         <nav>
-            <a href="/about">About Us</a>
-            <a href="/privacy-policy">Privacy Policy</a>
-            <a href="/terms-of-service">Terms of Service</a>
-            <a href="/contact">Contact</a>
+            <a href="/about">Tentang Kami</a>
+            <a href="/privacy-policy">Kebijakan Privasi</a>
+            <a href="/terms-of-service">Ketentuan Layanan</a>
+            <a href="/contact">Kontak</a>
         </nav>
         <p>&copy; AMDF.GROUP</p>
     </footer>
 
     <script type="module">
+        // Import modul Firebase yang dibutuhkan
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js"; // Rename ref to storageRef to avoid conflict
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // === KONFIGURASI DAN INISIALISASI FIREBASE ===
         const firebaseConfig = {
@@ -519,28 +548,36 @@
 
         let currentCreatorUid = null;
         let currentCreatorCustomId = 'N/A';
-        let currentAuthorName = 'Loading...';
+        let currentAuthorName = 'Memuat...';
 
-        // Get DOM elements for dashboard content and message
+        // Dapatkan elemen DOM untuk konten dashboard dan pesan notifikasi
         const dashboardContent = document.getElementById('dashboard-content');
         const notLoggedInMessage = document.getElementById('not-logged-in-message');
+        const loadingSpinner = document.getElementById('loading-spinner');
 
-        // === THEME TOGGLE (dari login.html, untuk konsistensi) ===
+        // === TEMA TOGGLE (dari login.html, untuk konsistensi) ===
         const body = document.body;
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             body.classList.add(savedTheme);
         }
 
-        // === AUTHENTICATION STATE LISTENER ===
-        // onAuthStateChanged is the primary way to manage auth state in Firebase
+        // === LISTENER STATUS AUTENTIKASI ===
+        // onAuthStateChanged adalah cara utama untuk mengelola status autentikasi di Firebase.
+        // Ini akan dieksekusi setiap kali status autentikasi berubah (login, logout, refresh halaman)
         onAuthStateChanged(auth, async (user) => {
+            // Sembunyikan spinner loading begitu status terdeteksi
+            loadingSpinner.classList.add('hidden');
+
             if (user) {
-                // User is signed in.
+                // Pengguna sudah login.
                 currentCreatorUid = user.uid;
-                // Fetch creator's detailed info from Firestore
+                // Ambil info detail kreator dari Firestore
                 try {
-                    const authorDocRef = doc(db, 'artifacts', 'default-app-id', 'public', 'data', 'authors', currentCreatorUid); // Sesuaikan path ini
+                    // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
+                    // Misalnya: 'users' atau 'creators'
+                    // Jika koleksi 'authors' Anda tidak berada di bawah 'artifacts/default-app-id/public/data/', sesuaikan jalur ini.
+                    const authorDocRef = doc(db, 'artifacts', 'default-app-id', 'public', 'data', 'authors', currentCreatorUid);
                     const authorDocSnap = await getDoc(authorDocRef);
 
                     if (authorDocSnap.exists()) {
@@ -552,62 +589,61 @@
                         document.getElementById('displayAuthorName').textContent = currentAuthorName;
                         document.getElementById('authorNameReadonly').value = currentAuthorName;
 
-                        // Check if creator is blocked
-                        // Anda perlu menyimpan status isBlocked di Firestore 'authors' collection.
-                        // Jika tidak ada di sana, pengecekan ini tidak akan berfungsi.
+                        // Periksa apakah kreator diblokir
+                        // Pastikan bidang 'isBlocked' ada di dokumen penulis Anda di Firestore.
                         if (data.isBlocked) {
-                            alert('Your account has been blocked. Please contact staff for more information.');
-                            await signOut(auth); // Force sign out
-                            window.location.href = '/ESPSTMARD/login.html'; // Redirect
+                            alert('Akun Anda telah diblokir. Silakan hubungi staf untuk informasi lebih lanjut.');
+                            await signOut(auth); // Paksa logout
+                            window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
                             return;
                         }
 
-                        // Load stories specific to this creator
+                        // Muat cerita khusus untuk kreator ini
                         loadCreatorStories(currentCreatorUid);
 
-                        // Show dashboard content
-                        dashboardContent.style.display = 'block';
-                        notLoggedInMessage.style.display = 'none';
+                        // Tampilkan konten dashboard
+                        dashboardContent.classList.remove('hidden');
+                        notLoggedInMessage.classList.add('hidden'); // Pastikan pesan tidak login tersembunyi
 
                     } else {
-                        // This case shouldn't ideally happen if registration logic is correct
-                        // Or if you store creator info in Realtime DB under UID, and need to fetch from there.
-                        console.error("Author document not found for UID:", currentCreatorUid);
-                        alert("Your creator profile is incomplete or not found. Please contact support.");
-                        await signOut(auth); // Force sign out
-                        window.location.href = '/ESPSTMARD/login.html'; // Redirect
+                        // Kasus ini seharusnya tidak terjadi jika logika pendaftaran sudah benar.
+                        console.error("Dokumen penulis tidak ditemukan untuk UID:", currentCreatorUid);
+                        alert("Profil kreator Anda tidak lengkap atau tidak ditemukan. Silakan hubungi dukungan.");
+                        await signOut(auth); // Paksa logout
+                        window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
                     }
                 } catch (error) {
                     console.error("Error fetching creator data:", error);
-                    alert("Failed to load creator data. Please try again.");
-                    await signOut(auth); // Force sign out on error
-                    window.location.href = '/ESPSTMARD/login.html'; // Redirect
+                    alert("Gagal memuat data kreator. Silakan coba lagi.");
+                    await signOut(auth); // Paksa logout jika ada error
+                    window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
                 }
             } else {
-                // No user is signed in. Redirect to login.
-                console.warn('No Firebase user authenticated. Redirecting to login.');
-                notLoggedInMessage.style.display = 'block';
-                dashboardContent.style.display = 'none';
-                alert('You are not logged in. Please log in to access the dashboard.'); // Keep alert for immediate feedback
+                // Tidak ada pengguna yang login. Arahkan ke halaman login.
+                console.warn('Tidak ada pengguna Firebase yang diautentikasi. Mengarahkan ke login.');
+                dashboardContent.classList.add('hidden'); // Sembunyikan dashboard
+                notLoggedInMessage.classList.remove('hidden'); // Tampilkan pesan tidak login
+
+                // Berikan sedikit waktu agar pengguna bisa membaca pesan sebelum diarahkan
                 setTimeout(() => {
-                    window.location.href = '/ESPSTMARD/login.html'; // Sesuaikan path ini!
-                }, 1500); // Redirect after 1.5 seconds
+                    window.location.href = '/ESPSTMARD/login.html'; // PASTIKAN JALUR INI BENAR!
+                }, 1500); // Arahkan setelah 1.5 detik
             }
         });
 
-        // === LOGOUT FUNCTIONALITY ===
+        // === FUNGSI LOGOUT ===
         document.getElementById('logoutButton').addEventListener('click', async () => {
             try {
-                await signOut(auth); // Use signOut from modular SDK
-                alert('You have been logged out successfully.');
-                window.location.href = '/ESPSTMARD/login.html'; // Redirect to login page
+                await signOut(auth); // Gunakan signOut dari Modular SDK
+                alert('Anda telah berhasil logout.');
+                window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
             } catch (error) {
-                console.error("Error during logout:", error);
-                alert("Logout failed. Please try again.");
+                console.error("Error selama logout:", error);
+                alert("Logout gagal. Silakan coba lagi.");
             }
         });
 
-        // === ADD NEW STORY FORM LOGIC ===
+        // === LOGIKA FORM TAMBAH CERITA BARU ===
         const addStoryForm = document.getElementById('addStoryForm');
         const storyTitleInput = document.getElementById('storyTitle');
         const storyGenreSelect = document.getElementById('storyGenre');
@@ -618,24 +654,24 @@
         const createStoryButton = document.getElementById('createStoryButton');
         const storyListElement = document.getElementById('creatorStoryList');
 
-        // Function to validate image file
+        // Fungsi untuk memvalidasi file gambar
         function validateImageFile(file) {
             if (!file) {
-                alert('Please select a thumbnail image.');
+                alert('Mohon pilih gambar thumbnail.');
                 return false;
             }
             if (file.type !== 'image/webp') {
-                alert('Image must be in .webp format.');
+                alert('Gambar harus dalam format .webp.');
                 return false;
             }
-            if (file.size > 200 * 1024) { // 200KB in bytes
-                alert('Image size must be max 200KB.');
+            if (file.size > 200 * 1024) { // 200KB dalam byte
+                alert('Ukuran gambar maksimal 200KB.');
                 return false;
             }
             return true;
         }
 
-        // Generate Story ID logic
+        // Logika untuk membuat ID Cerita
         async function generateStoryIdForCreator(creatorFirebaseUid, creatorCustomId) {
             const now = new Date();
             const year = String(now.getFullYear()).slice(-2);
@@ -644,27 +680,28 @@
 
             const shortCreatorId = creatorCustomId ? creatorCustomId.substring(0, 4) : 'NULL';
 
-            // Get the current story count for this creator from Firestore
+            // Dapatkan jumlah cerita saat ini untuk kreator ini dari Firestore
+            // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
             const creatorStatsDocRef = doc(db, 'artifacts', 'default-app-id', 'creator_stats', creatorFirebaseUid);
             const statsDocSnap = await getDoc(creatorStatsDocRef);
             let storyCount = 0;
             if (statsDocSnap.exists()) {
                 storyCount = statsDocSnap.data().storyCount || 0;
             }
-            storyCount++; // Increment for the new story
+            storyCount++; // Tambah untuk cerita baru
 
-            // Update the count in Firestore (crucial for uniqueness)
+            // Perbarui hitungan di Firestore (penting untuk keunikan)
             await setDoc(creatorStatsDocRef, { storyCount: storyCount }, { merge: true });
 
             return `${year}${month}${day}${shortCreatorId}${String(storyCount).padStart(3, '0')}`;
         }
 
-        // Handle "Create Story (Send for Review)" button
+        // Tangani tombol "Buat Cerita (Kirim untuk Review)"
         addStoryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             if (!currentCreatorUid) {
-                alert('User not authenticated. Please log in.');
+                alert('Pengguna tidak diautentikasi. Silakan login.');
                 return;
             }
 
@@ -675,7 +712,7 @@
             const imageFile = storyImageInput.files[0];
 
             if (!title || !genre || !content || !authorName || !imageFile) {
-                alert('Please fill in all required fields and select an image.');
+                alert('Mohon lengkapi semua bidang yang wajib diisi dan pilih gambar.');
                 return;
             }
 
@@ -683,22 +720,23 @@
                 return;
             }
 
-            // Disable button to prevent double submission
+            // Nonaktifkan tombol untuk mencegah pengiriman ganda
             createStoryButton.disabled = true;
-            createStoryButton.textContent = 'Submitting...';
+            createStoryButton.textContent = 'Mengirim...';
 
             try {
-                // 1. Generate unique Story ID
+                // 1. Buat ID Cerita yang unik
                 const storyId = await generateStoryIdForCreator(currentCreatorUid, currentCreatorCustomId);
 
-                // 2. Upload image to Firebase Storage
+                // 2. Unggah gambar ke Firebase Storage
                 const imagePath = `story_thumbnails/${currentCreatorUid}/${storyId}.webp`;
-                const imageRef = storageRef(storage, imagePath); // Use storageRef from modular SDK
-                await uploadBytes(imageRef, imageFile); // Use uploadBytes
-                const imageUrl = await getDownloadURL(imageRef); // Use getDownloadURL
+                const imageRef = storageRef(storage, imagePath); // Gunakan storageRef dari Modular SDK
+                await uploadBytes(imageRef, imageFile); // Gunakan uploadBytes
+                const imageUrl = await getDownloadURL(imageRef); // Gunakan getDownloadURL
 
-                // 3. Save story data to Firestore
-                const storyDocRef = doc(db, 'artifacts', 'default-app-id', 'stories', storyId); // Adjust Firestore path
+                // 3. Simpan data cerita ke Firestore
+                // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
+                const storyDocRef = doc(db, 'artifacts', 'default-app-id', 'stories', storyId);
                 await setDoc(storyDocRef, {
                     storyId: storyId,
                     title: title,
@@ -708,52 +746,52 @@
                     authorFirebaseUid: currentCreatorUid,
                     authorCustomId: currentCreatorCustomId,
                     authorName: authorName,
-                    status: 'under review',
-                    createdAt: serverTimestamp(), // Use serverTimestamp from modular SDK
+                    status: 'under review', // Status awal
+                    createdAt: serverTimestamp(), // Gunakan serverTimestamp dari Modular SDK
                     lastModified: serverTimestamp(),
                     views: 0,
                     ratings: {}
                 });
 
-                alert('Story submitted for review! Your Story ID: ' + storyId);
+                alert('Cerita berhasil dikirim untuk di-review! ID Cerita Anda: ' + storyId);
                 generatedStoryIdSpan.textContent = storyId;
-                storyIdDisplayDiv.style.display = 'block';
+                storyIdDisplayDiv.classList.remove('hidden');
 
-                // Clear form
+                // Bersihkan form
                 addStoryForm.reset();
-                // Optionally hide ID display after a short delay or user interaction
-                setTimeout(() => storyIdDisplayDiv.style.display = 'none', 3000);
+                // Opsional, sembunyikan tampilan ID setelah beberapa detik
+                setTimeout(() => storyIdDisplayDiv.classList.add('hidden'), 3000);
 
-                // Refresh the story list to show the new story
+                // Perbarui daftar cerita untuk menampilkan cerita baru
                 loadCreatorStories(currentCreatorUid);
 
             } catch (error) {
-                console.error('Error submitting story:', error);
-                alert('Failed to submit story. Please try again. ' + error.message);
+                console.error('Error saat mengirim cerita:', error);
+                alert('Gagal mengirim cerita. Silakan coba lagi. ' + error.message);
             } finally {
                 createStoryButton.disabled = false;
-                createStoryButton.textContent = 'Create Story (Send for Review)';
+                createStoryButton.textContent = 'Buat Cerita (Kirim untuk Review)';
             }
         });
 
-
-        // === LOAD CREATOR'S STORIES ===
+        // === MUAT CERITA KREATOR ===
         async function loadCreatorStories(creatorUid) {
-            storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">Loading your stories...</p>';
+            storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">Memuat cerita Anda...</p>';
 
             try {
-                // Query Firestore for stories where authorFirebaseUid matches the current creator's UID
-                // Use collection, query, where, orderBy from modular SDK
+                // Query Firestore untuk cerita di mana authorFirebaseUid cocok dengan UID kreator saat ini
+                // Gunakan collection, query, where, orderBy dari Modular SDK
+                // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
                 const q = query(
-                    collection(db, 'artifacts', 'default-app-id', 'stories'), // Adjust Firestore path
+                    collection(db, 'artifacts', 'default-app-id', 'stories'),
                     where('authorFirebaseUid', '==', creatorUid),
                     orderBy('createdAt', 'desc')
                 );
 
-                onSnapshot(q, (snapshot) => { // Use onSnapshot from modular SDK
-                    storyListElement.innerHTML = '';
+                onSnapshot(q, (snapshot) => { // Gunakan onSnapshot dari Modular SDK untuk update real-time
+                    storyListElement.innerHTML = ''; // Bersihkan daftar yang ada
                     if (snapshot.empty) {
-                        storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">You have not created any stories yet.</p>';
+                        storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">Anda belum membuat cerita apapun.</p>';
                         return;
                     }
 
@@ -764,38 +802,38 @@
 
                         if (story.status === 'under review') {
                             statusClass = 'status-under-review';
-                            displayStatusText = 'Under Review';
+                            displayStatusText = 'Dalam Review';
                         } else if (story.status === 'approved') {
                             statusClass = 'status-approved';
-                            displayStatusText = 'Approved';
+                            displayStatusText = 'Disetujui';
                         } else if (story.status === 'published') {
                             statusClass = 'status-published';
-                            displayStatusText = 'Published';
+                            displayStatusText = 'Diterbitkan';
                         } else if (story.status === 'rejected') {
                             statusClass = 'status-error-data-breach';
-                            displayStatusText = 'Rejected';
+                            displayStatusText = 'Ditolak';
                         } else {
                             statusClass = 'status-error-data-breach';
-                            displayStatusText = 'Unknown Status';
+                            displayStatusText = 'Status Tidak Dikenal';
                         }
 
                         const storyItemHtml = `
                             <div class="story-item">
-                                <span>Story ID: ${story.storyId}</span>
-                                <span>Title: ${story.title}</span>
+                                <span>ID Cerita: ${story.storyId}</span>
+                                <span>Judul: ${story.title}</span>
                                 <span class="status-indicator ${statusClass}">${displayStatusText}</span>
                             </div>
                         `;
                         storyListElement.insertAdjacentHTML('beforeend', storyItemHtml);
                     });
                 }, (error) => {
-                    console.error("Error listening to stories:", error);
-                    storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Error loading stories. Please try again.</p>';
+                    console.error("Error mendengarkan cerita:", error);
+                    storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Error memuat cerita. Silakan coba lagi.</p>';
                 });
 
             } catch (error) {
-                console.error('Error fetching creator stories:', error);
-                storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Failed to load your stories. Please try again.</p>';
+                console.error('Error mengambil cerita kreator:', error);
+                storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Gagal memuat cerita Anda. Silakan coba lagi.</p>';
             }
         }
     </script>
