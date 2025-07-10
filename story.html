@@ -1,381 +1,475 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="storyPageTitle">Loading Story...</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <style>
-        /* Anda bisa menyalin CSS dari halaman katalog atau mendefinisikan yang baru */
-        /* Contoh CSS untuk halaman detail cerita */
+    <title>AMDF.GROUP E-Book Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* CSS Variables for Light Mode */
         :root {
-            --background-start: #0a0a0f;
-            --background-end: #1a1a2e;
-            --container-background: #1f2038;
-            --input-background: #282a46;
+            --background-start: #f0f2f5;
+            --background-end: #e0e2e5;
+            --text-color: #333;
+            --header-bg: rgba(255, 255, 255, 0.9);
+            --header-border: #eee;
+            --card-bg: #ffffff;
+            --card-border: #ddd;
+            --card-shadow: rgba(0, 0, 0, 0.08);
+            --button-bg-gradient-start: #6a11cb;
+            --button-bg-gradient-end: #2575fc;
+            --button-text-color: #fff;
+            --link-color: #007bff;
+            --icon-color: #777;
+            --toggle-bg: #ddd;
+            --toggle-circle-bg: #fff;
+            --toggle-shadow: rgba(0, 0, 0, 0.2);
+            --footer-bg: #333;
+            --footer-text: #eee;
+        }
+
+        /* Dark Mode styles */
+        body.dark-mode {
+            --background-start: #1a1a2e;
+            --background-end: #16213e;
             --text-color: #e0e0e0;
-            --accent-color: #8c7ae6;
-            --gradient-1-start: #8c7ae6;
-            --gradient-1-end: #6c5ce7;
-            --border-color: #3f425b;
-            --light-mode-background-start: #e0e0e0;
-            --light-mode-background-end: #f0f0f0;
-            --light-mode-container-background: #ffffff;
-            --light-mode-input-background: #f8f8f8;
-            --light-mode-text-color: #333333;
-            --star-filled: #FFD700; /* Gold */
-            --star-empty: #ccc;
+            --header-bg: rgba(26, 26, 46, 0.9);
+            --header-border: #333;
+            --card-bg: #22253b;
+            --card-border: #444;
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --button-bg-gradient-start: #8e2de2;
+            --button-bg-gradient-end: #4a00e0;
+            --button-text-color: #fff;
+            --link-color: #8e2de2;
+            --icon-color: #aaa;
+            --toggle-bg: #555;
+            --toggle-circle-bg: #bbb;
+            --toggle-shadow: rgba(0, 0, 0, 0.4);
+            --footer-bg: #111;
+            --footer-text: #bbb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
             color: var(--text-color);
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        body.light-mode {
-            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
-            color: var(--light-mode-text-color);
-        }
-
         header {
-            background-color: rgba(31, 32, 56, 0.8);
-            padding: 15px 20px;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
+            border-bottom: 1px solid var(--header-border);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 2px 10px var(--card-shadow);
         }
 
-        header .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8em;
-            color: var(--accent-color);
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
             text-decoration: none;
-            text-shadow: 0 0 8px rgba(140, 122, 230, 0.6);
-        }
-        body.light-mode header .logo {
-            color: var(--light-mode-text-color);
-            text-shadow: none;
+            background: linear-gradient(45deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--link-color);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--button-bg-gradient-start); /* Fallback */
+            background: linear-gradient(45deg, var(--button-bg-gradient-start) 0%, var(--button-bg-gradient-end) 100%);
+            color: var(--button-text-color);
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap; /* Prevent text wrapping */
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--card-shadow);
+        }
+
+        .mode-toggle {
+            width: 50px;
+            height: 25px;
+            background-color: var(--toggle-bg);
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-shrink: 0; /* Prevent shrinking on small screens */
+        }
+
+        .mode-toggle .circle {
+            width: 20px;
+            height: 20px;
+            background-color: var(--toggle-circle-bg);
+            border-radius: 50%;
+            position: absolute;
+            top: 2.5px;
+            left: 2.5px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 2px 5px var(--toggle-shadow);
+        }
+
+        body.dark-mode .mode-toggle .circle {
+            transform: translateX(25px);
+        }
 
         main {
             flex-grow: 1;
-            padding: 20px;
-            max-width: 900px;
-            margin: 20px auto;
-            background-color: var(--container-background);
+            padding: 2rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .catalog-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .catalog-header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .catalog-header p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .creator-info {
+            background-color: rgba(0, 123, 255, 0.1);
+            border-left: 5px solid var(--link-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-top: 1.5rem;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .creator-info a {
+            color: var(--link-color);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .creator-info a:hover {
+            text-decoration: underline;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .book-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: 0 8px 25px var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
         }
 
-        body.light-mode main {
-            background-color: var(--light-mode-container-background);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.1);
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px var(--card-shadow);
         }
 
-        .story-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .story-header h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5em;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px rgba(140, 122, 230, 0.6);
-            margin-bottom: 10px;
-        }
-        body.light-mode .story-header h1 {
-            color: var(--light-mode-text-color);
-            text-shadow: none;
-        }
-
-
-        .story-header p {
-            font-size: 1.1em;
-            color: #ccc;
-        }
-        body.light-mode .story-header p {
-            color: var(--light-mode-text-color);
-        }
-
-
-        .story-thumbnail {
+        .book-card-thumbnail {
             width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-        }
-        body.light-mode .story-thumbnail {
-            border: 1px solid rgba(0,0,0,0.1);
+            height: 200px; /* Fixed height for thumbnails */
+            object-fit: cover; /* Ensures image covers the area, cropping if necessary */
+            border-bottom: 1px solid var(--card-border);
         }
 
-        .story-content {
-            font-size: 1.05em;
-            line-height: 1.8;
-            margin-bottom: 40px;
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
-        }
-
-        .story-stats {
+        .book-card-content {
+            padding: 1.5rem;
             display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-bottom: 40px;
-            font-size: 1.1em;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .book-card-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.7rem;
             color: var(--text-color);
+            flex-grow: 1; /* Allows title to take available space */
         }
 
-        .story-stats span .icon {
-            margin-right: 8px;
-            color: var(--accent-color);
+        .book-card-content p {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-bottom: 0.4rem;
         }
 
-        .rating-section, .comments-section {
-            padding-top: 30px;
-            border-top: 1px solid var(--border-color);
-            margin-top: 30px;
-        }
-        body.light-mode .rating-section, body.light-mode .comments-section {
-            border-top: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .rating-section h2, .comments-section h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8em;
-            color: var(--accent-color);
-            text-align: center;
-            margin-bottom: 25px;
-            text-shadow: 0 0 8px rgba(140, 122, 230, 0.3);
-        }
-        body.light-mode .rating-section h2, body.light-mode .comments-section h2 {
-            color: var(--light-mode-text-color);
-            text-shadow: none;
-        }
-
-
-        .stars {
+        .book-card-meta {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--icon-color);
+        }
+
+        .book-card-meta span {
+            display: flex;
+            align-items: center;
             gap: 5px;
-            font-size: 2.5em;
-            cursor: pointer;
-            margin-bottom: 20px;
         }
 
-        .star {
-            color: var(--star-empty);
-            transition: color 0.2s ease;
+        .book-card-meta i {
+            color: var(--link-color);
         }
 
-        .star.filled {
-            color: var(--star-filled);
-        }
-
-        .comment-form textarea {
-            width: calc(100% - 20px);
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--input-background);
-            color: var(--text-color);
-            font-size: 1em;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-            resize: vertical;
-            min-height: 100px;
-            margin-bottom: 15px;
-        }
-        body.light-mode .comment-form textarea {
-            background-color: var(--light-mode-input-background);
-            border: 1px solid rgba(0,0,0,0.1);
-            color: var(--light-mode-text-color);
-        }
-
-
-        .comment-form button {
-            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            display: block;
-            width: 100%;
-        }
-        .comment-form button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(140, 122, 230, 0.5);
-        }
-
-        .comment-list {
-            margin-top: 30px;
-        }
-
-        .comment-item {
-            background-color: var(--input-background);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        body.light-mode .comment-item {
-            background-color: var(--light-mode-input-background);
-            border: 1px solid rgba(0,0,0,0.1);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-
-        .comment-item strong {
-            color: var(--accent-color);
-            margin-bottom: 5px;
-            display: block;
-        }
-        body.light-mode .comment-item strong {
-            color: var(--light-mode-text-color);
-        }
-
-
-        .comment-item p {
-            margin: 5px 0;
-            font-size: 0.95em;
-        }
-
-        .comment-item small {
-            display: block;
-            text-align: right;
-            color: #aaa;
-            font-size: 0.8em;
-            margin-top: 10px;
+        .rating .stars {
+            color: gold; /* Or a specific yellow/orange */
         }
 
         footer {
-            background-color: rgba(31, 32, 56, 0.8);
-            padding: 20px;
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
             text-align: center;
-            font-size: 0.9em;
-            margin-top: 40px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            padding: 1.5rem 5%;
+            margin-top: 3rem;
+            border-top: 1px solid var(--header-border);
         }
 
         footer nav a {
-            color: var(--text-color);
+            color: var(--footer-text);
             text-decoration: none;
             margin: 0 10px;
-            transition: color 0.2s ease;
+            transition: color 0.3s ease;
         }
 
         footer nav a:hover {
-            color: var(--accent-color);
+            color: var(--link-color);
         }
 
-        body.light-mode footer {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        body.light-mode footer nav a {
-            color: var(--light-mode-text-color);
-        }
-
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem 4%;
+            }
+
+            .logo {
+                margin-bottom: 1rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+            }
+
+            .auth-buttons {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .btn {
+                flex-grow: 1;
+                text-align: center;
+                padding: 0.6rem 1rem;
+            }
+
             main {
-                padding: 15px;
-                margin: 15px auto;
+                padding: 1.5rem 4%;
             }
 
-            .story-header h1 {
-                font-size: 2em;
+            .catalog-header h1 {
+                font-size: 2rem;
             }
 
-            .stars {
-                font-size: 2em;
+            .catalog-header p {
+                font-size: 1rem;
+            }
+
+            .book-grid {
+                grid-template-columns: 1fr; /* Single column on small screens */
+            }
+
+            .book-card-thumbnail {
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+            .nav-links a {
+                font-size: 0.9rem;
+            }
+            .btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .catalog-header h1 {
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <a href="/" class="logo">AMDF EBOOK</a>
-        <button id="themeToggle">💡</button>
+        <a href="#" class="logo">AMDF.GROUP E-Books</a>
+        <div class="nav-links">
+            <a href="#catalog">Catalog</a>
+            <a href="#about">About</a>
+            <a href="#privacy">Privacy Policy</a>
+            <div class="mode-toggle" onclick="toggleDarkMode()">
+                <div class="circle"></div>
+            </div>
+        </div>
+        <div class="auth-buttons">
+            <a href="login_register_creator.html" class="btn">Login / Register</a>
+        </div>
     </header>
 
     <main>
-        <div class="story-header">
-            <h1 id="storyTitle">Loading Story Title...</h1>
-            <p>Author: <span id="storyAuthor">Loading...</span> | Genre: <span id="storyGenre">Loading...</span></p>
-        </div>
-
-        <img id="storyThumbnail" src="https://via.placeholder.com/800x450/cccccc/000000?text=Loading+Thumbnail" alt="Story Thumbnail" class="story-thumbnail">
-
-        <div class="story-content" id="storyContent">
-            <p>Loading story content...</p>
-        </div>
-
-        <div class="story-stats">
-            <span><span class="icon">👁️</span> Views: <span id="storyViews">0</span></span>
-            <span><span class="icon">⭐</span> Rating: <span id="storyRating">0.0</span> (<span id="storyRatingCount">0</span>)</span>
-        </div>
-
-        <section class="rating-section">
-            <h2>Rate This Story</h2>
-            <div class="stars" id="ratingStars">
-                <i class="fa-solid fa-star star" data-value="1"></i>
-                <i class="fa-solid fa-star star" data-value="2"></i>
-                <i class="fa-solid fa-star star" data-value="3"></i>
-                <i class="fa-solid fa-star star" data-value="4"></i>
-                <i class="fa-solid fa-star star" data-value="5"></i>
+        <section id="catalog" class="catalog-header">
+            <h1>Discover Amazing Stories</h1>
+            <p>Dive into a world of captivating tales, from thrilling adventures to heartwarming romances. Enjoy free e-books and explore new narratives every day.</p>
+            <div class="creator-info">
+                If you wish to become a story creator and share your own narratives, please <a href="login_register_creator.html">Login or Register here</a>. Reading stories is always free and doesn't require an account.
             </div>
-            <p id="ratingMessage" style="text-align: center; color: #ccc;"></p>
         </section>
 
-        <section class="comments-section">
-            <h2>Comments</h2>
-            <form id="commentForm" class="comment-form">
-                <textarea id="commentContent" placeholder="Write your comment here..." required></textarea>
-                <button type="submit">Post Comment</button>
-            </form>
-            <div id="commentList" class="comment-list">
-                <p>No comments yet. Be the first to comment!</p>
+        <section class="book-grid">
+            <div class="book-card" onclick="location.href='web_story.html?id=story123'">
+                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+1" alt="Story Thumbnail" class="book-card-thumbnail">
+                <div class="book-card-content">
+                    <h3>The Last Stargazer</h3>
+                    <p>Author: Jane Doe</p>
+                    <div class="book-card-meta">
+                        <span><i class="fas fa-eye"></i> 1,234 Views</span>
+                        <span class="rating">
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star-half-alt stars"></i>
+                            <i class="far fa-star"></i> 4.5 (120 Ratings)
+                        </span>
+                    </div>
                 </div>
-        </section>
+            </div>
+
+            <div class="book-card" onclick="location.href='web_story.html?id=story124'">
+                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+2" alt="Story Thumbnail" class="book-card-thumbnail">
+                <div class="book-card-content">
+                    <h3>Whispers of the Ancient Forest</h3>
+                    <p>Author: John Smith</p>
+                    <div class="book-card-meta">
+                        <span><i class="fas fa-eye"></i> 890 Views</span>
+                        <span class="rating">
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="far fa-star"></i> 4.0 (85 Ratings)
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="book-card" onclick="location.href='web_story.html?id=story125'">
+                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+3" alt="Story Thumbnail" class="book-card-thumbnail">
+                <div class="book-card-content">
+                    <h3>City of Neon Dreams</h3>
+                    <p>Author: Alice Wonderland</p>
+                    <div class="book-card-meta">
+                        <span><i class="fas fa-eye"></i> 2,500 Views</span>
+                        <span class="rating">
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i> 5.0 (210 Ratings)
+                        </span>
+                    </div>
+                </div>
+            </div>
+            </section>
     </main>
 
     <footer>
+        <p>&copy; 2025 AMDF.GROUP. All rights reserved.</p>
         <nav>
-            <a href="/about">About Us</a>
-            <a href="/privacy-policy">Privacy Policy</a>
-            <a href="/terms-of-service">Terms of Service</a>
-            <a href="/contact">Contact</a>
+            <a href="#about">About Us</a> |
+            <a href="#privacy">Privacy Policy</a> |
+            <a href="#terms">Terms of Service</a>
         </nav>
-        <p>&copy; AMDF.GROUP</p>
     </footer>
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> <script>
-        // === KONFIGURASI DAN INISIALISASI FIREBASE ===
+    <script type="module">
+        // Firebase Configuration (provided by you)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
+         Import other Firebase services as needed (e.g., getFirestore, getDatabase, getStorage)
+         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+         import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+         import { getStorage } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
+
+
         const firebaseConfig = {
             apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
             authDomain: "tamplatedoc.firebaseapp.com",
@@ -383,279 +477,98 @@
             projectId: "tamplatedoc",
             storageBucket: "tamplatedoc.firebasestorage.app",
             messagingSenderId: "264966107720",
-            appId: "1:264966107720:web:da19f6109e71390740de7d",
-            measurementId: "G-PFK8VQBFCV"
+            appId: "1:264966107720:web:868abe93cdff209040de7d",
+            measurementId: "G-S5WTZ7S5PG"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const rtdb = firebase.database();
-        const auth = firebase.auth(); // Untuk mendapatkan user ID saat rating/komentar
-    </script>
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+         You would also initialize Firestore, Realtime Database, Storage here:
+         const db = getFirestore(app);
+         const rtdb = getDatabase(app);
+         const storage = getStorage(app);
 
-    <script>
-        // === THEME TOGGLE ===
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.classList.add(savedTheme);
-            themeToggle.textContent = savedTheme === 'light-mode' ? '🌙' : '💡';
-        }
-
-        themeToggle.addEventListener('click', () => {
-            if (body.classList.contains('light-mode')) {
-                body.classList.remove('light-mode');
-                localStorage.setItem('theme', 'dark-mode');
-                themeToggle.textContent = '💡';
+        // Dark Mode Toggle Logic
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            // Store user preference in localStorage
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
             } else {
-                body.classList.add('light-mode');
-                localStorage.setItem('theme', 'light-mode');
-                themeToggle.textContent = '🌙';
-            }
-        });
-
-        // === GET STORY ID FROM URL ===
-        const urlParams = new URLSearchParams(window.location.search);
-        const storyId = urlParams.get('storyId');
-
-        // === ELEMENTS ===
-        const storyPageTitle = document.getElementById('storyPageTitle');
-        const storyTitleElem = document.getElementById('storyTitle');
-        const storyAuthorElem = document.getElementById('storyAuthor');
-        const storyGenreElem = document.getElementById('storyGenre');
-        const storyThumbnailElem = document.getElementById('storyThumbnail');
-        const storyContentElem = document.getElementById('storyContent');
-        const storyViewsElem = document.getElementById('storyViews');
-        const storyRatingElem = document.getElementById('storyRating');
-        const storyRatingCountElem = document.getElementById('storyRatingCount');
-        const ratingStarsContainer = document.getElementById('ratingStars');
-        const ratingMessage = document.getElementById('ratingMessage');
-        const commentForm = document.getElementById('commentForm');
-        const commentContentInput = document.getElementById('commentContent');
-        const commentListElem = document.getElementById('commentList');
-
-        let currentUser = null; // Akan menyimpan user yang sedang login (jika ada)
-
-        // --- AUTH STATE LISTENER ---
-        // Ini penting untuk mengetahui apakah user sudah login saat memberikan rating/komentar
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                console.log("User is logged in:", user.uid);
-                ratingMessage.textContent = "Click a star to rate!";
-            } else {
-                currentUser = null;
-                console.log("No user is logged in.");
-                ratingMessage.textContent = "Login to rate and comment.";
-                // Disable rating and comment if not logged in
-                ratingStarsContainer.style.pointerEvents = 'none';
-                commentForm.style.pointerEvents = 'none';
-                commentForm.querySelector('button').textContent = "Login to comment";
-            }
-        });
-
-
-        // === LOAD STORY DETAILS, VIEWS, AND RATINGS ===
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (!storyId) {
-                storyTitleElem.textContent = 'Story Not Found';
-                storyContentElem.innerHTML = '<p>No story ID provided in the URL.</p>';
-                storyPageTitle.textContent = 'Error - AMDF Ebook';
-                return;
-            }
-
-            try {
-                // Fetch Story Details from Firestore
-                const storyDoc = await db.collection('stories').doc(storyId).get();
-
-                if (!storyDoc.exists) {
-                    storyTitleElem.textContent = 'Story Not Found';
-                    storyContentElem.innerHTML = '<p>The story you are looking for does not exist.</p>';
-                    storyPageTitle.textContent = 'Not Found - AMDF Ebook';
-                    return;
-                }
-
-                const storyData = storyDoc.data();
-                storyPageTitle.textContent = storyData.title + ' - AMDF Ebook';
-                storyTitleElem.textContent = storyData.title;
-                storyAuthorElem.textContent = storyData.authorName;
-                storyGenreElem.textContent = storyData.genre;
-                storyThumbnailElem.src = storyData.thumbnailUrl || 'https://via.placeholder.com/800x450/cccccc/000000?text=No+Image';
-                // Use innerHTML for rich text content, and replace \n with <br> for line breaks
-                storyContentElem.innerHTML = storyData.content.replace(/\n/g, '<br>');
-
-
-                // Increment Views in Realtime Database
-                const viewsRef = rtdb.ref(`stories_stats/${storyId}/views`);
-                viewsRef.transaction((currentViews) => {
-                    return (currentViews || 0) + 1;
-                }, (error, committed, snapshot) => {
-                    if (error) {
-                        console.error("Transaction failed: ", error);
-                    } else if (committed) {
-                        console.log("Views incremented!");
-                        storyViewsElem.textContent = snapshot.val(); // Update displayed views
-                    } else {
-                        console.log("Views not incremented (transaction aborted).");
-                    }
-                });
-
-                // Load Initial Views and Ratings (if transaction fails or for initial display)
-                viewsRef.on('value', (snapshot) => {
-                    storyViewsElem.textContent = snapshot.val() || 0;
-                });
-
-                const ratingsRef = rtdb.ref(`stories_stats/${storyId}/ratings`);
-                ratingsRef.on('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        let totalRating = 0;
-                        let count = 0;
-                        snapshot.forEach(childSnap => {
-                            totalRating += childSnap.val();
-                            count++;
-                        });
-                        storyRatingElem.textContent = (totalRating / count).toFixed(1);
-                        storyRatingCountElem.textContent = count;
-                    } else {
-                        storyRatingElem.textContent = '0.0';
-                        storyRatingCountElem.textContent = '0';
-                    }
-                });
-
-                // Load Comments
-                loadComments(storyId);
-
-            } catch (error) {
-                console.error("Error loading story details:", error);
-                storyTitleElem.textContent = 'Error Loading Story';
-                storyContentElem.innerHTML = '<p>An error occurred while loading the story. Please try again.</p>';
-                storyPageTitle.textContent = 'Error - AMDF Ebook';
-            }
-        });
-
-        // === RATING LOGIC ===
-        ratingStarsContainer.addEventListener('mouseover', (e) => {
-            if (e.target.classList.contains('star')) {
-                const value = parseInt(e.target.dataset.value);
-                Array.from(ratingStarsContainer.children).forEach(star => {
-                    star.classList.toggle('filled', parseInt(star.dataset.value) <= value);
-                });
-            }
-        });
-
-        ratingStarsContainer.addEventListener('mouseout', () => {
-            // Reset to current average rating or no fill if no rating given
-            // For now, simply clear the hover effect if no current user rating is displayed
-            updateStarDisplay(storyRatingElem.textContent.split('.')[0] || 0); // Re-fill based on current average or 0
-        });
-
-        ratingStarsContainer.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('star')) {
-                if (!currentUser) {
-                    alert('Please log in to submit a rating.');
-                    return;
-                }
-
-                const ratingValue = parseInt(e.target.dataset.value);
-                const userId = currentUser.uid; // Menggunakan UID Firebase Auth sebagai ID pengguna
-
-                try {
-                    // Save rating to Realtime Database
-                    await rtdb.ref(`stories_stats/${storyId}/ratings/${userId}`).set(ratingValue);
-                    alert(`Thanks for rating ${ratingValue} stars!`);
-                    ratingMessage.textContent = `You rated: ${ratingValue} stars!`;
-                    // The 'on value' listener for ratingsRef will automatically update the display
-                } catch (error) {
-                    console.error("Error submitting rating:", error);
-                    alert("Failed to submit rating. Please try again.");
-                }
-            }
-        });
-
-        function updateStarDisplay(averageRating) {
-            Array.from(ratingStarsContainer.children).forEach(star => {
-                star.classList.toggle('filled', parseInt(star.dataset.value) <= Math.round(averageRating));
-            });
-        }
-
-
-        // === COMMENT LOGIC ===
-        commentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!currentUser) {
-                alert('Please log in to post a comment.');
-                return;
-            }
-
-            const commentContent = commentContentInput.value.trim();
-            if (!commentContent) {
-                alert('Comment cannot be empty.');
-                return;
-            }
-
-            const username = currentUser.email ? currentUser.email.split('@')[0] : 'Anonymous User'; // Contoh nama pengguna
-            // Anda mungkin ingin mengambil nama pengguna yang lebih ramah dari Firestore 'users' collection jika ada
-            // Misalnya: const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            // const username = userDoc.exists ? userDoc.data().displayName : 'Anonymous User';
-
-
-            try {
-                // Save comment to Firestore
-                await db.collection('comments').add({
-                    storyId: storyId,
-                    userId: currentUser.uid,
-                    username: username,
-                    content: commentContent,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp() // Firestore Timestamp
-                });
-
-                alert('Comment posted successfully!');
-                commentContentInput.value = ''; // Clear input
-                loadComments(storyId); // Reload comments to show new one
-
-            } catch (error) {
-                console.error("Error posting comment:", error);
-                alert("Failed to post comment. Please try again.");
-            }
-        });
-
-        async function loadComments(storyId) {
-            commentListElem.innerHTML = '<p>Loading comments...</p>'; // Show loading message
-
-            try {
-                const commentsSnapshot = await db.collection('comments')
-                                                .where('storyId', '==', storyId)
-                                                .orderBy('timestamp', 'desc')
-                                                .get();
-
-                if (commentsSnapshot.empty) {
-                    commentListElem.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
-                    return;
-                }
-
-                commentListElem.innerHTML = ''; // Clear loading message
-                commentsSnapshot.forEach(doc => {
-                    const comment = doc.data();
-                    const timestamp = comment.timestamp ? comment.timestamp.toDate().toLocaleString() : 'N/A'; // Format timestamp
-
-                    const commentItem = document.createElement('div');
-                    commentItem.className = 'comment-item';
-                    commentItem.innerHTML = `
-                        <strong>${comment.username || 'Anonymous'}</strong>
-                        <p>${comment.content}</p>
-                        <small>${timestamp}</small>
-                    `;
-                    commentListElem.appendChild(commentItem);
-                });
-
-            } catch (error) {
-                console.error("Error loading comments:", error);
-                commentListElem.innerHTML = '<p>Failed to load comments.</p>';
+                localStorage.setItem('theme', 'light');
             }
         }
+
+        // Apply theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            // In a real application, you'd fetch data from Firebase here
+             Example: fetchAndDisplayBooks(db, rtdb, storage);
+        });
+
+        // Function to dynamically load books (placeholder)
+         async function fetchAndDisplayBooks(db, rtdb, storage) {
+             const bookGrid = document.querySelector('.book-grid');
+            bookGrid.innerHTML = ''; // Clear existing placeholders
+
+             // Example of fetching from Firestore (assuming a 'books' collection)
+              const querySnapshot = await getDocs(collection(db, "books"));
+              const books = [];
+              querySnapshot.forEach((doc) => {
+                  books.push({ id: doc.id, ...doc.data() });
+              });
+
+        //     // For each book, fetch its views from Realtime DB and rating
+        //     // And its thumbnail from Storage
+
+        //     // Example static data for now
+             const staticBooks = [
+                 { id: 'story123', title: 'The Last Stargazer', author: 'Jane Doe', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+1', views: 1234, rating: 4.5, ratingsCount: 120 },
+                 { id: 'story124', title: 'Whispers of the Ancient Forest', author: 'John Smith', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+2', views: 890, rating: 4.0, ratingsCount: 85 },
+               { id: 'story125', title: 'City of Neon Dreams', author: 'Alice Wonderland', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+3', views: 2500, rating: 5.0, ratingsCount: 210 },
+             ];
+
+             staticBooks.forEach(book => {
+                 const card = document.createElement('div');
+                 card.className = 'book-card';
+                 card.onclick = () => location.href = `web_story.html?id=${book.id}`;
+                 card.innerHTML = `
+                     <img src="${book.thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
+                     <div class="book-card-content">
+                         <h3>${book.title}</h3>
+                         <p>Author: ${book.author}</p>
+                         <div class="book-card-meta">
+                             <span><i class="fas fa-eye"></i> ${book.views} Views</span>
+                             <span class="rating">
+                                 ${generateStarRating(book.rating)} ${book.rating} (${book.ratingsCount} Ratings)
+                             </span>
+                         </div>
+                     </div>
+                 `;
+                 bookGrid.appendChild(card);
+             });
+         }
+
+         // Helper function to generate star icons
+         function generateStarRating(rating) {
+             let starsHtml = '';
+             const fullStars = Math.floor(rating);
+             const hasHalfStar = rating % 1 !== 0;
+
+             for (let i = 0; i < fullStars; i++) {
+                 starsHtml += '<i class="fas fa-star stars"></i>';
+             }
+             if (hasHalfStar) {
+                 starsHtml += '<i class="fas fa-star-half-alt stars"></i>';
+             }
+             for (let i = 0; i < (5 - fullStars - (hasHalfStar ? 1 : 0)); i++) {
+                 starsHtml += '<i class="far fa-star"></i>';
+             }
+             return starsHtml;
+         }
     </script>
 </body>
 </html>
