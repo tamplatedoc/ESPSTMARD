@@ -426,6 +426,14 @@
             }
         }
         document.addEventListener('DOMContentLoaded', applyTheme);
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
+
+    const toggleButton = document.getElementById('darkModeToggle');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', toggleDarkMode);
+    }
+});
 
         const authTitle = document.getElementById('authTitle');
         const loginForm = document.getElementById('loginForm');
