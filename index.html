@@ -282,6 +282,13 @@
             font-size: 0.9rem;
             color: var(--icon-color);
         }
+        .book-card-meta.vertical-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+}
+
 
         .book-card-meta span {
             display: flex;
@@ -542,9 +549,9 @@ card.innerHTML = `
     <div class="book-card-content">
         <h3>${storyData.title}</h3>
         <p>Author: ${storyData.authorName}</p>
-        <div class="book-card-meta">
-            <p> <span class="rating">${generateStarRatingHtml(averageRating)} ${averageRating} (${ratingsCount} Ratings)</span></p>
-         <p>   <span><i class="fas fa-eye"></i> ${views} Views</span></p>
+        <div class="book-card-meta vertical-meta">
+            <div class="rating">${generateStarRatingHtml(averageRating)} ${averageRating} (${ratingsCount} Ratings)</div>
+            <div><i class="fas fa-eye"></i> ${views} Views</div>
         </div>
     </div>
 `;
