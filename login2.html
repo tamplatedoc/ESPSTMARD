@@ -131,11 +131,6 @@
         </form>
     </div>
 
- <!-- Hapus baris ini -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
-<!-- Ganti dengan baris ini -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
@@ -154,21 +149,67 @@
   // Inisialisasi Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+
+  // Fungsi untuk menampilkan pesan error yang lebih informatif
+  const getErrorMessage = (error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    
+    switch (errorCode) {
+      case 'auth/invalid-email':
+        return 'Email tidak valid. Pastikan format email benar.';
+      case 'auth/user-disabled':
+        return 'Akun Anda telah dinonaktifkan. Hubungi administrator.';
+      case 'auth/user-not-found':
+        return 'Akun tidak ditemukan. Pastikan username dan password benar.';
+      case 'auth/wrong-password':
+        return 'Password salah. Coba lagi.';
+      case 'auth/network-request-failed':
+        return 'Koneksi terputus. Periksa koneksi internet Anda.';
+      case 'auth/too-many-requests':
+        return 'Terlalu banyak percobaan login. Coba lagi nanti.';
+      default:
+        return `Terjadi kesalahan: ${errorMessage}`;
+    }
+  };
+
+  // Menambahkan event listener untuk form login
+  document.querySelector('.login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Menampilkan loading state
+    const loginButton = document.querySelector('.login-button');
+    const originalText = loginButton.textContent;
+    loginButton.textContent = 'Sedang masuk...';
+    loginButton.disabled = true;
+
+    try {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Validasi input
+      if (!username || !password) {
+        throw new Error('Username dan password tidak boleh kosong');
+      }
+
+      // Proses login
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        username + '@amdf.group',
+        password
+      );
+
+      // Redirect ke halaman staff
+      window.location.href = '/ESPSTMARD/staff.html';
+    } catch (error) {
+      // Menampilkan pesan error yang lebih informatif
+      alert(getErrorMessage(error));
+    } finally {
+      // Mengembalikan state tombol
+      loginButton.textContent = originalText;
+      loginButton.disabled = false;
+    }
+  });
 </script>
-
-        document.querySelector('.login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-
-            try {
-                await auth.signInWithEmailAndPassword(username + '@amdf.group', password);
-                window.location.href = '/ESPSTMARD/staff.html';
-            } catch (error) {
-                alert('Login gagal: ' + error.message);
-            }
-        });
-    </script>
 </body>
 </html>
