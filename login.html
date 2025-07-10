@@ -290,285 +290,291 @@
         }
     </style>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, set, get, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-            authDomain: "tamplatedoc.firebaseapp.com",
-            databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "tamplatedoc",
-            storageBucket: "tamplatedoc.firebasestorage.app",
-            messagingSenderId: "264966107720",
-            appId: "1:264966107720:web:da19f6109e71390740de7d",
-            measurementId: "G-PFK8VQBFCV"
-        };
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+        authDomain: "tamplatedoc.firebaseapp.com",
+        databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "tamplatedoc",
+        storageBucket: "tamplatedoc.firebasestorage.app",
+        messagingSenderId: "264966107720",
+        appId: "1:264966107720:web:da19f6109e71390740de7d",
+        measurementId: "G-PFK8VQBFCV"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const dbRT = getDatabase(app); // Realtime Database instance
-        const dbFS = getFirestore(app); // Firestore instance
-        const auth = getAuth(app); // Auth instance
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const dbRT = getDatabase(app); // Realtime Database instance
+    const dbFS = getFirestore(app); // Firestore instance
+    const auth = getAuth(app); // Auth instance
 
-        // Global variables for Canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+    // Global variables for Canvas environment
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        let currentUserId = null; // UID dari Firebase Auth atau UUID fallback
+    let currentUserId = null; // UID dari Firebase Auth atau UUID fallback
 
-        // --- AUTHENTICATION & SESSION MANAGEMENT ---
+    // --- AUTHENTICATION & SESSION MANAGEMENT ---
 
-        async function initializeAuthAndSession() {
-            try {
-                // Periksa apakah ada UID di sessionStorage terlebih dahulu
-                const cachedUserId = sessionStorage.getItem('cachedUserId');
-                if (cachedUserId) {
-                    currentUserId = cachedUserId;
-                    console.log("Using cached User ID:", currentUserId);
-                } else {
-                    // Jika tidak ada di cache, coba sign in anonymously untuk mendapatkan UID baru
-                    await signInAnonymously(auth);
-                    currentUserId = auth.currentUser?.uid || crypto.randomUUID();
-                    sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID baru
-                    console.log("Signed in anonymously. Current User ID:", currentUserId);
+    async function initializeAuthAndSession() {
+        try {
+            // Periksa apakah ada UID di sessionStorage terlebih dahulu
+            const cachedUserId = sessionStorage.getItem('cachedUserId');
+            if (cachedUserId) {
+                currentUserId = cachedUserId;
+                console.log("Using cached User ID:", currentUserId);
+            } else {
+                // Jika tidak ada di cache, coba sign in anonymously untuk mendapatkan UID baru
+                await signInAnonymously(auth);
+                currentUserId = auth.currentUser?.uid || crypto.randomUUID();
+                sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID baru
+                console.log("Signed in anonymously. Current User ID:", currentUserId);
+            }
+
+            // Setelah inisialisasi auth, periksa status login
+            checkLoginStatus();
+
+        } catch (error) {
+            console.error("Error during Firebase authentication:", error);
+            // Fallback jika auth gagal sepenuhnya, pastikan tetap ada currentUserId
+            currentUserId = sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
+            sessionStorage.setItem('cachedUserId', currentUserId);
+            console.log("Using cached or generated UUID as currentUserId due to auth error:", currentUserId);
+            checkLoginStatus(); // Tetap coba cek status login
+        }
+    }
+
+    // Fungsi untuk mengecek status login dari sessionStorage
+    function checkLoginStatus() {
+        const loggedInRole = sessionStorage.getItem('loggedInUserRole');
+        if (loggedInRole === 'creator') {
+            // Jika sudah login sebagai creator, langsung redirect
+            window.location.href = '/ESPSTMARD/creator.html';
+        } else if (loggedInRole === 'staff') {
+            // Jika staff login di halaman ini, beritahu untuk ke halaman staff_login.html
+            console.warn('Anda terdeteksi sebagai Staff. Silakan login melalui portal Staff.');
+        }
+    }
+
+    // Fungsi untuk menyimpan status login
+    function setLoginSession(role, creatorId = null) {
+        sessionStorage.setItem('loggedInUserRole', role);
+        if (creatorId) {
+            sessionStorage.setItem('currentCreatorId', creatorId);
+        }
+    }
+
+    // Fungsi untuk menghapus status login (misal, saat logout)
+    function clearLoginSession() {
+        sessionStorage.removeItem('loggedInUserRole');
+        sessionStorage.removeItem('cachedUserId');
+        sessionStorage.removeItem('currentCreatorId');
+    }
+
+    // --- Utility Functions ---
+
+    // Function to generate a 4-character alphanumeric ID
+    function generateId(length = 4) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    // Function to show custom pop-up message
+    function showPopup(title, message, type) {
+        const overlay = document.getElementById('popup-overlay');
+        const content = document.getElementById('popup-content');
+        const popupTitle = document.getElementById('popup-title');
+        const popupMessage = document.getElementById('popup-message');
+
+        popupTitle.textContent = title;
+        popupMessage.textContent = message;
+
+        content.className = 'popup-content ' + type; // Add success or error class
+        overlay.classList.add('show');
+    }
+
+    // Function to hide custom pop-up message
+    function hidePopup() {
+        document.getElementById('popup-overlay').classList.remove('show');
+    }
+
+    // --- Form Display Logic ---
+    window.showSection = function(sectionId) {
+        const sections = document.querySelectorAll('.form-section');
+        sections.forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionId + '-section').classList.add('active');
+
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => {
+            if (button.onclick && button.onclick.toString().includes(`showSection('${sectionId}')`)) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    }
+
+    // --- Firebase Integration Logic (Hanya untuk Creator) ---
+
+    // Login Functionality
+    document.getElementById('login-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const pin = document.getElementById('login-pin').value.trim();
+
+        if (!email || !pin) {
+            showPopup('Login Gagal', 'Email dan PIN harus diisi.', 'error');
+            return;
+        }
+
+        try {
+            // Cari user di Firestore berdasarkan email
+            const usersRef = collection(dbFS, `artifacts/${appId}/users`);
+            const q = query(usersRef, where("email", "==", email));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                showPopup('Login Gagal', 'Email tidak ditemukan.', 'error');
+                return;
+            }
+
+            let userFound = false;
+            let userData = null;
+            let creatorId = null;
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.pin === pin) {
+                    userData = data;
+                    creatorId = doc.id;
+                    userFound = true;
+                    currentUserId = data.uid || currentUserId;
+                    sessionStorage.setItem('cachedUserId', currentUserId);
                 }
-
-                // Setelah inisialisasi auth, periksa status login
-                checkLoginStatus();
-
-            } catch (error) {
-                console.error("Error during Firebase authentication:", error);
-                // Fallback jika auth gagal sepenuhnya, pastikan tetap ada currentUserId
-                currentUserId = sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
-                sessionStorage.setItem('cachedUserId', currentUserId);
-                console.log("Using cached or generated UUID as currentUserId due to auth error:", currentUserId);
-                checkLoginStatus(); // Tetap coba cek status login
-            }
-        }
-
-        // Fungsi untuk mengecek status login dari sessionStorage
-        function checkLoginStatus() {
-            const loggedInRole = sessionStorage.getItem('loggedInUserRole');
-            if (loggedInRole === 'creator') {
-                // Jika sudah login sebagai creator, langsung redirect
-                window.location.href = '/ESPSTMARD/creator.html';
-            } else if (loggedInRole === 'staff') {
-                // Jika staff login di halaman ini, beritahu untuk ke halaman staff_login.html
-                // Optional: showPopup bisa dipertimbangkan atau cukup pesan di konsol
-                console.warn('Anda terdeteksi sebagai Staff. Silakan login melalui portal Staff.');
-            }
-        }
-
-        // Fungsi untuk menyimpan status login
-        function setLoginSession(role) {
-            sessionStorage.setItem('loggedInUserRole', role);
-        }
-
-        // Fungsi untuk menghapus status login (misal, saat logout)
-        function clearLoginSession() {
-            sessionStorage.removeItem('loggedInUserRole');
-            sessionStorage.removeItem('cachedUserId');
-            // Jika ada UID dari Firebase Auth, bisa juga signOut(auth)
-            // Namun, karena kita pakai anonymous, itu akan menghasilkan UID baru
-            // Jika Anda menerapkan logout, pertimbangkan untuk redirect ke halaman login
-        }
-
-        // --- Utility Functions ---
-
-        // Function to generate a 4-character alphanumeric ID
-        function generateId(length = 4) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        // Function to show custom pop-up message
-        function showPopup(title, message, type) {
-            const overlay = document.getElementById('popup-overlay');
-            const content = document.getElementById('popup-content');
-            const popupTitle = document.getElementById('popup-title');
-            const popupMessage = document.getElementById('popup-message');
-
-            popupTitle.textContent = title;
-            popupMessage.textContent = message;
-
-            content.className = 'popup-content ' + type; // Add success or error class
-            overlay.classList.add('show');
-        }
-
-        // Function to hide custom pop-up message
-        function hidePopup() {
-            document.getElementById('popup-overlay').classList.remove('show');
-        }
-
-        // --- Form Display Logic ---
-        window.showSection = function(sectionId) {
-            const sections = document.querySelectorAll('.form-section');
-            sections.forEach(section => {
-                section.classList.remove('active');
             });
-            document.getElementById(sectionId + '-section').classList.add('active');
 
-            const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => {
-                if (button.onclick && button.onclick.toString().includes(`showSection('${sectionId}')`)) {
-                    button.classList.add('active');
+            if (userFound) {
+                if (userData.role === 'creator') {
+                    setLoginSession('creator', creatorId); // Simpan status login dan creatorId
+                    showPopup('Login Berhasil!', `Selamat datang, ${userData.email}. Mengarahkan ke halaman creator...`, 'success');
+                    
+                    // Update last login timestamp
+                    const userRef = doc(dbFS, `artifacts/${appId}/users`, creatorId);
+                    await setDoc(userRef, {
+                        lastLogin: new Date().toISOString()
+                    }, { merge: true });
+                    
+                    setTimeout(() => window.location.href = '/ESPSTMARD/creator.html', 1500);
                 } else {
-                    button.classList.remove('active');
+                    showPopup('Login Gagal', 'Akun ini bukan akun Creator. Silakan login di portal Staff.', 'error');
                 }
-            });
+            } else {
+                showPopup('Login Gagal', 'Email atau PIN salah.', 'error');
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+            showPopup('Login Error', 'Terjadi kesalahan saat login. Coba lagi nanti.', 'error');
+        }
+    });
+
+    // Creator Register Functionality
+    document.getElementById('creator-register-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = document.getElementById('creator-email').value.trim();
+        const pin = document.getElementById('creator-pin').value.trim();
+        const namaPenulis = document.getElementById('creator-name').value.trim();
+        const whatsapp = document.getElementById('creator-whatsapp').value.trim();
+
+        if (!email || !pin || !namaPenulis || !whatsapp) {
+            showPopup('Registrasi Gagal', 'Semua field harus diisi.', 'error');
+            return;
+        }
+        if (pin.length !== 6 || !/^\d+$/.test(pin)) {
+            showPopup('Registrasi Gagal', 'PIN harus 6 digit angka.', 'error');
+            return;
         }
 
-        // --- Firebase Integration Logic (Hanya untuk Creator) ---
+        try {
+            // Cek email duplikat di Firestore
+            const usersRef = collection(dbFS, `artifacts/${appId}/users`);
+            const q = query(usersRef, where("email", "==", email));
+            const querySnapshot = await getDocs(q);
 
-        // Login Functionality
-        document.getElementById('login-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-            const pin = document.getElementById('login-pin').value.trim();
-
-            if (!email || !pin) {
-                showPopup('Login Gagal', 'Email dan PIN harus diisi.', 'error');
+            if (!querySnapshot.empty) {
+                showPopup('Registrasi Gagal', 'Email ini sudah terdaftar di sistem. Gunakan email lain atau login.', 'error');
                 return;
             }
 
-            try {
-                // MODIFIKASI PENTING: Mencari di SELURUH 'users' node untuk menemukan kredensial
-                // Ini akan mengiterasi setiap UID (misal: 3S6hdqbzGabwfGQg0mnrPDGBFaz1, TctUZz4D8IRgfc5FQu58kZJzsS23)
-                // dan memeriksa user_credentials di dalamnya.
-                const allUsersRootRef = ref(dbRT, `artifacts/${appId}/users`);
-                const snapshot = await get(allUsersRootRef);
+            const creatorId = generateId(); // Generate unique 4-char ID
+            const registrationDate = new Date().toISOString();
 
-                let userFound = false;
-                let userData = null;
+            // Simpan ke Firestore (users collection)
+            const userRef = doc(dbFS, `artifacts/${appId}/users`, creatorId);
+            await setDoc(userRef, {
+                email: email,
+                pin: pin,
+                whatsapp: whatsapp,
+                name: namaPenulis,
+                role: 'creator',
+                creatorId: creatorId,
+                uid: currentUserId,
+                registrationDate: registrationDate,
+                lastLogin: registrationDate,
+                status: 'active'
+            });
 
-                if (snapshot.exists()) {
-                    snapshot.forEach((uidSnapshot) => {
-                        const userCredentials = uidSnapshot.child('user_credentials').val();
-                        if (userCredentials) {
-                            // Iterasi setiap credential (misal: 9FDS, JLXD, PEUT, GUS7) di bawah UID ini
-                            for (const creatorId in userCredentials) {
-                                const user = userCredentials[creatorId];
-                                if (user.email === email && user.pin === pin) {
-                                    userData = user;
-                                    userFound = true;
-                                    // Set currentUserId menjadi UID di mana user ditemukan
-                                    currentUserId = uidSnapshot.key;
-                                    sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID yang benar
-                                    return true; // Berhenti iterasi UID setelah ditemukan
-                                }
-                            }
-                        }
-                    });
-                }
+            // Simpan ke Firestore (public authors collection)
+            const authorRef = doc(dbFS, `artifacts/${appId}/public/authors`, creatorId);
+            await setDoc(authorRef, {
+                name: namaPenulis,
+                creatorId: creatorId,
+                joinDate: registrationDate
+            });
 
-                if (userFound) {
-                    if (userData.role === 'creator') {
-                        setLoginSession('creator'); // Simpan status login di sessionStorage
-                        showPopup('Login Berhasil!', `Selamat datang, ${userData.email}. Mengarahkan ke halaman creator...`, 'success');
-                        setTimeout(() => window.location.href = '/ESPSTMARD/creator.html', 1500);
-                    } else {
-                        // Jika email/PIN cocok tapi bukan creator (misal staff)
-                        showPopup('Login Gagal', 'Akun ini bukan akun Creator. Silakan login di portal Staff.', 'error');
-                    }
-                } else {
-                    showPopup('Login Gagal', 'Email atau PIN salah.', 'error');
-                }
-            } catch (error) {
-                console.error("Error during login:", error);
-                showPopup('Login Error', 'Terjadi kesalahan saat login. Coba lagi nanti.', 'error');
-            }
-        });
+            // Simpan ke Realtime Database (jika masih diperlukan)
+            const rtUserRef = child(ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`), creatorId);
+            await set(rtUserRef, {
+                email: email,
+                pin: pin,
+                whatsapp: whatsapp,
+                role: 'creator',
+                creatorId: creatorId
+            });
 
-        // Creator Register Functionality
-        document.getElementById('creator-register-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const email = document.getElementById('creator-email').value.trim();
-            const pin = document.getElementById('creator-pin').value.trim();
-            const namaPenulis = document.getElementById('creator-name').value.trim();
-            const whatsapp = document.getElementById('creator-whatsapp').value.trim();
+            showPopup('Registrasi Berhasil!', `Akun Creator Anda telah dibuat. ID Anda: ${creatorId}. Silakan login.`, 'success');
+            
+            // Clear form and switch to login tab
+            document.getElementById('creator-register-form').reset();
+            setTimeout(() => showSection('login'), 2000);
 
-            if (!email || !pin || !namaPenulis || !whatsapp) {
-                showPopup('Registrasi Gagal', 'Semua field harus diisi.', 'error');
-                return;
-            }
-            if (pin.length !== 6 || !/^\d+$/.test(pin)) {
-                showPopup('Registrasi Gagal', 'PIN harus 6 digit angka.', 'error');
-                return;
-            }
+        } catch (error) {
+            console.error("Error during creator registration:", error);
+            showPopup('Registrasi Error', `Terjadi kesalahan: ${error.message}. Coba lagi nanti.`, 'error');
+        }
+    });
 
-            try {
-                // MODIFIKASI PENTING: Mengecek email duplikat di SELURUH 'users' node
-                // sebelum registrasi, untuk menghindari duplikasi email antar UID.
-                const allUsersRootRef = ref(dbRT, `artifacts/${appId}/users`);
-                const allUsersSnapshot = await get(allUsersRootRef);
-                
-                if (allUsersSnapshot.exists()) {
-                    let emailExistsGlobally = false;
-                    allUsersSnapshot.forEach((uidSnapshot) => {
-                        const userCredentials = uidSnapshot.child('user_credentials').val();
-                        if (userCredentials) {
-                            for (const idKey in userCredentials) {
-                                if (userCredentials[idKey].email === email) {
-                                    emailExistsGlobally = true;
-                                    return true; // Berhenti iterasi UID
-                                }
-                            }
-                        }
-                    });
-                    if (emailExistsGlobally) {
-                        showPopup('Registrasi Gagal', 'Email ini sudah terdaftar di sistem. Gunakan email lain atau login.', 'error');
-                        return;
-                    }
-                }
-                
-                const creatorId = generateId(); // Generate unique 4-char ID
-
-                // Simpan ke Realtime Database di bawah currentUserId yang sedang aktif
-                const newCreatorRef = child(ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`), creatorId);
-                await set(newCreatorRef, {
-                    email: email,
-                    pin: pin,
-                    whatsapp: whatsapp,
-                    role: 'creator',
-                    creatorId: creatorId
-                });
-
-                // Simpan ke Firestore (untuk public display)
-                const authorDocRef = doc(dbFS, `artifacts/${appId}/public/data/authors`, creatorId);
-                await setDoc(authorDocRef, {
-                    name: namaPenulis,
-                    creatorId: creatorId
-                });
-
-                showPopup('Registrasi Berhasil!', `Akun Creator Anda telah dibuat. ID Anda: ${creatorId}. Silakan login.`, 'success');
-                // Clear form and switch to login tab
-                document.getElementById('creator-register-form').reset();
-                setTimeout(() => showSection('login'), 2000);
-
-            } catch (error) {
-                console.error("Error during creator registration:", error);
-                showPopup('Registrasi Error', `Terjadi kesalahan: ${error.message}. Coba lagi nanti.`, 'error');
-            }
-        });
-
-        // --- Initial Setup ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            await initializeAuthAndSession(); // Inisialisasi Auth dan cek sesi
-            showSection('login'); // Tampilkan bagian login secara default jika belum redirect
-        });
-    </script>
+    // --- Initial Setup ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        await initializeAuthAndSession(); // Inisialisasi Auth dan cek sesi
+        showSection('login'); // Tampilkan bagian login secara default jika belum redirect
+    });
+</script>
 </head>
 <body>
     <div class="container">
-        <h1>ACCESS PORTAL</h1>
+        <h1>PORTAL CREATOR</h1>
 
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showSection('login')">LOGIN</button>
