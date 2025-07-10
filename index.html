@@ -3,352 +3,473 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMDF.GROUP Ebook Catalog</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>AMDF.GROUP E-Book Catalog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* CSS Variables for Light Mode */
         :root {
-            --background-start: #0a0a0f;
-            --background-end: #1a1a2e;
-            --card-background: #1f2038;
+            --background-start: #f0f2f5;
+            --background-end: #e0e2e5;
+            --text-color: #333;
+            --header-bg: rgba(255, 255, 255, 0.9);
+            --header-border: #eee;
+            --card-bg: #ffffff;
+            --card-border: #ddd;
+            --card-shadow: rgba(0, 0, 0, 0.08);
+            --button-bg-gradient-start: #6a11cb;
+            --button-bg-gradient-end: #2575fc;
+            --button-text-color: #fff;
+            --link-color: #007bff;
+            --icon-color: #777;
+            --toggle-bg: #ddd;
+            --toggle-circle-bg: #fff;
+            --toggle-shadow: rgba(0, 0, 0, 0.2);
+            --footer-bg: #333;
+            --footer-text: #eee;
+        }
+
+        /* Dark Mode styles */
+        body.dark-mode {
+            --background-start: #1a1a2e;
+            --background-end: #16213e;
             --text-color: #e0e0e0;
-            --accent-color: #8c7ae6;
-            --gradient-1-start: #8c7ae6;
-            --gradient-1-end: #6c5ce7;
-            --gradient-2-start: #00cec9;
-            --gradient-2-end: #00b894;
-            --border-color: #3f425b;
-            --dark-mode-background-start: #0a0a0f;
-            --dark-mode-background-end: #1a1a2e;
-            --dark-mode-card-background: #1f2038;
-            --dark-mode-text-color: #e0e0e0;
-            --light-mode-background-start: #e0e0e0;
-            --light-mode-background-end: #f0f0f0;
-            --light-mode-card-background: #ffffff;
-            --light-mode-text-color: #333333;
+            --header-bg: rgba(26, 26, 46, 0.9);
+            --header-border: #333;
+            --card-bg: #22253b;
+            --card-border: #444;
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --button-bg-gradient-start: #8e2de2;
+            --button-bg-gradient-end: #4a00e0;
+            --button-text-color: #fff;
+            --link-color: #8e2de2;
+            --icon-color: #aaa;
+            --toggle-bg: #555;
+            --toggle-circle-bg: #bbb;
+            --toggle-shadow: rgba(0, 0, 0, 0.4);
+            --footer-bg: #111;
+            --footer-text: #bbb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, var(--background-start), var(--background-end));
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
             color: var(--text-color);
+            background: linear-gradient(135deg, var(--background-start), var(--background-end));
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        body.light-mode {
-            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
-            color: var(--light-mode-text-color);
-        }
-
         header {
-            background-color: rgba(31, 32, 56, 0.8);
-            padding: 15px 20px;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
+            border-bottom: 1px solid var(--header-border);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 2px 10px var(--card-shadow);
         }
 
-        header .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8em;
-            color: var(--accent-color);
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
             text-decoration: none;
-            text-shadow: 0 0 8px rgba(140, 122, 230, 0.6);
+            background: linear-gradient(45deg, var(--button-bg-gradient-start), var(--button-bg-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .auth-section {
+        .nav-links {
             display: flex;
+            gap: 1.5rem;
             align-items: center;
-            gap: 15px;
         }
 
-        .auth-section a {
-            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
+        .nav-links a {
+            color: var(--text-color);
             text-decoration: none;
-            font-weight: bold;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .auth-section a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
-        }
-
-        .auth-section p {
-            font-size: 0.9em;
-            color: var(--text-color);
-            margin: 0;
-            max-width: 180px;
-            text-align: right;
-        }
-
-        body.light-mode header {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        body.light-mode .auth-section p {
-            color: var(--light-mode-text-color);
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: var(--text-color);
+            font-weight: 600;
             transition: color 0.3s ease;
         }
 
-        body.light-mode .theme-toggle {
-            color: var(--light-mode-text-color);
+        .nav-links a:hover {
+            color: var(--link-color);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--button-bg-gradient-start); /* Fallback */
+            background: linear-gradient(45deg, var(--button-bg-gradient-start) 0%, var(--button-bg-gradient-end) 100%);
+            color: var(--button-text-color);
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap; /* Prevent text wrapping */
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--card-shadow);
+        }
+
+        .mode-toggle {
+            width: 50px;
+            height: 25px;
+            background-color: var(--toggle-bg);
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-shrink: 0; /* Prevent shrinking on small screens */
+        }
+
+        .mode-toggle .circle {
+            width: 20px;
+            height: 20px;
+            background-color: var(--toggle-circle-bg);
+            border-radius: 50%;
+            position: absolute;
+            top: 2.5px;
+            left: 2.5px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 2px 5px var(--toggle-shadow);
+        }
+
+        body.dark-mode .mode-toggle .circle {
+            transform: translateX(25px);
         }
 
         main {
             flex-grow: 1;
-            padding: 20px;
+            padding: 2rem 5%;
             max-width: 1200px;
-            margin: 20px auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 25px;
+            margin: 0 auto;
         }
 
-        .ebook-card {
-            background-color: var(--card-background);
+        .catalog-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .catalog-header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .catalog-header p {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .creator-info {
+            background-color: rgba(0, 123, 255, 0.1);
+            border-left: 5px solid var(--link-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-top: 1.5rem;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .creator-info a {
+            color: var(--link-color);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .creator-info a:hover {
+            text-decoration: underline;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .book-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px var(--card-shadow);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
             cursor: pointer;
-            border: 1px solid var(--border-color);
         }
 
-        body.light-mode .ebook-card {
-            background-color: var(--light-mode-card-background);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.1);
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px var(--card-shadow);
         }
 
-        .ebook-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
-        }
-
-        .ebook-card img {
+        .book-card-thumbnail {
             width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-bottom: 1px solid var(--border-color);
+            height: 200px; /* Fixed height for thumbnails */
+            object-fit: cover; /* Ensures image covers the area, cropping if necessary */
+            border-bottom: 1px solid var(--card-border);
         }
 
-        body.light-mode .ebook-card img {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .ebook-info {
-            padding: 15px;
-            flex-grow: 1;
+        .book-card-content {
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            flex-grow: 1;
         }
 
-        .ebook-info h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1.4em;
-            color: var(--accent-color);
-            text-shadow: 0 0 5px rgba(140, 122, 230, 0.3);
-        }
-
-        body.light-mode .ebook-info h3 {
-            color: var(--light-mode-text-color);
-            text-shadow: none;
-        }
-
-        .ebook-info p {
-            margin: 0 0 8px 0;
-            font-size: 0.9em;
+        .book-card-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.7rem;
             color: var(--text-color);
+            flex-grow: 1; /* Allows title to take available space */
         }
 
-        body.light-mode .ebook-info p {
-            color: var(--light-mode-text-color);
+        .book-card-content p {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-bottom: 0.4rem;
         }
 
-        .ebook-stats {
+        .book-card-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--icon-color);
         }
 
-        body.light-mode .ebook-stats {
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .ebook-stats span {
+        .book-card-meta span {
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.9em;
         }
 
-        .ebook-stats .icon {
-            font-size: 1.1em;
-            color: var(--accent-color);
+        .book-card-meta i {
+            color: var(--link-color);
+        }
+
+        .rating .stars {
+            color: gold; /* Or a specific yellow/orange */
         }
 
         footer {
-            background-color: rgba(31, 32, 56, 0.8);
-            padding: 20px;
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
             text-align: center;
-            font-size: 0.9em;
-            margin-top: 40px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            padding: 1.5rem 5%;
+            margin-top: 3rem;
+            border-top: 1px solid var(--header-border);
         }
 
         footer nav a {
-            color: var(--text-color);
+            color: var(--footer-text);
             text-decoration: none;
             margin: 0 10px;
-            transition: color 0.2s ease;
+            transition: color 0.3s ease;
         }
 
         footer nav a:hover {
-            color: var(--accent-color);
+            color: var(--link-color);
         }
 
-        body.light-mode footer {
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        body.light-mode footer nav a {
-            color: var(--light-mode-text-color);
-        }
-
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
-                gap: 10px;
-                padding: 10px;
+                align-items: flex-start;
+                padding: 1rem 4%;
             }
 
-            .auth-section {
-                flex-direction: column;
-                gap: 10px;
+            .logo {
+                margin-bottom: 1rem;
+            }
+
+            .nav-links {
                 width: 100%;
+                justify-content: space-between;
+                margin-bottom: 1rem;
             }
 
-            .auth-section p {
+            .auth-buttons {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .btn {
+                flex-grow: 1;
                 text-align: center;
-                max-width: none;
+                padding: 0.6rem 1rem;
             }
 
             main {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                padding: 15px;
+                padding: 1.5rem 4%;
             }
 
-            .ebook-card img {
-                height: 150px;
+            .catalog-header h1 {
+                font-size: 2rem;
+            }
+
+            .catalog-header p {
+                font-size: 1rem;
+            }
+
+            .book-grid {
+                grid-template-columns: 1fr; /* Single column on small screens */
+            }
+
+            .book-card-thumbnail {
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+            .nav-links a {
+                font-size: 0.9rem;
+            }
+            .btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .catalog-header h1 {
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <a href="#" class="logo">AMDF EBOOK</a>
-        <div class="auth-section">
-            <p>If you want to become a story creator, you can log in/register.</p>
-            <div>
-                <a href="login.html">Login</a>
-                <a href="login.html">Register</a>
+        <a href="#" class="logo">AMDF.GROUP E-Books</a>
+        <div class="nav-links">
+            <a href="#catalog">Catalog</a>
+            <a href="#about">About</a>
+            <a href="#privacy">Privacy Policy</a>
+            <div class="mode-toggle" onclick="toggleDarkMode()">
+                <div class="circle"></div>
             </div>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">💡</button>
+        </div>
+        <div class="auth-buttons">
+            <a href="login_register_creator.html" class="btn">Login / Register</a>
         </div>
     </header>
 
-    <main id="ebookCatalog">
-        <div class="ebook-card" onclick="location.href='/story/id_cerita_12345'">
-            <img src="https://via.placeholder.com/400x250/00cec9/ffffff?text=Ebook+Thumbnail+1" alt="Ebook Thumbnail">
-            <div class="ebook-info">
-                <h3>The Last Starship</h3>
-                <p>Author: Jane Doe</p>
-                <div class="ebook-stats">
-                    <span><span class="icon">👁️</span> 1.2K</span>
-                    <span><span class="icon">⭐</span> 4.5 (234)</span>
-                </div>
+    <main>
+        <section id="catalog" class="catalog-header">
+            <h1>Discover Amazing Stories</h1>
+            <p>Dive into a world of captivating tales, from thrilling adventures to heartwarming romances. Enjoy free e-books and explore new narratives every day.</p>
+            <div class="creator-info">
+                If you wish to become a story creator and share your own narratives, please <a href="login_register_creator.html">Login or Register here</a>. Reading stories is always free and doesn't require an account.
             </div>
-        </div>
-        <div class="ebook-card" onclick="location.href='/story/id_cerita_12346'">
-            <img src="https://via.placeholder.com/400x250/8c7ae6/ffffff?text=Ebook+Thumbnail+2" alt="Ebook Thumbnail">
-            <div class="ebook-info">
-                <h3>Secrets of the Forgotten City</h3>
-                <p>Author: John Smith</p>
-                <div class="ebook-stats">
-                    <span><span class="icon">👁️</span> 850</span>
-                    <span><span class="icon">⭐</span> 4.2 (150)</span>
-                </div>
-            </div>
-        </div>
+        </section>
 
-        <div class="ebook-card" onclick="location.href='/story/id_cerita_12347'">
-            <img src="https://via.placeholder.com/400x250/ff7675/ffffff?text=Ebook+Thumbnail+3" alt="Ebook Thumbnail">
-            <div class="ebook-info">
-                <h3>Chronicles of Eldoria: Vol 1</h3>
-                <p>Author: Alice Wonderland</p>
-                <div class="ebook-stats">
-                    <span><span class="icon">👁️</span> 2.1K</span>
-                    <span><span class="icon">⭐</span> 4.8 (300)</span>
+        <section class="book-grid">
+            <div class="book-card" onclick="location.href='web_story.html?id=story123'">
+                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+1" alt="Story Thumbnail" class="book-card-thumbnail">
+                <div class="book-card-content">
+                    <h3>The Last Stargazer</h3>
+                    <p>Author: Jane Doe</p>
+                    <div class="book-card-meta">
+                        <span><i class="fas fa-eye"></i> 1,234 Views</span>
+                        <span class="rating">
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star-half-alt stars"></i>
+                            <i class="far fa-star"></i> 4.5 (120 Ratings)
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="ebook-card" onclick="location.href='/story/id_cerita_12348'">
-            <img src="https://via.placeholder.com/400x250/fdcb6e/ffffff?text=Ebook+Thumbnail+4" alt="Ebook Thumbnail">
-            <div class="ebook-info">
-                <h3>The Quantum Paradox</h3>
-                <p>Author: Robert Oppenheimer</p>
-                <div class="ebook-stats">
-                    <span><span class="icon">👁️</span> 600</span>
-                    <span><span class="icon">⭐</span> 3.9 (90)</span>
+            <div class="book-card" onclick="location.href='web_story.html?id=story124'">
+                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+2" alt="Story Thumbnail" class="book-card-thumbnail">
+                <div class="book-card-content">
+                    <h3>Whispers of the Ancient Forest</h3>
+                    <p>Author: John Smith</p>
+                    <div class="book-card-meta">
+                        <span><i class="fas fa-eye"></i> 890 Views</span>
+                        <span class="rating">
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="far fa-star"></i> 4.0 (85 Ratings)
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
+            
+            <div class="book-card" onclick="location.href='web_story.html?id=story125'">
+                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+3" alt="Story Thumbnail" class="book-card-thumbnail">
+                <div class="book-card-content">
+                    <h3>City of Neon Dreams</h3>
+                    <p>Author: Alice Wonderland</p>
+                    <div class="book-card-meta">
+                        <span><i class="fas fa-eye"></i> 2,500 Views</span>
+                        <span class="rating">
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i>
+                            <i class="fas fa-star stars"></i> 5.0 (210 Ratings)
+                        </span>
+                    </div>
+                </div>
+            </div>
+            </section>
     </main>
 
     <footer>
+        <p>&copy; 2025 AMDF.GROUP. All rights reserved.</p>
         <nav>
-            <a href="/about">About Us</a>
-            <a href="/privacy-policy">Privacy Policy</a>
-            <a href="/terms-of-service">Terms of Service</a>
-            <a href="/contact">Contact</a>
+            <a href="#about">About Us</a> |
+            <a href="#privacy">Privacy Policy</a> |
+            <a href="#terms">Terms of Service</a>
         </nav>
-        <p>&copy; AMDF.GROUP</p>
     </footer>
 
-    <script>
-        // === KONFIGURASI DAN INISIALISASI FIREBASE ===
+    <script type="module">
+        // Firebase Configuration (provided by you)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
+        Import other Firebase services as needed (e.g., getFirestore, getDatabase, getStorage)
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        import { getStorage } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
+
+
         const firebaseConfig = {
             apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
             authDomain: "tamplatedoc.firebaseapp.com",
@@ -356,161 +477,98 @@
             projectId: "tamplatedoc",
             storageBucket: "tamplatedoc.firebasestorage.app",
             messagingSenderId: "264966107720",
-            appId: "1:264966107720:web:da19f6109e71390740de7d",
-            measurementId: "G-PFK8VQBFCV"
+            appId: "1:264966107720:web:868abe93cdff209040de7d",
+            measurementId: "G-S5WTZ7S5PG"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const rtdb = firebase.database(); // Realtime Database untuk views/rating
-    </script>
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        // You would also initialize Firestore, Realtime Database, Storage here:
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+        const storage = getStorage(app);
 
-    <style>
-        /* CSS Anda ada di sini */
-        /* Pastikan CSS untuk .ebook-card, .ebook-info, .ebook-stats, icon, dll. sudah ada */
-    </style>
-</head>
-<body>
-    <main>
-        <section class="catalog-section">
-            <div id="ebookCatalog" class="ebook-grid">
-                <p>Loading ebooks...</p>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        // === LOGIKA THEME TOGGLE ===
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.classList.add(savedTheme);
-            themeToggle.textContent = savedTheme === 'light-mode' ? '🌙' : '💡';
+        // Dark Mode Toggle Logic
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            // Store user preference in localStorage
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
         }
 
-        themeToggle.addEventListener('click', () => {
-            if (body.classList.contains('light-mode')) {
-                body.classList.remove('light-mode');
-                localStorage.setItem('theme', 'dark-mode');
-                themeToggle.textContent = '💡';
-            } else {
-                body.classList.add('light-mode');
-                localStorage.setItem('theme', 'light-mode');
-                themeToggle.textContent = '🌙';
+        // Apply theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
             }
+            // In a real application, you'd fetch data from Firebase here
+            Example: fetchAndDisplayBooks(db, rtdb, storage);
         });
 
-        // === LOGIKA LOADING KONTEN DINAMIS DARI FIREBASE ===
-        document.addEventListener('DOMContentLoaded', async () => {
-            const ebookCatalog = document.getElementById('ebookCatalog');
-            ebookCatalog.innerHTML = '<p>Loading ebooks...</p>'; // Tampilkan pesan loading
+        // Function to dynamically load books (placeholder)
+        async function fetchAndDisplayBooks(db, rtdb, storage) {
+        const bookGrid = document.querySelector('.book-grid');
+        bookGrid.innerHTML = ''; // Clear existing placeholders
 
-            try {
-                // 1. Ambil data cerita dari Firestore
-                // Asumsi koleksi cerita utama Anda bernama 'stories'
-                // Dan hanya ambil cerita yang statusnya 'published'
-                const storiesSnapshot = await db.collection('stories')
-                                                .where('status', '==', 'published')
-                                                .orderBy('createdAt', 'desc') // Urutkan berdasarkan tanggal dibuat
-                                                .get();
-
-                if (storiesSnapshot.empty) {
-                    ebookCatalog.innerHTML = '<p>No ebooks available yet. Please check back later!</p>';
-                    return;
-                }
-
-                const storyPromises = storiesSnapshot.docs.map(async doc => {
-                    const story = doc.data();
-                    const storyId = doc.id; // ID cerita dari Firestore
-
-                    // Ambil rating dan views dari Realtime Database (jika Anda menyimpannya di sana)
-                    // Asumsi struktur RTDB: /{storyId}/views dan /{storyId}/ratings/{userId}
-                    let views = 0;
-                    let averageRating = 0;
-                    let ratingCount = 0;
-
-                    try {
-                        const viewsRef = rtdb.ref(`stories_stats/${storyId}/views`);
-                        const viewsSnapshot = await viewsRef.once('value');
-                        views = viewsSnapshot.val() || 0;
-                    } catch (err) {
-                        console.warn("Could not fetch views for story", storyId, err);
-                    }
-
-                    try {
-                        const ratingsRef = rtdb.ref(`stories_stats/${storyId}/ratings`);
-                        const ratingsSnapshot = await ratingsRef.once('value');
-                        if (ratingsSnapshot.exists()) {
-                            let totalRating = 0;
-                            ratingsSnapshot.forEach(childSnap => {
-                                totalRating += childSnap.val();
-                            });
-                            ratingCount = ratingsSnapshot.numChildren();
-                            averageRating = (totalRating / ratingCount).toFixed(1); // Pembulatan 1 desimal
-                        }
-                    } catch (err) {
-                        console.warn("Could not fetch ratings for story", storyId, err);
-                    }
-
-
-                    // Buat elemen ebook card
-                    const ebookCard = document.createElement('div');
-                    ebookCard.className = 'ebook-card';
-                    // Ketika diklik, arahkan ke halaman detail cerita (belum ada, tapi ini simulasinya)
-                    // URL ini perlu disesuaikan dengan bagaimana Anda akan menampilkan detail cerita
-                    ebookCard.onclick = () => location.href = `/story-detail.html?storyId=${storyId}`; // Contoh: Arahkan ke story-detail.html
-
-                    // Pastikan story.thumbnailUrl ada dan valid
-                    const thumbnailUrl = story.thumbnailUrl || 'https://via.placeholder.com/150/cccccc/000000?text=No+Image'; // Placeholder jika tidak ada thumbnail
-
-                    ebookCard.innerHTML = `
-                        <img src="${thumbnailUrl}" alt="Ebook Thumbnail">
-                        <div class="ebook-info">
-                            <h3>${story.title}</h3>
-                            <p>Author: ${story.authorName}</p>
-                            <div class="ebook-stats">
-                                <span><span class="icon">👁️</span> ${views}</span>
-                                <span><span class="icon">⭐</span> ${averageRating} (${ratingCount})</span>
-                            </div>
-                        </div>
-                    `;
-                    return ebookCard;
-                });
-
-                const ebookCards = await Promise.all(storyPromises);
-                ebookCatalog.innerHTML = ''; // Hapus pesan loading
-                ebookCards.forEach(card => ebookCatalog.appendChild(card));
-
-            } catch (error) {
-                console.error("Error fetching ebooks:", error);
-                ebookCatalog.innerHTML = '<p>Failed to load ebooks. Please try again later.</p>';
-            }
+        Example of fetching from Firestore (assuming a 'books' collection)
+        /const querySnapshot = await getDocs(collection(db, "books"));
+        const books = [];
+         querySnapshot.forEach((doc) => {
+            books.push({ id: doc.id, ...doc.data() });
         });
 
-        // === LOGIKA SEARCH BAR (MASIH SAMA SEPERTI SEBELUMNYA) ===
-        // Anda mungkin ingin menambahkan fungsionalitas pencarian yang sesungguhnya dengan Firebase
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
+        //     // For each book, fetch its views from Realtime DB and rating
+        //     // And its thumbnail from Storage
 
-        searchButton.addEventListener('click', () => {
-            const query = searchInput.value.trim();
-            if (query) {
-                alert('Searching for: ' + query + ' (Fungsionalitas pencarian akan terhubung ke database)');
-                // Di sini Anda akan menambahkan logika pencarian ke Firestore atau RTDB
-                // Contoh: db.collection('stories').where('title', '>=', query).get();
-            } else {
-                alert('Please enter a search query.');
+            // Example static data for now
+             const staticBooks = [
+                 { id: 'story123', title: 'The Last Stargazer', author: 'Jane Doe', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+1', views: 1234, rating: 4.5, ratingsCount: 120 },
+                 { id: 'story124', title: 'Whispers of the Ancient Forest', author: 'John Smith', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+2', views: 890, rating: 4.0, ratingsCount: 85 },
+                { id: 'story125', title: 'City of Neon Dreams', author: 'Alice Wonderland', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+3', views: 2500, rating: 5.0, ratingsCount: 210 },
+             ];
+
+            staticBooks.forEach(book => {
+                const card = document.createElement('div');
+               card.className = 'book-card';
+                card.onclick = () => location.href = `web_story.html?id=${book.id}`;
+                card.innerHTML = `
+                    <img src="${book.thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
+                    <div class="book-card-content">
+                        <h3>${book.title}</h3>
+                        <p>Author: ${book.author}</p>
+                         <div class="book-card-meta">
+                            <span><i class="fas fa-eye"></i> ${book.views} Views</span>
+                          <span class="rating">
+                                 ${generateStarRating(book.rating)} ${book.rating} (${book.ratingsCount} Ratings)
+                          </span>
+                         </div>
+                    </div>
+                 `;
+                 bookGrid.appendChild(card);
+             });
+        }
+
+         // Helper function to generate star icons
+         function generateStarRating(rating) {
+             let starsHtml = '';
+             const fullStars = Math.floor(rating);
+             const hasHalfStar = rating % 1 !== 0;
+
+             for (let i = 0; i < fullStars; i++) {
+                 starsHtml += '<i class="fas fa-star stars"></i>';
+             }
+            if (hasHalfStar) {
+                 starsHtml += '<i class="fas fa-star-half-alt stars"></i>';
             }
-        });
-
-        searchInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                searchButton.click();
+            for (let i = 0; i < (5 - fullStars - (hasHalfStar ? 1 : 0)); i++) {
+                 starsHtml += '<i class="far fa-star"></i>';
             }
-        });
-
+            return starsHtml;
+         }
     </script>
 </body>
 </html>
