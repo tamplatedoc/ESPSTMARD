@@ -1,25 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Login - AMDF.GROUP</title>
+    <title>Login Staff - AMDF.GROUP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --background-start: #0a0a0f;
             --background-end: #1a1a2e;
-            --form-background: #1f2038;
+            --container-background: #1f2038;
             --input-background: #282a46;
             --text-color: #e0e0e0;
             --accent-color: #8c7ae6;
             --gradient-1-start: #8c7ae6;
             --gradient-1-end: #6c5ce7;
             --border-color: #3f425b;
-            --light-mode-background-start: #e0e0e0;
-            --light-mode-background-end: #f0f0f0;
-            --light-mode-form-background: #ffffff;
-            --light-mode-input-background: #f8f8f8;
-            --light-mode-text-color: #333333;
         }
 
         body {
@@ -30,205 +27,137 @@
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            transition: background 0.3s ease, color 0.3s ease;
+            justify-content: center;
         }
 
-        body.light-mode {
-            background: linear-gradient(135deg, var(--light-mode-background-start), var(--light-mode-background-end));
-            color: var(--light-mode-text-color);
-        }
-
-        .container {
-            background-color: var(--form-background);
-            padding: 40px;
+        .login-container {
+            background-color: var(--container-background);
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            margin: 20px;
         }
 
-        body.light-mode .container {
-            background-color: var(--light-mode-form-background);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(0, 0, 0, 0.1);
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
-        .container h1 {
+        .login-header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.2em;
             color: var(--accent-color);
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(140, 122, 230, 0.6);
+            margin: 0;
+            text-shadow: 0 0 12px rgba(140, 122, 230, 0.7);
         }
 
-        body.light-mode .container h1 {
-            color: var(--light-mode-text-color);
-            text-shadow: none;
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+            position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            font-size: 0.95em;
+            margin-bottom: 5px;
+            color: var(--text-color);
         }
 
         .form-group input {
-            width: calc(100% - 20px);
+            width: 100%;
             padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
             background-color: var(--input-background);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
             color: var(--text-color);
-            font-size: 1em;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        body.light-mode .form-group input {
-            background-color: var(--light-mode-input-background);
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: border-color 0.3s ease;
         }
 
         .form-group input:focus {
             border-color: var(--accent-color);
-            box-shadow: 0 0 8px rgba(140, 122, 230, 0.4);
-            outline: none;
         }
 
-        button[type="submit"] {
+        .login-button {
             background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
             color: white;
+            padding: 12px;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 1.1em;
+            border-radius: 5px;
             cursor: pointer;
-            width: 100%;
             font-weight: bold;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
         }
 
-        button[type="submit"]:hover {
+        .login-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(140, 122, 230, 0.5);
+            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
         }
 
-        @media (max-width: 600px) {
-            .container {
-                margin: 20px;
-                padding: 30px 20px;
-            }
-
-            .container h1 {
-                font-size: 1.8em;
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 10px;
+                padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Staff Login - AMDF.GROUP</h1>
-        
-        <form id="loginForm">
+    <div class="login-container">
+        <div class="login-header">
+            <h1>AMDF Staff Login</h1>
+        </div>
+
+        <form action="/ESPSTMARD/staff.html" method="POST" class="login-form">
             <div class="form-group">
-                <label for="loginEmail">Staff Email</label>
-                <input type="email" id="loginEmail" placeholder="staff.email@amdf.group" required>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Masukkan username Anda">
             </div>
+            
             <div class="form-group">
-                <label for="loginPin">Staff PIN</label>
-                <input type="password" id="loginPin" placeholder="Your 6-digit Staff PIN" pattern="\d{6}" maxlength="6" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required placeholder="Masukkan password Anda">
             </div>
-            <button type="submit">Login as Staff</button>
+
+            <button type="submit" class="login-button">Login</button>
         </form>
     </div>
 
-    <!-- Gunakan satu dari dua opsi berikut: -->
-
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script>
-        // Tambahkan error handling untuk memudahkan debugging
-        window.addEventListener('error', function(event) {
-            console.error('Error:', event.error);
+        // Initialize Firebase
+        firebase.initializeApp({
+            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+            authDomain: "tamplatedoc.firebaseapp.com",
+            projectId: "tamplatedoc",
+            storageBucket: "tamplatedoc.firebasestorage.app",
+            messagingSenderId: "264966107720",
+            appId: "1:264966107720:web:da19f6109e71390740de7d",
+            measurementId: "G-PFK8VQBFCV"
         });
-    <!-- Opsi 2: Modern SDK (untuk browser modern) -->
-    <!--
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-        // Inisialisasi Firebase
-            const firebaseConfig = {
-                apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-                authDomain: "tamplatedoc.firebaseapp.com",
-                projectId: "tamplatedoc",
-                storageBucket: "tamplatedoc.firebasestorage.app",
-                messagingSenderId: "264966107720",
-                appId: "1:264966107720:web:da19f6109e71390740de7d"
-            };
+        const auth = firebase.auth();
 
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-    </script>
-    -->
+        document.querySelector('.login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
 
-    <script>
-
-            // Inisialisasi Firebase dengan error handling
             try {
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
-
-                // Cek apakah Firebase sudah terinisialisasi
-                if (!app || !auth || !db) {
-                    throw new Error('Firebase initialization failed');
-                }
-
-                // Setup login form handler
-                const loginForm = document.getElementById('loginForm');
-                loginForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    
-                    const email = document.getElementById('loginEmail').value;
-                    const pin = document.getElementById('loginPin').value;
-
-                    try {
-                        // Menggunakan signInWithCustomToken untuk menghindari CORS
-                        const customToken = await fetch('/api/get-custom-token', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ email, pin })
-                        }).then(res => res.json());
-
-                        const userCredential = await signInWithCustomToken(auth, customToken);
-                        const user = userCredential.user;
-
-                        // Simpan token di localStorage untuk autentikasi berikutnya
-                        localStorage.setItem('staffToken', customToken);
-
-                        // Redirect ke halaman staff
-                        window.location.href = '/ESPSTMARD/staff.html';
-
-                    } catch (error) {
-                        console.error('Login failed:', error);
-                        alert('Login failed: ' + error.message);
-                    }
-                });
+                await auth.signInWithEmailAndPassword(username + '@amdf.group', password);
+                window.location.href = '/ESPSTMARD/staff.html';
             } catch (error) {
-                console.error('Firebase initialization failed:', error);
-                alert('Firebase initialization failed. Please try again later.');
+                alert('Login gagal: ' + error.message);
             }
         });
     </script>
