@@ -285,9 +285,19 @@
         .book-card-meta.vertical-meta {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.4rem;
+    align-items: center;         /* Tengah horizontal */
+    text-align: center;          /* Tengah isi teks */
+    gap: 0.2rem;                 /* Jarak antar elemen */
+    margin-top: 0.5rem;
 }
+
+.book-card-meta.vertical-meta .rating,
+.book-card-meta.vertical-meta .views {
+    font-size: 0.85rem;          /* Ukuran teks sedikit kecil */
+    line-height: 1.2;            /* Jarak antar baris rapat */
+    letter-spacing: 0.2px;       /* Jarak antar huruf lebih rapat */
+}
+
 
 
         .book-card-meta span {
