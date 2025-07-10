@@ -522,7 +522,7 @@
         <p>&copy; AMDF.GROUP</p>
     </footer>
 
-   <script type="module">
+<script type="module">
     // Import modul Firebase yang dibutuhkan
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -587,7 +587,8 @@
             
             try {
                 // Ambil info detail kreator dari Firestore
-                const authorDocRef = doc(db, 'artifacts', 'default-app-id', 'public', 'data', 'authors', currentCreatorUid);
+                const creatorId = sessionStorage.getItem('currentCreatorId');
+                const authorDocRef = doc(db, 'artifacts', 'default-app-id', 'users', creatorId);
                 const authorDocSnap = await getDoc(authorDocRef);
 
                 if (authorDocSnap.exists()) {
@@ -600,7 +601,7 @@
                     document.getElementById('authorNameReadonly').value = currentAuthorName;
 
                     // Periksa apakah kreator diblokir
-                    if (data.isBlocked) {
+                    if (data.status === 'blocked') {
                         alert('Akun Anda telah diblokir. Silakan hubungi staf untuk informasi lebih lanjut.');
                         await signOut(auth);
                         clearLoginSession();
@@ -649,6 +650,12 @@
 
     // === FUNGSI UNTUK MEMBERSIHKAN SESSION LOGIN ===
     function clearLoginSession() {
+        const creatorId = sessionStorage.getItem('currentCreatorId');
+        if (creatorId) {
+            // Hapus dari Realtime Database
+            const rtUserRef = ref(dbRT, `artifacts/default-app-id/loggedInUsers/${creatorId}`);
+            set(rtUserRef, null);
+        }
         sessionStorage.removeItem('loggedInUserRole');
         sessionStorage.removeItem('cachedUserId');
         sessionStorage.removeItem('currentCreatorId');
@@ -681,7 +688,7 @@
     // Fungsi untuk memvalidasi file gambar
     function validateImageFile(file) {
         if (!file) {
-            alert('Mohon pilih gambar thumbnail.');
+            alert('Mohun pilih gambar thumbnail.');
             return false;
         }
         if (file.type !== 'image/webp') {
