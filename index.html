@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* CSS Variables for Light Mode */
         :root {
             --background-start: #f0f2f5;
             --background-end: #e0e2e5;
@@ -29,7 +28,6 @@
             --footer-text: #eee;
         }
 
-        /* Dark Mode styles */
         body.dark-mode {
             --background-start: #1a1a2e;
             --background-end: #16213e;
@@ -115,7 +113,7 @@
         }
 
         .btn {
-            background: var(--button-bg-gradient-start); /* Fallback */
+            background: var(--button-bg-gradient-start);
             background: linear-gradient(45deg, var(--button-bg-gradient-start) 0%, var(--button-bg-gradient-end) 100%);
             color: var(--button-text-color);
             padding: 0.7rem 1.4rem;
@@ -123,7 +121,7 @@
             text-decoration: none;
             font-weight: 600;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            white-space: nowrap; /* Prevent text wrapping */
+            white-space: nowrap;
             border: none;
             cursor: pointer;
             font-size: 1rem;
@@ -142,7 +140,7 @@
             position: relative;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            flex-shrink: 0; /* Prevent shrinking on small screens */
+            flex-shrink: 0;
         }
 
         .mode-toggle .circle {
@@ -234,8 +232,8 @@
 
         .book-card-thumbnail {
             width: 100%;
-            height: 200px; /* Fixed height for thumbnails */
-            object-fit: cover; /* Ensures image covers the area, cropping if necessary */
+            height: 200px;
+            object-fit: cover;
             border-bottom: 1px solid var(--card-border);
         }
 
@@ -250,7 +248,7 @@
             font-size: 1.4rem;
             margin-bottom: 0.7rem;
             color: var(--text-color);
-            flex-grow: 1; /* Allows title to take available space */
+            flex-grow: 1;
         }
 
         .book-card-content p {
@@ -279,7 +277,7 @@
         }
 
         .rating .stars {
-            color: gold; /* Or a specific yellow/orange */
+            color: gold;
         }
 
         footer {
@@ -302,7 +300,6 @@
             color: var(--link-color);
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -344,7 +341,7 @@
             }
 
             .book-grid {
-                grid-template-columns: 1fr; /* Single column on small screens */
+                grid-template-columns: 1fr;
             }
 
             .book-card-thumbnail {
@@ -371,9 +368,9 @@
 </head>
 <body>
     <header>
-        <a href="#" class="logo">AMDF.GROUP E-Books</a>
+        <a href="catalog.html" class="logo">AMDF.GROUP E-Books</a>
         <div class="nav-links">
-            <a href="#catalog">Catalog</a>
+            <a href="catalog.html">Catalog</a>
             <a href="#about">About</a>
             <a href="#privacy">Privacy Policy</a>
             <div class="mode-toggle" onclick="toggleDarkMode()">
@@ -394,61 +391,9 @@
             </div>
         </section>
 
-        <section class="book-grid">
-            <div class="book-card" onclick="location.href='web_story.html?id=story123'">
-                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+1" alt="Story Thumbnail" class="book-card-thumbnail">
-                <div class="book-card-content">
-                    <h3>The Last Stargazer</h3>
-                    <p>Author: Jane Doe</p>
-                    <div class="book-card-meta">
-                        <span><i class="fas fa-eye"></i> 1,234 Views</span>
-                        <span class="rating">
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star-half-alt stars"></i>
-                            <i class="far fa-star"></i> 4.5 (120 Ratings)
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="book-card" onclick="location.href='web_story.html?id=story124'">
-                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+2" alt="Story Thumbnail" class="book-card-thumbnail">
-                <div class="book-card-content">
-                    <h3>Whispers of the Ancient Forest</h3>
-                    <p>Author: John Smith</p>
-                    <div class="book-card-meta">
-                        <span><i class="fas fa-eye"></i> 890 Views</span>
-                        <span class="rating">
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="far fa-star"></i> 4.0 (85 Ratings)
-                        </span>
-                    </div>
-                </div>
-            </div>
+        <section class="book-grid" id="bookGrid">
             
-            <div class="book-card" onclick="location.href='web_story.html?id=story125'">
-                <img src="https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+3" alt="Story Thumbnail" class="book-card-thumbnail">
-                <div class="book-card-content">
-                    <h3>City of Neon Dreams</h3>
-                    <p>Author: Alice Wonderland</p>
-                    <div class="book-card-meta">
-                        <span><i class="fas fa-eye"></i> 2,500 Views</span>
-                        <span class="rating">
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i>
-                            <i class="fas fa-star stars"></i> 5.0 (210 Ratings)
-                        </span>
-                    </div>
-                </div>
-            </div>
-            </section>
+        </section>
     </main>
 
     <footer>
@@ -461,14 +406,10 @@
     </footer>
 
     <script type="module">
-        // Firebase Configuration (provided by you)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
-        Import other Firebase services as needed (e.g., getFirestore, getDatabase, getStorage)
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-        import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
-        import { getStorage } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
-
+        import { getFirestore, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+        import { getDatabase, ref as rtdbRef, get as rtdbGet, child as rtdbChild } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        import { getStorage, ref as storageRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
@@ -481,18 +422,13 @@
             measurementId: "G-S5WTZ7S5PG"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        // You would also initialize Firestore, Realtime Database, Storage here:
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
         const storage = getStorage(app);
 
-        // Dark Mode Toggle Logic
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
-            // Store user preference in localStorage
             if (document.body.classList.contains('dark-mode')) {
                 localStorage.setItem('theme', 'dark');
             } else {
@@ -500,75 +436,112 @@
             }
         }
 
-        // Apply theme on page load
-        document.addEventListener('DOMContentLoaded', () => {
+        function applyTheme() {
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
             }
-            // In a real application, you'd fetch data from Firebase here
-            Example: fetchAndDisplayBooks(db, rtdb, storage);
-        });
-
-        // Function to dynamically load books (placeholder)
-        async function fetchAndDisplayBooks(db, rtdb, storage) {
-        const bookGrid = document.querySelector('.book-grid');
-        bookGrid.innerHTML = ''; // Clear existing placeholders
-
-        Example of fetching from Firestore (assuming a 'books' collection)
-        /const querySnapshot = await getDocs(collection(db, "books"));
-        const books = [];
-         querySnapshot.forEach((doc) => {
-            books.push({ id: doc.id, ...doc.data() });
-        });
-
-        //     // For each book, fetch its views from Realtime DB and rating
-        //     // And its thumbnail from Storage
-
-            // Example static data for now
-             const staticBooks = [
-                 { id: 'story123', title: 'The Last Stargazer', author: 'Jane Doe', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+1', views: 1234, rating: 4.5, ratingsCount: 120 },
-                 { id: 'story124', title: 'Whispers of the Ancient Forest', author: 'John Smith', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+2', views: 890, rating: 4.0, ratingsCount: 85 },
-                { id: 'story125', title: 'City of Neon Dreams', author: 'Alice Wonderland', thumbnailUrl: 'https://via.placeholder.com/300x200/eee/333?text=Book+Thumbnail+3', views: 2500, rating: 5.0, ratingsCount: 210 },
-             ];
-
-            staticBooks.forEach(book => {
-                const card = document.createElement('div');
-               card.className = 'book-card';
-                card.onclick = () => location.href = `web_story.html?id=${book.id}`;
-                card.innerHTML = `
-                    <img src="${book.thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
-                    <div class="book-card-content">
-                        <h3>${book.title}</h3>
-                        <p>Author: ${book.author}</p>
-                         <div class="book-card-meta">
-                            <span><i class="fas fa-eye"></i> ${book.views} Views</span>
-                          <span class="rating">
-                                 ${generateStarRating(book.rating)} ${book.rating} (${book.ratingsCount} Ratings)
-                          </span>
-                         </div>
-                    </div>
-                 `;
-                 bookGrid.appendChild(card);
-             });
         }
 
-         // Helper function to generate star icons
-         function generateStarRating(rating) {
-             let starsHtml = '';
-             const fullStars = Math.floor(rating);
-             const hasHalfStar = rating % 1 !== 0;
+        function generateStarRatingHtml(rating) {
+            let starsHtml = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
 
-             for (let i = 0; i < fullStars; i++) {
-                 starsHtml += '<i class="fas fa-star stars"></i>';
-             }
+            for (let i = 0; i < fullStars; i++) {
+                starsHtml += '<i class="fas fa-star stars"></i>';
+            }
             if (hasHalfStar) {
-                 starsHtml += '<i class="fas fa-star-half-alt stars"></i>';
+                starsHtml += '<i class="fas fa-star-half-alt stars"></i>';
             }
             for (let i = 0; i < (5 - fullStars - (hasHalfStar ? 1 : 0)); i++) {
-                 starsHtml += '<i class="far fa-star"></i>';
+                starsHtml += '<i class="far fa-star"></i>';
             }
             return starsHtml;
-         }
+        }
+
+        async function fetchAndDisplayBooks() {
+            const bookGrid = document.getElementById('bookGrid');
+            bookGrid.innerHTML = '';
+            const storiesCollectionRef = collection(db, "stories");
+            const q = query(storiesCollectionRef);
+
+            try {
+                const querySnapshot = await getDocs(q);
+                for (const docSnapshot of querySnapshot.docs) {
+                    const storyData = docSnapshot.data();
+                    const storyId = docSnapshot.id;
+
+                    if (storyData.status !== 'approved') {
+                        continue;
+                    }
+
+                    let views = 0;
+                    let averageRating = 0;
+                    let ratingsCount = 0;
+                    let thumbnailUrl = 'https://via.placeholder.com/300x200/eee/333?text=No+Thumbnail';
+
+                    try {
+                        const viewsSnapshot = await rtdbGet(rtdbChild(rtdbRef(rtdb), `storyViews/${storyId}/views`));
+                        if (viewsSnapshot.exists()) {
+                            views = viewsSnapshot.val();
+                        }
+                    } catch (error) {
+                        console.error("Error fetching views for story", storyId, error);
+                    }
+
+                    try {
+                        const ratingsSnapshot = await rtdbGet(rtdbChild(rtdbRef(rtdb), `storyRatings/${storyId}/ratings`));
+                        if (ratingsSnapshot.exists()) {
+                            const ratingData = ratingsSnapshot.val();
+                            ratingsCount = ratingData.count || 0;
+                            if (ratingsCount > 0) {
+                                averageRating = (ratingData.total / ratingsCount).toFixed(1);
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error fetching ratings for story", storyId, error);
+                    }
+
+                    if (storyData.thumbnailPath) {
+                        try {
+                            const imageRef = storageRef(storage, storyData.thumbnailPath);
+                            thumbnailUrl = await getDownloadURL(imageRef);
+                        } catch (error) {
+                            console.error("Error fetching thumbnail URL for story", storyId, error);
+                            thumbnailUrl = 'https://via.placeholder.com/300x200/eee/333?text=Image+Error';
+                        }
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'book-card';
+                    card.onclick = () => location.href = `web_story.html?id=${storyId}`;
+                    card.innerHTML = `
+                        <img src="${thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
+                        <div class="book-card-content">
+                            <h3>${storyData.title}</h3>
+                            <p>Author: ${storyData.authorName}</p>
+                            <div class="book-card-meta">
+                                <span><i class="fas fa-eye"></i> ${views} Views</span>
+                                <span class="rating">
+                                    ${generateStarRatingHtml(averageRating)} ${averageRating} (${ratingsCount} Ratings)
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    bookGrid.appendChild(card);
+                }
+            } catch (error) {
+                console.error("Error fetching stories:", error);
+                bookGrid.innerHTML = '<p style="text-align: center; color: var(--text-color);">Failed to load stories. Please try again later.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+            fetchAndDisplayBooks();
+        });
     </script>
 </body>
 </html>
