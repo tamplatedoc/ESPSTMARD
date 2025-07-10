@@ -522,320 +522,330 @@
         <p>&copy; AMDF.GROUP</p>
     </footer>
 
-    <script type="module">
-        // Import modul Firebase yang dibutuhkan
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+   <script type="module">
+    // Import modul Firebase yang dibutuhkan
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // === KONFIGURASI DAN INISIALISASI FIREBASE ===
-        const firebaseConfig = {
-            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-            authDomain: "tamplatedoc.firebaseapp.com",
-            databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "tamplatedoc",
-            storageBucket: "tamplatedoc.firebasestorage.app",
-            messagingSenderId: "264966107720",
-            appId: "1:264966107720:web:da19f6109e71390740de7d",
-            measurementId: "G-PFK8VQBFCV"
-        };
+    // === KONFIGURASI DAN INISIALISASI FIREBASE ===
+    const firebaseConfig = {
+        apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+        authDomain: "tamplatedoc.firebaseapp.com",
+        databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "tamplatedoc",
+        storageBucket: "tamplatedoc.firebasestorage.app",
+        messagingSenderId: "264966107720",
+        appId: "1:264966107720:web:da19f6109e71390740de7d",
+        measurementId: "G-PFK8VQBFCV"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-        let currentCreatorUid = null;
-        let currentCreatorCustomId = 'N/A';
-        let currentAuthorName = 'Memuat...';
+    let currentCreatorUid = null;
+    let currentCreatorCustomId = 'N/A';
+    let currentAuthorName = 'Memuat...';
 
-        // Dapatkan elemen DOM untuk konten dashboard dan pesan notifikasi
-        const dashboardContent = document.getElementById('dashboard-content');
-        const notLoggedInMessage = document.getElementById('not-logged-in-message');
-        const loadingSpinner = document.getElementById('loading-spinner');
+    // Dapatkan elemen DOM untuk konten dashboard dan pesan notifikasi
+    const dashboardContent = document.getElementById('dashboard-content');
+    const notLoggedInMessage = document.getElementById('not-logged-in-message');
+    const loadingSpinner = document.getElementById('loading-spinner');
 
-        // === TEMA TOGGLE (dari login.html, untuk konsistensi) ===
-        const body = document.body;
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.classList.add(savedTheme);
-        }
+    // === TEMA TOGGLE ===
+    const body = document.body;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        body.classList.add(savedTheme);
+    }
 
-        // === LISTENER STATUS AUTENTIKASI ===
-        // onAuthStateChanged adalah cara utama untuk mengelola status autentikasi di Firebase.
-        // Ini akan dieksekusi setiap kali status autentikasi berubah (login, logout, refresh halaman)
-        onAuthStateChanged(auth, async (user) => {
-            // Sembunyikan spinner loading begitu status terdeteksi
-            loadingSpinner.classList.add('hidden');
-
-            if (user) {
-                // Pengguna sudah login.
-                currentCreatorUid = user.uid;
-                // Ambil info detail kreator dari Firestore
-                try {
-                    // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
-                    // Misalnya: 'users' atau 'creators'
-                    // Jika koleksi 'authors' Anda tidak berada di bawah 'artifacts/default-app-id/public/data/', sesuaikan jalur ini.
-                    const authorDocRef = doc(db, 'artifacts', 'default-app-id', 'public', 'data', 'authors', currentCreatorUid);
-                    const authorDocSnap = await getDoc(authorDocRef);
-
-                    if (authorDocSnap.exists()) {
-                        const data = authorDocSnap.data();
-                        currentCreatorCustomId = data.creatorId;
-                        currentAuthorName = data.name;
-
-                        document.getElementById('displayCreatorId').textContent = currentCreatorCustomId;
-                        document.getElementById('displayAuthorName').textContent = currentAuthorName;
-                        document.getElementById('authorNameReadonly').value = currentAuthorName;
-
-                        // Periksa apakah kreator diblokir
-                        // Pastikan bidang 'isBlocked' ada di dokumen penulis Anda di Firestore.
-                        if (data.isBlocked) {
-                            alert('Akun Anda telah diblokir. Silakan hubungi staf untuk informasi lebih lanjut.');
-                            await signOut(auth); // Paksa logout
-                            window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
-                            return;
-                        }
-
-                        // Muat cerita khusus untuk kreator ini
-                        loadCreatorStories(currentCreatorUid);
-
-                        // Tampilkan konten dashboard
-                        dashboardContent.classList.remove('hidden');
-                        notLoggedInMessage.classList.add('hidden'); // Pastikan pesan tidak login tersembunyi
-
-                    } else {
-                        // Kasus ini seharusnya tidak terjadi jika logika pendaftaran sudah benar.
-                        console.error("Dokumen penulis tidak ditemukan untuk UID:", currentCreatorUid);
-                        alert("Profil kreator Anda tidak lengkap atau tidak ditemukan. Silakan hubungi dukungan.");
-                        await signOut(auth); // Paksa logout
-                        window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
-                    }
-                } catch (error) {
-                    console.error("Error fetching creator data:", error);
-                    alert("Gagal memuat data kreator. Silakan coba lagi.");
-                    await signOut(auth); // Paksa logout jika ada error
-                    window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
-                }
-            } else {
-                // Tidak ada pengguna yang login. Arahkan ke halaman login.
-                console.warn('Tidak ada pengguna Firebase yang diautentikasi. Mengarahkan ke login.');
-                dashboardContent.classList.add('hidden'); // Sembunyikan dashboard
-                notLoggedInMessage.classList.remove('hidden'); // Tampilkan pesan tidak login
-
-                // Berikan sedikit waktu agar pengguna bisa membaca pesan sebelum diarahkan
-                setTimeout(() => {
-                    window.location.href = '/ESPSTMARD/login.html'; // PASTIKAN JALUR INI BENAR!
-                }, 1500); // Arahkan setelah 1.5 detik
-            }
-        });
-
-        // === FUNGSI LOGOUT ===
-        document.getElementById('logoutButton').addEventListener('click', async () => {
-            try {
-                await signOut(auth); // Gunakan signOut dari Modular SDK
-                alert('Anda telah berhasil logout.');
-                window.location.href = '/ESPSTMARD/login.html'; // Arahkan ke halaman login
-            } catch (error) {
-                console.error("Error selama logout:", error);
-                alert("Logout gagal. Silakan coba lagi.");
-            }
-        });
-
-        // === LOGIKA FORM TAMBAH CERITA BARU ===
-        const addStoryForm = document.getElementById('addStoryForm');
-        const storyTitleInput = document.getElementById('storyTitle');
-        const storyGenreSelect = document.getElementById('storyGenre');
-        const storyContentTextarea = document.getElementById('storyContent');
-        const storyImageInput = document.getElementById('storyImage');
-        const generatedStoryIdSpan = document.getElementById('generatedStoryId');
-        const storyIdDisplayDiv = document.getElementById('storyIdDisplay');
-        const createStoryButton = document.getElementById('createStoryButton');
-        const storyListElement = document.getElementById('creatorStoryList');
-
-        // Fungsi untuk memvalidasi file gambar
-        function validateImageFile(file) {
-            if (!file) {
-                alert('Mohon pilih gambar thumbnail.');
-                return false;
-            }
-            if (file.type !== 'image/webp') {
-                alert('Gambar harus dalam format .webp.');
-                return false;
-            }
-            if (file.size > 200 * 1024) { // 200KB dalam byte
-                alert('Ukuran gambar maksimal 200KB.');
-                return false;
-            }
+    // === FUNGSI UNTUK MEMERIKSA SESSION LOGIN ===
+    function checkSessionLogin() {
+        const loggedInUserRole = sessionStorage.getItem('loggedInUserRole');
+        const cachedUserId = sessionStorage.getItem('cachedUserId');
+        
+        if (loggedInUserRole === 'creator' && cachedUserId) {
+            // Jika sudah login sebagai creator dan ada cachedUserId
             return true;
         }
+        return false;
+    }
 
-        // Logika untuk membuat ID Cerita
-        async function generateStoryIdForCreator(creatorFirebaseUid, creatorCustomId) {
-            const now = new Date();
-            const year = String(now.getFullYear()).slice(-2);
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
+    // === LISTENER STATUS AUTENTIKASI ===
+    onAuthStateChanged(auth, async (user) => {
+        loadingSpinner.classList.add('hidden');
 
-            const shortCreatorId = creatorCustomId ? creatorCustomId.substring(0, 4) : 'NULL';
-
-            // Dapatkan jumlah cerita saat ini untuk kreator ini dari Firestore
-            // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
-            const creatorStatsDocRef = doc(db, 'artifacts', 'default-app-id', 'creator_stats', creatorFirebaseUid);
-            const statsDocSnap = await getDoc(creatorStatsDocRef);
-            let storyCount = 0;
-            if (statsDocSnap.exists()) {
-                storyCount = statsDocSnap.data().storyCount || 0;
-            }
-            storyCount++; // Tambah untuk cerita baru
-
-            // Perbarui hitungan di Firestore (penting untuk keunikan)
-            await setDoc(creatorStatsDocRef, { storyCount: storyCount }, { merge: true });
-
-            return `${year}${month}${day}${shortCreatorId}${String(storyCount).padStart(3, '0')}`;
-        }
-
-        // Tangani tombol "Buat Cerita (Kirim untuk Review)"
-        addStoryForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!currentCreatorUid) {
-                alert('Pengguna tidak diautentikasi. Silakan login.');
-                return;
-            }
-
-            const title = storyTitleInput.value.trim();
-            const genre = storyGenreSelect.value;
-            const content = storyContentTextarea.value.trim();
-            const authorName = document.getElementById('authorNameReadonly').value;
-            const imageFile = storyImageInput.files[0];
-
-            if (!title || !genre || !content || !authorName || !imageFile) {
-                alert('Mohon lengkapi semua bidang yang wajib diisi dan pilih gambar.');
-                return;
-            }
-
-            if (!validateImageFile(imageFile)) {
-                return;
-            }
-
-            // Nonaktifkan tombol untuk mencegah pengiriman ganda
-            createStoryButton.disabled = true;
-            createStoryButton.textContent = 'Mengirim...';
-
+        // Periksa session login terlebih dahulu
+        const isLoggedIn = checkSessionLogin();
+        
+        if (user && isLoggedIn) {
+            // Pengguna sudah login dan session valid
+            currentCreatorUid = user.uid;
+            
             try {
-                // 1. Buat ID Cerita yang unik
-                const storyId = await generateStoryIdForCreator(currentCreatorUid, currentCreatorCustomId);
+                // Ambil info detail kreator dari Firestore
+                const authorDocRef = doc(db, 'artifacts', 'default-app-id', 'public', 'data', 'authors', currentCreatorUid);
+                const authorDocSnap = await getDoc(authorDocRef);
 
-                // 2. Unggah gambar ke Firebase Storage
-                const imagePath = `story_thumbnails/${currentCreatorUid}/${storyId}.webp`;
-                const imageRef = storageRef(storage, imagePath); // Gunakan storageRef dari Modular SDK
-                await uploadBytes(imageRef, imageFile); // Gunakan uploadBytes
-                const imageUrl = await getDownloadURL(imageRef); // Gunakan getDownloadURL
+                if (authorDocSnap.exists()) {
+                    const data = authorDocSnap.data();
+                    currentCreatorCustomId = data.creatorId;
+                    currentAuthorName = data.name;
 
-                // 3. Simpan data cerita ke Firestore
-                // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
-                const storyDocRef = doc(db, 'artifacts', 'default-app-id', 'stories', storyId);
-                await setDoc(storyDocRef, {
-                    storyId: storyId,
-                    title: title,
-                    genre: genre,
-                    content: content,
-                    thumbnailUrl: imageUrl,
-                    authorFirebaseUid: currentCreatorUid,
-                    authorCustomId: currentCreatorCustomId,
-                    authorName: authorName,
-                    status: 'under review', // Status awal
-                    createdAt: serverTimestamp(), // Gunakan serverTimestamp dari Modular SDK
-                    lastModified: serverTimestamp(),
-                    views: 0,
-                    ratings: {}
-                });
+                    document.getElementById('displayCreatorId').textContent = currentCreatorCustomId;
+                    document.getElementById('displayAuthorName').textContent = currentAuthorName;
+                    document.getElementById('authorNameReadonly').value = currentAuthorName;
 
-                alert('Cerita berhasil dikirim untuk di-review! ID Cerita Anda: ' + storyId);
-                generatedStoryIdSpan.textContent = storyId;
-                storyIdDisplayDiv.classList.remove('hidden');
-
-                // Bersihkan form
-                addStoryForm.reset();
-                // Opsional, sembunyikan tampilan ID setelah beberapa detik
-                setTimeout(() => storyIdDisplayDiv.classList.add('hidden'), 3000);
-
-                // Perbarui daftar cerita untuk menampilkan cerita baru
-                loadCreatorStories(currentCreatorUid);
-
-            } catch (error) {
-                console.error('Error saat mengirim cerita:', error);
-                alert('Gagal mengirim cerita. Silakan coba lagi. ' + error.message);
-            } finally {
-                createStoryButton.disabled = false;
-                createStoryButton.textContent = 'Buat Cerita (Kirim untuk Review)';
-            }
-        });
-
-        // === MUAT CERITA KREATOR ===
-        async function loadCreatorStories(creatorUid) {
-            storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">Memuat cerita Anda...</p>';
-
-            try {
-                // Query Firestore untuk cerita di mana authorFirebaseUid cocok dengan UID kreator saat ini
-                // Gunakan collection, query, where, orderBy dari Modular SDK
-                // PASTIKAN JALUR INI SESUAI DENGAN STRUKTUR FIRESTORE ANDA
-                const q = query(
-                    collection(db, 'artifacts', 'default-app-id', 'stories'),
-                    where('authorFirebaseUid', '==', creatorUid),
-                    orderBy('createdAt', 'desc')
-                );
-
-                onSnapshot(q, (snapshot) => { // Gunakan onSnapshot dari Modular SDK untuk update real-time
-                    storyListElement.innerHTML = ''; // Bersihkan daftar yang ada
-                    if (snapshot.empty) {
-                        storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">Anda belum membuat cerita apapun.</p>';
+                    // Periksa apakah kreator diblokir
+                    if (data.isBlocked) {
+                        alert('Akun Anda telah diblokir. Silakan hubungi staf untuk informasi lebih lanjut.');
+                        await signOut(auth);
+                        clearLoginSession();
+                        window.location.href = '/ESPSTMARD/login.html';
                         return;
                     }
 
-                    snapshot.forEach(doc => {
-                        const story = doc.data();
-                        let statusClass = '';
-                        let displayStatusText = '';
+                    // Muat cerita khusus untuk kreator ini
+                    loadCreatorStories(currentCreatorUid);
 
-                        if (story.status === 'under review') {
-                            statusClass = 'status-under-review';
-                            displayStatusText = 'Dalam Review';
-                        } else if (story.status === 'approved') {
-                            statusClass = 'status-approved';
-                            displayStatusText = 'Disetujui';
-                        } else if (story.status === 'published') {
-                            statusClass = 'status-published';
-                            displayStatusText = 'Diterbitkan';
-                        } else if (story.status === 'rejected') {
-                            statusClass = 'status-error-data-breach';
-                            displayStatusText = 'Ditolak';
-                        } else {
-                            statusClass = 'status-error-data-breach';
-                            displayStatusText = 'Status Tidak Dikenal';
-                        }
+                    // Tampilkan konten dashboard
+                    dashboardContent.classList.remove('hidden');
+                    notLoggedInMessage.classList.add('hidden');
 
-                        const storyItemHtml = `
-                            <div class="story-item">
-                                <span>ID Cerita: ${story.storyId}</span>
-                                <span>Judul: ${story.title}</span>
-                                <span class="status-indicator ${statusClass}">${displayStatusText}</span>
-                            </div>
-                        `;
-                        storyListElement.insertAdjacentHTML('beforeend', storyItemHtml);
-                    });
-                }, (error) => {
-                    console.error("Error mendengarkan cerita:", error);
-                    storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Error memuat cerita. Silakan coba lagi.</p>';
-                });
-
+                } else {
+                    console.error("Dokumen penulis tidak ditemukan untuk UID:", currentCreatorUid);
+                    alert("Profil kreator Anda tidak lengkap atau tidak ditemukan. Silakan hubungi dukungan.");
+                    await signOut(auth);
+                    clearLoginSession();
+                    window.location.href = '/ESPSTMARD/login.html';
+                }
             } catch (error) {
-                console.error('Error mengambil cerita kreator:', error);
-                storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Gagal memuat cerita Anda. Silakan coba lagi.</p>';
+                console.error("Error fetching creator data:", error);
+                alert("Gagal memuat data kreator. Silakan coba lagi.");
+                await signOut(auth);
+                clearLoginSession();
+                window.location.href = '/ESPSTMARD/login.html';
             }
+        } else {
+            // Tidak ada pengguna yang login atau session tidak valid
+            console.warn('Tidak ada pengguna yang diautentikasi atau session tidak valid.');
+            dashboardContent.classList.add('hidden');
+            notLoggedInMessage.classList.remove('hidden');
+
+            // Jika ada user tapi session tidak valid, lakukan logout
+            if (user) {
+                await signOut(auth);
+                clearLoginSession();
+            }
+
+            setTimeout(() => {
+                window.location.href = '/ESPSTMARD/login.html';
+            }, 1500);
         }
-    </script>
+    });
+
+    // === FUNGSI UNTUK MEMBERSIHKAN SESSION LOGIN ===
+    function clearLoginSession() {
+        sessionStorage.removeItem('loggedInUserRole');
+        sessionStorage.removeItem('cachedUserId');
+        sessionStorage.removeItem('currentCreatorId');
+    }
+
+    // === FUNGSI LOGOUT ===
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+            clearLoginSession();
+            alert('Anda telah berhasil logout.');
+            window.location.href = '/ESPSTMARD/login.html';
+        } catch (error) {
+            console.error("Error selama logout:", error);
+            alert("Logout gagal. Silakan coba lagi.");
+        }
+    });
+
+    // === LOGIKA FORM TAMBAH CERITA BARU ===
+    const addStoryForm = document.getElementById('addStoryForm');
+    const storyTitleInput = document.getElementById('storyTitle');
+    const storyGenreSelect = document.getElementById('storyGenre');
+    const storyContentTextarea = document.getElementById('storyContent');
+    const storyImageInput = document.getElementById('storyImage');
+    const generatedStoryIdSpan = document.getElementById('generatedStoryId');
+    const storyIdDisplayDiv = document.getElementById('storyIdDisplay');
+    const createStoryButton = document.getElementById('createStoryButton');
+    const storyListElement = document.getElementById('creatorStoryList');
+
+    // Fungsi untuk memvalidasi file gambar
+    function validateImageFile(file) {
+        if (!file) {
+            alert('Mohon pilih gambar thumbnail.');
+            return false;
+        }
+        if (file.type !== 'image/webp') {
+            alert('Gambar harus dalam format .webp.');
+            return false;
+        }
+        if (file.size > 200 * 1024) {
+            alert('Ukuran gambar maksimal 200KB.');
+            return false;
+        }
+        return true;
+    }
+
+    // Logika untuk membuat ID Cerita
+    async function generateStoryIdForCreator(creatorFirebaseUid, creatorCustomId) {
+        const now = new Date();
+        const year = String(now.getFullYear()).slice(-2);
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+
+        const shortCreatorId = creatorCustomId ? creatorCustomId.substring(0, 4) : 'NULL';
+
+        const creatorStatsDocRef = doc(db, 'artifacts', 'default-app-id', 'creator_stats', creatorFirebaseUid);
+        const statsDocSnap = await getDoc(creatorStatsDocRef);
+        let storyCount = 0;
+        if (statsDocSnap.exists()) {
+            storyCount = statsDocSnap.data().storyCount || 0;
+        }
+        storyCount++;
+
+        await setDoc(creatorStatsDocRef, { storyCount: storyCount }, { merge: true });
+
+        return `${year}${month}${day}${shortCreatorId}${String(storyCount).padStart(3, '0')}`;
+    }
+
+    // Tangani tombol "Buat Cerita (Kirim untuk Review)"
+    addStoryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!currentCreatorUid) {
+            alert('Pengguna tidak diautentikasi. Silakan login.');
+            return;
+        }
+
+        const title = storyTitleInput.value.trim();
+        const genre = storyGenreSelect.value;
+        const content = storyContentTextarea.value.trim();
+        const authorName = document.getElementById('authorNameReadonly').value;
+        const imageFile = storyImageInput.files[0];
+
+        if (!title || !genre || !content || !authorName || !imageFile) {
+            alert('Mohon lengkapi semua bidang yang wajib diisi dan pilih gambar.');
+            return;
+        }
+
+        if (!validateImageFile(imageFile)) {
+            return;
+        }
+
+        createStoryButton.disabled = true;
+        createStoryButton.textContent = 'Mengirim...';
+
+        try {
+            const storyId = await generateStoryIdForCreator(currentCreatorUid, currentCreatorCustomId);
+
+            const imagePath = `story_thumbnails/${currentCreatorUid}/${storyId}.webp`;
+            const imageRef = storageRef(storage, imagePath);
+            await uploadBytes(imageRef, imageFile);
+            const imageUrl = await getDownloadURL(imageRef);
+
+            const storyDocRef = doc(db, 'artifacts', 'default-app-id', 'stories', storyId);
+            await setDoc(storyDocRef, {
+                storyId: storyId,
+                title: title,
+                genre: genre,
+                content: content,
+                thumbnailUrl: imageUrl,
+                authorFirebaseUid: currentCreatorUid,
+                authorCustomId: currentCreatorCustomId,
+                authorName: authorName,
+                status: 'under review',
+                createdAt: serverTimestamp(),
+                lastModified: serverTimestamp(),
+                views: 0,
+                ratings: {}
+            });
+
+            alert('Cerita berhasil dikirim untuk di-review! ID Cerita Anda: ' + storyId);
+            generatedStoryIdSpan.textContent = storyId;
+            storyIdDisplayDiv.classList.remove('hidden');
+
+            addStoryForm.reset();
+            setTimeout(() => storyIdDisplayDiv.classList.add('hidden'), 3000);
+
+            loadCreatorStories(currentCreatorUid);
+
+        } catch (error) {
+            console.error('Error saat mengirim cerita:', error);
+            alert('Gagal mengirim cerita. Silakan coba lagi. ' + error.message);
+        } finally {
+            createStoryButton.disabled = false;
+            createStoryButton.textContent = 'Buat Cerita (Kirim untuk Review)';
+        }
+    });
+
+    // === MUAT CERITA KREATOR ===
+    async function loadCreatorStories(creatorUid) {
+        storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">Memuat cerita Anda...</p>';
+
+        try {
+            const q = query(
+                collection(db, 'artifacts', 'default-app-id', 'stories'),
+                where('authorFirebaseUid', '==', creatorUid),
+                orderBy('createdAt', 'desc')
+            );
+
+            onSnapshot(q, (snapshot) => {
+                storyListElement.innerHTML = '';
+                if (snapshot.empty) {
+                    storyListElement.innerHTML = '<p style="text-align: center; color: #aaa;">Anda belum membuat cerita apapun.</p>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const story = doc.data();
+                    let statusClass = '';
+                    let displayStatusText = '';
+
+                    if (story.status === 'under review') {
+                        statusClass = 'status-under-review';
+                        displayStatusText = 'Dalam Review';
+                    } else if (story.status === 'approved') {
+                        statusClass = 'status-approved';
+                        displayStatusText = 'Disetujui';
+                    } else if (story.status === 'published') {
+                        statusClass = 'status-published';
+                        displayStatusText = 'Diterbitkan';
+                    } else if (story.status === 'rejected') {
+                        statusClass = 'status-error-data-breach';
+                        displayStatusText = 'Ditolak';
+                    } else {
+                        statusClass = 'status-error-data-breach';
+                        displayStatusText = 'Status Tidak Dikenal';
+                    }
+
+                    const storyItemHtml = `
+                        <div class="story-item">
+                            <span>ID Cerita: ${story.storyId}</span>
+                            <span>Judul: ${story.title}</span>
+                            <span class="status-indicator ${statusClass}">${displayStatusText}</span>
+                        </div>
+                    `;
+                    storyListElement.insertAdjacentHTML('beforeend', storyItemHtml);
+                });
+            }, (error) => {
+                console.error("Error mendengarkan cerita:", error);
+                storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Error memuat cerita. Silakan coba lagi.</p>';
+            });
+
+        } catch (error) {
+            console.error('Error mengambil cerita kreator:', error);
+            storyListElement.innerHTML = '<p style="text-align: center; color: var(--status-error-data-breach);">Gagal memuat cerita Anda. Silakan coba lagi.</p>';
+        }
+    }
+</script>
 </body>
 </html>
