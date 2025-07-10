@@ -432,6 +432,14 @@
 }
 
 window.toggleDarkMode = toggleDarkMode; // <--- Tambahkan ini
+        // Saat halaman dimuat, terapkan preferensi dari localStorage
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+});
+
 
         const authTitle = document.getElementById('authTitle');
         const loginForm = document.getElementById('loginForm');
@@ -560,5 +568,6 @@ window.toggleDarkMode = toggleDarkMode; // <--- Tambahkan ini
             }
         });
     </script>
+
 </body>
 </html>
