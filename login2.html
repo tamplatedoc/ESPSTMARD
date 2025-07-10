@@ -1,196 +1,43 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Staff - AMDF.GROUP</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --background-start: #0a0a0f;
-            --background-end: #1a1a2e;
-            --container-background: #1f2038;
-            --input-background: #282a46;
-            --text-color: #e0e0e0;
-            --accent-color: #8c7ae6;
-            --gradient-1-start: #8c7ae6;
-            --gradient-1-end: #6c5ce7;
-            --border-color: #3f425b;
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Test Login Firebase</title>
+  </head>
+  <body>
+    <h1>Login Tes Firebase</h1>
+    <button id="login">Login Sekarang</button>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+        authDomain: "tamplatedoc.firebaseapp.com",
+        projectId: "tamplatedoc",
+        storageBucket: "tamplatedoc.appspot.com",
+        messagingSenderId: "264966107720",
+        appId: "1:264966107720:web:da19f6109e71390740de7d"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      document.getElementById("login").addEventListener("click", async () => {
+        const email = "admin1@amdf.group";
+        const password = "123456";
+
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          alert("Berhasil login sebagai: " + userCredential.user.email);
+        } catch (error) {
+          console.error("Gagal login:", error.code, error.message);
+          alert("Gagal login: " + error.code + "\n" + error.message);
         }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, var(--background-start), var(--background-end));
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .login-container {
-            background-color: var(--container-background);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 400px;
-            margin: 20px;
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .login-header h1 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-color);
-            margin: 0;
-            text-shadow: 0 0 12px rgba(140, 122, 230, 0.7);
-        }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .form-group {
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-color);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--input-background);
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            color: var(--text-color);
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus {
-            border-color: var(--accent-color);
-        }
-
-        .login-button {
-            background: linear-gradient(45deg, var(--gradient-1-start), var(--gradient-1-end));
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            margin-top: 20px;
-        }
-
-        .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(140, 122, 230, 0.4);
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                margin: 10px;
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-  <div class="login-container">
-    <div class="login-header">
-      <h1>AMDF Staff Login</h1>
-    </div>
-
-    <form class="login-form">
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required placeholder="Masukkan username Anda">
-      </div>
-      
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required placeholder="Masukkan password Anda">
-      </div>
-
-      <button type="submit" class="login-button">Login</button>
-    </form>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-      authDomain: "tamplatedoc.firebaseapp.com",
-      projectId: "tamplatedoc",
-      storageBucket: "tamplatedoc.appspot.com",
-      messagingSenderId: "264966107720",
-      appId: "1:264966107720:web:da19f6109e71390740de7d",
-      measurementId: "G-PFK8VQBFCV"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const getErrorMessage = (error) => {
-      switch (error.code) {
-        case 'auth/invalid-email':
-          return 'Email tidak valid. Pastikan format email benar.';
-        case 'auth/user-disabled':
-          return 'Akun Anda telah dinonaktifkan. Hubungi administrator.';
-        case 'auth/user-not-found':
-          return 'Akun tidak ditemukan. Pastikan username dan password benar.';
-        case 'auth/wrong-password':
-          return 'Password salah. Coba lagi.';
-        case 'auth/network-request-failed':
-          return 'Koneksi terputus. Periksa koneksi internet Anda.';
-        case 'auth/too-many-requests':
-          return 'Terlalu banyak percobaan login. Coba lagi nanti.';
-        default:
-          return `Terjadi kesalahan: ${error.message}`;
-      }
-    };
-
-    document.querySelector('.login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
-
-      if (!username || !password) {
-        alert('Username dan password tidak boleh kosong');
-        return;
-      }
-
-      try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          username + '@amdf.group', // Gabungkan ke bentuk email
-          password
-        );
-        // Login sukses
-        window.location.href = '/ESPSTMARD/staff.html';
-      } catch (error) {
-        alert(getErrorMessage(error));
-      }
-    });
-  </script>
-</body>
+      });
+    </script>
+  </body>
 </html>
+
 
