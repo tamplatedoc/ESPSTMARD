@@ -296,7 +296,7 @@
     import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    // Your web app's Firebase configuration
+    // Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
         authDomain: "tamplatedoc.firebaseapp.com",
@@ -315,40 +315,17 @@
     const auth = getAuth(app);
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
     let currentUserId = null;
 
-    // --- AUTHENTICATION & SESSION MANAGEMENT ---
-    async function initializeAuthAndSession() {
-        try {
-            const cachedUserId = sessionStorage.getItem('cachedUserId');
-            if (cachedUserId) {
-                currentUserId = cachedUserId;
-                console.log("Using cached User ID:", currentUserId);
-            } else {
-                await signInAnonymously(auth);
-                currentUserId = auth.currentUser?.uid || crypto.randomUUID();
-                sessionStorage.setItem('cachedUserId', currentUserId);
-                console.log("Signed in anonymously. Current User ID:", currentUserId);
-            }
-            checkLoginStatus();
-        } catch (error) {
-            console.error("Error during Firebase authentication:", error);
-            currentUserId = sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
-            sessionStorage.setItem('cachedUserId', currentUserId);
-            console.log("Using cached or generated UUID as currentUserId due to auth error:", currentUserId);
-            checkLoginStatus();
+    // --- Session Management Functions ---
+    function checkReturningFromCreator() {
+        if (document.referrer.includes('/ESPSTMARD/creator.html') && 
+            window.location.href.includes('/ESPSTMARD/login.html')) {
+            clearLoginSession();
+            showPopup('Info', 'Silakan login kembali', 'info');
+            return true;
         }
-    }
-
-    function checkLoginStatus() {
-        const loggedInRole = sessionStorage.getItem('loggedInUserRole');
-        if (loggedInRole === 'creator') {
-            window.location.href = '/ESPSTMARD/creator.html';
-        } else if (loggedInRole === 'staff') {
-            console.warn('Anda terdeteksi sebagai Staff. Silakan login melalui portal Staff.');
-        }
+        return false;
     }
 
     function setLoginSession(role, creatorId = null) {
@@ -374,7 +351,49 @@
         sessionStorage.removeItem('currentCreatorId');
     }
 
-    // --- Utility Functions ---
+    function checkLoginStatus() {
+        if (checkReturningFromCreator()) return;
+        
+        const loggedInRole = sessionStorage.getItem('loggedInUserRole');
+        if (loggedInRole === 'creator') {
+            if (!window.location.href.includes('/ESPSTMARD/creator.html')) {
+                window.location.href = '/ESPSTMARD/creator.html';
+            }
+        }
+    }
+
+    // --- Authentication ---
+    async function initializeAuthAndSession() {
+        try {
+            const cachedUserId = sessionStorage.getItem('cachedUserId');
+            currentUserId = cachedUserId || (await signInAnonymously(auth)).user?.uid || crypto.randomUUID();
+            if (!cachedUserId) sessionStorage.setItem('cachedUserId', currentUserId);
+            checkLoginStatus();
+        } catch (error) {
+            console.error("Authentication error:", error);
+            currentUserId = sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
+            sessionStorage.setItem('cachedUserId', currentUserId);
+            checkLoginStatus();
+        }
+    }
+
+    // --- UI Functions ---
+    function showPopup(title, message, type) {
+        const overlay = document.getElementById('popup-overlay');
+        const content = document.getElementById('popup-content');
+        const popupTitle = document.getElementById('popup-title');
+        const popupMessage = document.getElementById('popup-message');
+
+        popupTitle.textContent = title;
+        popupMessage.textContent = message;
+        content.className = 'popup-content ' + type;
+        overlay.classList.add('show');
+    }
+
+    function hidePopup() {
+        document.getElementById('popup-overlay').classList.remove('show');
+    }
+
     function generateId(length = 4) {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let result = '';
@@ -384,44 +403,14 @@
         return result;
     }
 
-    function showPopup(title, message, type) {
-        const overlay = document.getElementById('popup-overlay');
-        const content = document.getElementById('popup-content');
-        const popupTitle = document.getElementById('popup-title');
-        const popupMessage = document.getElementById('popup-message');
-
-        popupTitle.textContent = title;
-        popupMessage.textContent = message;
-
-        content.className = 'popup-content ' + type;
-        overlay.classList.add('show');
-    }
-
- // Function to hide custom pop-up message
-function hidePopup() {
-    const overlay = document.getElementById('popup-overlay');
-    overlay.classList.remove('show');
-}
-
-    // --- Form Display Logic ---
     window.showSection = function(sectionId) {
-        const sections = document.querySelectorAll('.form-section');
-        sections.forEach(section => {
+        document.querySelectorAll('.form-section').forEach(section => {
             section.classList.remove('active');
         });
         document.getElementById(sectionId + '-section').classList.add('active');
+    };
 
-        const tabButtons = document.querySelectorAll('.tab-button');
-        tabButtons.forEach(button => {
-            if (button.onclick && button.onclick.toString().includes(`showSection('${sectionId}')`)) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-    }
-
-    // --- Firebase Integration Logic ---
+    // --- Form Handlers ---
     document.getElementById('login-form').addEventListener('submit', async function(event) {
         event.preventDefault();
         const email = document.getElementById('login-email').value.trim();
@@ -442,47 +431,39 @@ function hidePopup() {
                 return;
             }
 
-            let userFound = false;
             let userData = null;
             let creatorId = null;
-
+            
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 if (data.pin === pin) {
                     userData = data;
                     creatorId = doc.id;
-                    userFound = true;
                     currentUserId = data.uid || currentUserId;
                     sessionStorage.setItem('cachedUserId', currentUserId);
                 }
             });
 
-            if (userFound) {
+            if (userData) {
                 if (userData.role === 'creator') {
                     setLoginSession('creator', creatorId);
+                    sessionStorage.setItem('goingToCreator', 'true');
                     showPopup('Login Berhasil!', `Selamat datang, ${userData.email}. Mengarahkan ke halaman creator...`, 'success');
                     
-                    const userRef = doc(dbFS, `artifacts/${appId}/users`, creatorId);
-                    await setDoc(userRef, {
+                    await setDoc(doc(dbFS, `artifacts/${appId}/users`, creatorId), {
                         lastLogin: new Date().toISOString()
                     }, { merge: true });
                     
-                    const rtLoginRef = ref(dbRT, `artifacts/${appId}/userLogins/${creatorId}`);
-                    await set(rtLoginRef, {
-                        email: email,
-                        lastLogin: new Date().toISOString()
-                    });
-                    
                     setTimeout(() => window.location.href = '/ESPSTMARD/creator.html', 1500);
                 } else {
-                    showPopup('Login Gagal', 'Akun ini bukan akun Creator. Silakan login di portal Staff.', 'error');
+                    showPopup('Login Gagal', 'Akun ini bukan akun Creator.', 'error');
                 }
             } else {
                 showPopup('Login Gagal', 'Email atau PIN salah.', 'error');
             }
         } catch (error) {
-            console.error("Error during login:", error);
-            showPopup('Login Error', 'Terjadi kesalahan saat login. Coba lagi nanti.', 'error');
+            console.error("Login error:", error);
+            showPopup('Error', 'Terjadi kesalahan saat login.', 'error');
         }
     });
 
@@ -508,60 +489,41 @@ function hidePopup() {
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
-                showPopup('Registrasi Gagal', 'Email ini sudah terdaftar di sistem. Gunakan email lain atau login.', 'error');
+                showPopup('Registrasi Gagal', 'Email sudah terdaftar.', 'error');
                 return;
             }
 
             const creatorId = generateId();
             const registrationDate = new Date().toISOString();
 
-            // Simpan ke users collection
-            const userRef = doc(dbFS, `artifacts/${appId}/users`, creatorId);
-            await setDoc(userRef, {
-                email: email,
-                pin: pin,
-                whatsapp: whatsapp,
-                name: namaPenulis,
-                role: 'creator',
-                creatorId: creatorId,
-                uid: currentUserId,
-                registrationDate: registrationDate,
-                lastLogin: registrationDate,
-                status: 'active'
+            await setDoc(doc(dbFS, `artifacts/${appId}/users`, creatorId), {
+                email, pin, whatsapp, name: namaPenulis,
+                role: 'creator', creatorId, uid: currentUserId,
+                registrationDate, lastLogin: registrationDate, status: 'active'
             });
 
-            // Simpan ke public authors collection dengan path yang benar
-            const authorRef = doc(dbFS, `artifacts/${appId}/public/data/authors`, creatorId);
-            await setDoc(authorRef, {
-                name: namaPenulis,
-                creatorId: creatorId,
-                joinDate: registrationDate
+            await setDoc(doc(dbFS, `artifacts/${appId}/public/data/authors`, creatorId), {
+                name: namaPenulis, creatorId, joinDate: registrationDate
             });
 
-            // Simpan ke Realtime Database
-            const rtUserRef = ref(dbRT, `artifacts/${appId}/users/${creatorId}`);
-            await set(rtUserRef, {
-                email: email,
-                pin: pin,
-                whatsapp: whatsapp,
-                role: 'creator',
-                creatorId: creatorId,
-                registrationDate: registrationDate
+            await set(ref(dbRT, `artifacts/${appId}/users/${creatorId}`), {
+                email, pin, whatsapp, role: 'creator', creatorId, registrationDate
             });
 
-            showPopup('Registrasi Berhasil!', `Akun Creator Anda telah dibuat. ID Anda: ${creatorId}. Silakan login.`, 'success');
-            
+            showPopup('Registrasi Berhasil!', `Akun Creator berhasil dibuat. ID: ${creatorId}`, 'success');
             document.getElementById('creator-register-form').reset();
             setTimeout(() => showSection('login'), 2000);
-
         } catch (error) {
-            console.error("Error during creator registration:", error);
-            showPopup('Registrasi Error', `Terjadi kesalahan: ${error.message}. Coba lagi nanti.`, 'error');
+            console.error("Registration error:", error);
+            showPopup('Error', 'Gagal melakukan registrasi.', 'error');
         }
     });
 
-    // --- Initial Setup ---
+    // --- Initialize ---
     document.addEventListener('DOMContentLoaded', async () => {
+        if (sessionStorage.getItem('goingToCreator')) {
+            sessionStorage.removeItem('goingToCreator');
+        }
         await initializeAuthAndSession();
         showSection('login');
     });
@@ -630,5 +592,12 @@ function hidePopup() {
             <button onclick="hidePopup()">OK</button>
         </div>
     </div>
+    <script>
+    window.addEventListener('beforeunload', function() {
+        if (!sessionStorage.getItem('goingToCreator')) {
+            sessionStorage.setItem('fromCreator', 'true');
+        }
+    });
+</script>
 </body>
 </html>
