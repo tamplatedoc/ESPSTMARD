@@ -292,7 +292,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, set, get, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
@@ -318,29 +318,62 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        let currentUserId = null;
+        let currentUserId = null; // UID dari Firebase Auth atau UUID fallback
 
-        // Sign in anonymously or with custom token if available
-        async function initializeAuth() {
+        // --- AUTHENTICATION & SESSION MANAGEMENT ---
+
+        async function initializeAuthAndSession() {
             try {
                 if (initialAuthToken) {
-                    // Although we're given an initialAuthToken, for custom PIN verification
-                    // against RTDB, anonymous sign-in is generally simpler for getting a UID
-                    // without a server-side custom token generation process.
-                    await signInAnonymously(auth); 
+                    await signInAnonymously(auth); // Tetap gunakan anonymous untuk mendapatkan UID
                     console.log("Signed in anonymously with initial token context.");
                 } else {
                     await signInAnonymously(auth);
                     console.log("Signed in anonymously.");
                 }
-                currentUserId = auth.currentUser?.uid || crypto.randomUUID(); // Fallback to random UUID if no auth UID
+                currentUserId = auth.currentUser?.uid || sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
+                sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID untuk refresh
                 console.log("Current User ID:", currentUserId);
+
+                // Setelah inisialisasi auth, periksa status login
+                checkLoginStatus();
+
             } catch (error) {
                 console.error("Error during Firebase authentication:", error);
-                // If anonymous sign-in fails, we'll still use a generated UUID
-                currentUserId = crypto.randomUUID();
-                console.log("Using generated UUID as currentUserId due to auth error:", currentUserId);
+                // Fallback jika auth gagal sepenuhnya
+                currentUserId = sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
+                sessionStorage.setItem('cachedUserId', currentUserId);
+                console.log("Using cached or generated UUID as currentUserId due to auth error:", currentUserId);
+                checkLoginStatus(); // Tetap coba cek status login
             }
+        }
+
+        // Fungsi untuk mengecek status login dari sessionStorage
+        function checkLoginStatus() {
+            const loggedInRole = sessionStorage.getItem('loggedInUserRole');
+            if (loggedInRole === 'creator') {
+                // Jika sudah login sebagai creator, langsung redirect
+                window.location.href = '/ESPSTMARD/creator.html';
+            } else if (loggedInRole === 'staff') {
+                // Jika staff login di halaman ini, beritahu untuk ke halaman staff_login.html
+                showPopup('Login Ditemukan', 'Anda terdeteksi sebagai Staff. Silakan login melalui portal Staff.', 'error');
+                // Optional: Clear session if they are on the wrong page
+                // sessionStorage.removeItem('loggedInUserRole');
+            }
+        }
+
+        // Fungsi untuk menyimpan status login
+        function setLoginSession(role) {
+            sessionStorage.setItem('loggedInUserRole', role);
+        }
+
+        // Fungsi untuk menghapus status login (misal, saat logout)
+        function clearLoginSession() {
+            sessionStorage.removeItem('loggedInUserRole');
+            sessionStorage.removeItem('cachedUserId');
+            // Jika ada UID dari Firebase Auth, bisa juga signOut(auth)
+            // Namun, karena kita pakai anonymous, itu akan menghasilkan UID baru
+            // Jika Anda menerapkan logout, pertimbangkan untuk redirect ke halaman login
         }
 
         // --- Utility Functions ---
@@ -406,30 +439,35 @@
             }
 
             try {
-                const usersRef = ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`);
-                const snapshot = await get(usersRef);
+                // Path ke user_credentials di bawah UID saat ini
+                const usersCredentialsRef = ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`);
+                
+                // Query Realtime Database: cari entri dengan email yang cocok dan role 'creator'
+                const snapshot = await get(
+                    query(usersCredentialsRef, orderByChild('email'), equalTo(email))
+                );
 
                 let userFound = false;
                 let userData = null;
 
                 if (snapshot.exists()) {
-                    const allUsers = snapshot.val();
-                    for (const idKey in allUsers) {
-                        const user = allUsers[idKey];
+                    snapshot.forEach((childSnapshot) => {
+                        const user = childSnapshot.val();
                         if (user.email === email && user.pin === pin) {
                             userData = user;
                             userFound = true;
-                            break;
+                            return true; // Berhenti iterasi setelah ditemukan
                         }
-                    }
+                    });
                 }
 
                 if (userFound) {
                     if (userData.role === 'creator') {
+                        setLoginSession('creator'); // Simpan status login di sessionStorage
                         showPopup('Login Berhasil!', `Selamat datang, ${userData.email}. Mengarahkan ke halaman creator...`, 'success');
-                        setTimeout(() => window.location.href = '/ESPSTMARD/creator.html', 1500); // Redirect ke URL spesifik Creator
+                        setTimeout(() => window.location.href = '/ESPSTMARD/creator.html', 1500);
                     } else {
-                        // Jika bukan creator, arahkan ke pesan untuk login di portal staff
+                        // Jika email/PIN cocok tapi bukan creator (misal staff)
                         showPopup('Login Gagal', 'Akun ini bukan akun Creator. Silakan login di portal Staff.', 'error');
                     }
                 } else {
@@ -459,35 +497,34 @@
             }
 
             try {
-                const usersRef = ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`);
-                const snapshot = await get(usersRef);
+                // Cek email duplikat di bawah UID pengguna saat ini
+                const usersCredentialsRef = ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`);
+                const snapshot = await get(
+                    query(usersCredentialsRef, orderByChild('email'), equalTo(email))
+                );
+
                 if (snapshot.exists()) {
-                    const allUsers = snapshot.val();
-                    for (const idKey in allUsers) {
-                        if (allUsers[idKey].email === email) {
-                            showPopup('Registrasi Gagal', 'Email ini sudah terdaftar.', 'error');
-                            return;
-                        }
-                    }
+                    showPopup('Registrasi Gagal', 'Email ini sudah terdaftar di bawah akun Anda.', 'error');
+                    return;
                 }
 
                 const creatorId = generateId(); // Generate unique 4-char ID
 
                 // Save to Realtime Database
-                const newCreatorRef = child(usersRef, creatorId); // Use creatorId as key in RTDB for easy lookup
+                const newCreatorRef = child(usersCredentialsRef, creatorId); // Use creatorId as key in RTDB for easy lookup
                 await set(newCreatorRef, {
                     email: email,
                     pin: pin,
                     whatsapp: whatsapp,
                     role: 'creator',
-                    creatorId: creatorId // Store it here for redundancy/lookup
+                    creatorId: creatorId
                 });
 
                 // Save to Firestore (for public display)
                 const authorDocRef = doc(dbFS, `artifacts/${appId}/public/data/authors`, creatorId);
                 await setDoc(authorDocRef, {
                     name: namaPenulis,
-                    creatorId: creatorId // Store creatorId in Firestore doc too
+                    creatorId: creatorId
                 });
 
                 showPopup('Registrasi Berhasil!', `Akun Creator Anda telah dibuat. ID Anda: ${creatorId}. Silakan login.`, 'success');
@@ -503,8 +540,8 @@
 
         // --- Initial Setup ---
         document.addEventListener('DOMContentLoaded', async () => {
-            await initializeAuth(); // Initialize Firebase Auth first
-            showSection('login'); // Show login section by default
+            await initializeAuthAndSession(); // Inisialisasi Auth dan cek sesi
+            showSection('login'); // Tampilkan bagian login secara default jika belum redirect
         });
     </script>
 </head>
