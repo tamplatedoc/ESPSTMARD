@@ -542,430 +542,416 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <script>
-        // Your Firebase config (replace with your actual config)
-const firebaseConfig = {
-  apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-  authDomain: "tamplatedoc.firebaseapp.com",
-  databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "tamplatedoc",
-  storageBucket: "tamplatedoc.firebasestorage.app",
-  messagingSenderId: "264966107720",
-  appId: "1:264966107720:web:da19f6109e71390740de7d",
-  measurementId: "G-PFK8VQBFCV"
-};
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+<script>
+  // Firebase Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+    authDomain: "tamplatedoc.firebaseapp.com",
+    databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "tamplatedoc",
+    storageBucket: "tamplatedoc.firebasestorage.app",
+    messagingSenderId: "264966107720",
+    appId: "1:264966107720:web:da19f6109e71390740de7d",
+    measurementId: "G-PFK8VQBFCV"
+  };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-// Ubah fungsi pertama untuk menggunakan login2.html
-auth.onAuthStateChanged(user => {
+  // Authentication State Handler
+  auth.onAuthStateChanged(user => {
     if (!user) {
-        window.location.href = '/ESPSTMARD/login2.html';
+      window.location.href = '/ESPSTMARD/login2.html';
+    } else {
+      // Initialize all page functionality after confirming user is logged in
+      initializePage();
     }
-});
+  });
 
+  // Initialize all page functionality
+  function initializePage() {
+    // Light/Dark Mode Toggle
+    const body = document.body;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      body.classList.add(savedTheme);
+    }
 
-
-        // Light/Dark Mode (re-used for consistency)
-        const body = document.body;
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.classList.add(savedTheme);
-        }
-
-// Fungsi kedua sudah benar, tidak perlu diubah
-document.getElementById('staffLogoutButton').addEventListener('click', async () => {
-    try {
+    // Logout Functionality
+    document.getElementById('staffLogoutButton').addEventListener('click', async () => {
+      try {
         await auth.signOut();
         alert('Staff logging out...');
         window.location.href = '/ESPSTMARD/login2.html';
-    } catch (error) {
+      } catch (error) {
         console.error("Error signing out:", error);
         alert("Error logging out: " + error.message);
+      }
+    });
+
+    // Search Forms Handlers
+    setupSearchForms();
+    
+    // Review Queue Modal
+    setupReviewModal();
+    
+    // Load initial review queue
+    loadReviewQueue();
+  }
+
+  // Helper function to display results
+  function displayResults(containerId, data, type) {
+    const resultsDiv = document.getElementById(containerId);
+    resultsDiv.innerHTML = ''; // Clear previous results
+
+    if (!data || Object.keys(data).length === 0) {
+      resultsDiv.innerHTML = `<p>${type} not found.</p>`;
+      return;
     }
-});
 
-        // Search Forms Handlers
+    if (type === 'creator') {
+      const creatorId = Object.keys(data)[0];
+      const creator = data[creatorId];
+      const storiesHtml = creator.stories ? creator.stories.map(s => `${s.title} (${s.status.charAt(0).toUpperCase() + s.status.slice(1)})`).join(', ') : 'No stories found.';
+      resultsDiv.innerHTML = `
+        <div class="result-item">
+          <h3>Creator: ${creator.name} (${creatorId})</h3>
+          <p>Email: ${creator.email}</p>
+          <p>WhatsApp: ${creator.whatsapp}</p>
+          <p>Stories: ${storiesHtml}</p>
+          <div class="result-actions">
+            <button class="btn-block" ${creator.isBlocked ? 'style="display:none;"' : ''} data-creator-id="${creatorId}">Block Access</button>
+            <button class="btn-unblock" ${!creator.isBlocked ? 'style="display:none;"' : ''} data-creator-id="${creatorId}">Unblock Access</button>
+          </div>
+        </div>
+      `;
+      resultsDiv.querySelector('.btn-block')?.addEventListener('click', (btnE) => handleCreatorBlock(btnE.target.dataset.creatorId, true));
+      resultsDiv.querySelector('.btn-unblock')?.addEventListener('click', (btnE) => handleCreatorBlock(btnE.target.dataset.creatorId, false));
+    } else if (type === 'story') {
+      const storyId = Object.keys(data)[0];
+      const story = data[storyId];
+      resultsDiv.innerHTML = `
+        <div class="result-item">
+          <h3>Story: ${story.title} (${story.id})</h3>
+          <p>Author: ${story.authorName} (${story.creatorId})</p>
+          <p>Genre: ${story.genre}</p>
+          <p>Status: ${story.status.charAt(0).toUpperCase() + story.status.slice(1)}</p>
+          <div class="result-actions">
+            <button class="btn-edit" data-story-id="${storyId}">Edit Story</button>
+            <button class="btn-delete" data-story-id="${storyId}">Delete Story</button>
+          </div>
+        </div>
+      `;
+      resultsDiv.querySelector('.btn-edit')?.addEventListener('click', (btnE) => alert('Edit story ' + btnE.target.dataset.storyId + ' (functionality to be implemented)'));
+      resultsDiv.querySelector('.btn-delete')?.addEventListener('click', (btnE) => handleDeleteStory(btnE.target.dataset.storyId));
+    } else if (type === 'comment') {
+      const commentId = Object.keys(data)[0];
+      const comment = data[commentId];
+      resultsDiv.innerHTML = `
+        <div class="result-item">
+          <h3>Comment ID: ${commentId}</h3>
+          <p>Story ID: ${comment.storyId}</p>
+          <p>Content: "${comment.content}"</p>
+          <div class="result-actions">
+            <button class="btn-delete" data-comment-id="${commentId}">Delete Comment</button>
+          </div>
+        </div>
+      `;
+      resultsDiv.querySelector('.btn-delete')?.addEventListener('click', (btnE) => handleDeleteComment(btnE.target.dataset.commentId));
+    }
+  }
 
-        // Helper function to display results
-        function displayResults(containerId, data, type) {
-            const resultsDiv = document.getElementById(containerId);
-            resultsDiv.innerHTML = ''; // Clear previous results
+  // Setup Search Forms
+  function setupSearchForms() {
+    // Creator Search
+    document.getElementById('creatorSearchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const creatorId = document.getElementById('searchCreatorId').value.trim();
+      const resultsDiv = document.getElementById('creatorSearchResults');
+      resultsDiv.innerHTML = 'Searching...';
 
-            if (!data || Object.keys(data).length === 0) {
-                resultsDiv.innerHTML = `<p>${type} not found.</p>`;
-                return;
-            }
+      try {
+        const creatorDoc = await db.collection('creators').doc(creatorId).get();
+        if (creatorDoc.exists) {
+          const creatorData = creatorDoc.data();
+          const storiesSnapshot = await db.collection('stories').where('creatorId', '==', creatorId).get();
+          const stories = [];
+          storiesSnapshot.forEach(doc => {
+            stories.push({ id: doc.id, ...doc.data() });
+          });
+          creatorData.stories = stories;
+          displayResults('creatorSearchResults', { [creatorId]: creatorData }, 'creator');
+        } else {
+          resultsDiv.innerHTML = '<p>Creator not found.</p>';
+        }
+      } catch (error) {
+        console.error("Error searching creator:", error);
+        resultsDiv.innerHTML = `<p>Error searching creator: ${error.message}</p>`;
+      }
+    });
 
-            if (type === 'creator') {
-                const creatorId = Object.keys(data)[0];
-                const creator = data[creatorId];
-                const storiesHtml = creator.stories ? creator.stories.map(s => `${s.title} (${s.status.charAt(0).toUpperCase() + s.status.slice(1)})`).join(', ') : 'No stories found.';
-                resultsDiv.innerHTML = `
-                    <div class="result-item">
-                        <h3>Creator: ${creator.name} (${creatorId})</h3>
-                        <p>Email: ${creator.email}</p>
-                        <p>WhatsApp: ${creator.whatsapp}</p>
-                        <p>Stories: ${storiesHtml}</p>
-                        <div class="result-actions">
-                            <button class="btn-block" ${creator.isBlocked ? 'style="display:none;"' : ''} data-creator-id="${creatorId}">Block Access</button>
-                            <button class="btn-unblock" ${!creator.isBlocked ? 'style="display:none;"' : ''} data-creator-id="${creatorId}">Unblock Access</button>
-                        </div>
-                    </div>
-                `;
-                resultsDiv.querySelector('.btn-block')?.addEventListener('click', (btnE) => handleCreatorBlock(btnE.target.dataset.creatorId, true));
-                resultsDiv.querySelector('.btn-unblock')?.addEventListener('click', (btnE) => handleCreatorBlock(btnE.target.dataset.creatorId, false));
-            } else if (type === 'story') {
-                const storyId = Object.keys(data)[0];
-                const story = data[storyId];
-                resultsDiv.innerHTML = `
-                    <div class="result-item">
-                        <h3>Story: ${story.title} (${story.id})</h3>
-                        <p>Author: ${story.authorName} (${story.creatorId})</p>
-                        <p>Genre: ${story.genre}</p>
-                        <p>Status: ${story.status.charAt(0).toUpperCase() + story.status.slice(1)}</p>
-                        <div class="result-actions">
-                            <button class="btn-edit" data-story-id="${storyId}">Edit Story</button>
-                            <button class="btn-delete" data-story-id="${storyId}">Delete Story</button>
-                        </div>
-                    </div>
-                `;
-                resultsDiv.querySelector('.btn-edit')?.addEventListener('click', (btnE) => alert('Edit story ' + btnE.target.dataset.storyId + ' (functionality to be implemented)'));
-                resultsDiv.querySelector('.btn-delete')?.addEventListener('click', (btnE) => handleDeleteStory(btnE.target.dataset.storyId));
-            } else if (type === 'comment') {
-                const commentId = Object.keys(data)[0];
-                const comment = data[commentId];
-                resultsDiv.innerHTML = `
-                    <div class="result-item">
-                        <h3>Comment ID: ${commentId}</h3>
-                        <p>Story ID: ${comment.storyId}</p>
-                        <p>Content: "${comment.content}"</p>
-                        <div class="result-actions">
-                            <button class="btn-delete" data-comment-id="${commentId}">Delete Comment</button>
-                        </div>
-                    </div>
-                `;
-                resultsDiv.querySelector('.btn-delete')?.addEventListener('click', (btnE) => handleDeleteComment(btnE.target.dataset.commentId));
-            }
+    // Story Search
+    document.getElementById('storySearchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const storyId = document.getElementById('searchStoryId').value.trim();
+      const resultsDiv = document.getElementById('storySearchResults');
+      resultsDiv.innerHTML = 'Searching...';
+
+      try {
+        const storyDoc = await db.collection('stories').doc(storyId).get();
+        if (storyDoc.exists) {
+          const storyData = { id: storyDoc.id, ...storyDoc.data() };
+          displayResults('storySearchResults', { [storyId]: storyData }, 'story');
+        } else {
+          resultsDiv.innerHTML = '<p>Story not found.</p>';
+        }
+      } catch (error) {
+        console.error("Error searching story:", error);
+        resultsDiv.innerHTML = `<p>Error searching story: ${error.message}</p>`;
+      }
+    });
+
+    // Comment Search
+    document.getElementById('commentSearchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const commentId = document.getElementById('searchCommentId').value.trim();
+      const resultsDiv = document.getElementById('commentSearchResults');
+      resultsDiv.innerHTML = 'Searching...';
+
+      try {
+        const commentDoc = await db.collection('comments').doc(commentId).get();
+        if (commentDoc.exists) {
+          const commentData = commentDoc.data();
+          displayResults('commentSearchResults', { [commentId]: commentData }, 'comment');
+        } else {
+          resultsDiv.innerHTML = '<p>Comment not found.</p>';
+        }
+      } catch (error) {
+        console.error("Error searching comment:", error);
+        resultsDiv.innerHTML = `<p>Error searching comment: ${error.message}</p>`;
+      }
+    });
+  }
+
+  // Handle Creator Block/Unblock
+  async function handleCreatorBlock(creatorId, blockStatus) {
+    console.log(`Attempting to ${blockStatus ? 'block' : 'unblock'} creator: ${creatorId}`);
+    try {
+      await db.collection('creators').doc(creatorId).update({
+        isBlocked: blockStatus
+      });
+      alert(`Creator ${creatorId} access ${blockStatus ? 'blocked' : 'unblocked'}.`);
+      document.getElementById('creatorSearchForm').requestSubmit();
+    } catch (error) {
+      console.error(`Error ${blockStatus ? 'blocking' : 'unblocking'} creator:`, error);
+      alert(`Error ${blockStatus ? 'blocking' : 'unblocking'} creator: ${error.message}`);
+    }
+  }
+
+  // Handle Delete Story
+  async function handleDeleteStory(storyId) {
+    if (confirm(`Are you sure you want to delete story: ${storyId}? This action cannot be undone!`)) {
+      console.log(`Deleting story: ${storyId}`);
+      try {
+        const storyDoc = await db.collection('stories').doc(storyId).get();
+        if (storyDoc.exists && storyDoc.data().thumbnailUrl) {
+          const thumbnailUrl = storyDoc.data().thumbnailUrl;
+          const storageRef = storage.refFromURL(thumbnailUrl);
+          await storageRef.delete();
+          console.log('Thumbnail deleted from storage.');
         }
 
-        // Creator Search
-        document.getElementById('creatorSearchForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const creatorId = document.getElementById('searchCreatorId').value.trim();
-            const resultsDiv = document.getElementById('creatorSearchResults');
-            resultsDiv.innerHTML = 'Searching...';
+        await db.collection('stories').doc(storyId).delete();
+        await db.collection('stories_under_review').doc(storyId).delete().catch(e => console.warn("Story not found in review queue:", e.message));
 
-            try {
-                // Fetch creator data from Firestore
-                const creatorDoc = await db.collection('creators').doc(creatorId).get();
-
-                if (creatorDoc.exists) {
-                    const creatorData = creatorDoc.data();
-                    // Fetch creator's stories (assuming a subcollection 'stories' under creator, or a separate stories collection with creatorId field)
-                    const storiesSnapshot = await db.collection('stories').where('creatorId', '==', creatorId).get();
-                    const stories = [];
-                    storiesSnapshot.forEach(doc => {
-                        stories.push({ id: doc.id, ...doc.data() });
-                    });
-                    creatorData.stories = stories; // Add stories to creator data for display
-                    displayResults('creatorSearchResults', { [creatorId]: creatorData }, 'creator');
-                } else {
-                    resultsDiv.innerHTML = '<p>Creator not found.</p>';
-                }
-            } catch (error) {
-                console.error("Error searching creator:", error);
-                resultsDiv.innerHTML = `<p>Error searching creator: ${error.message}</p>`;
-            }
+        const commentsSnapshot = await db.collection('comments').where('storyId', '==', storyId).get();
+        const batch = db.batch();
+        commentsSnapshot.forEach(doc => {
+          batch.delete(doc.ref);
         });
+        await batch.commit();
+        console.log('Associated comments deleted.');
 
-        // Story Search
-        document.getElementById('storySearchForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const storyId = document.getElementById('searchStoryId').value.trim();
-            const resultsDiv = document.getElementById('storySearchResults');
-            resultsDiv.innerHTML = 'Searching...';
+        alert(`Story ${storyId} and its associated data deleted.`);
+        document.getElementById('storySearchForm').requestSubmit();
+      } catch (error) {
+        console.error("Error deleting story:", error);
+        alert(`Error deleting story: ${error.message}`);
+      }
+    }
+  }
 
-            try {
-                // Fetch story data from main 'stories' collection
-                const storyDoc = await db.collection('stories').doc(storyId).get();
+  // Handle Delete Comment
+  async function handleDeleteComment(commentId) {
+    if (confirm(`Are you sure you want to delete comment: ${commentId}?`)) {
+      console.log(`Deleting comment: ${commentId}`);
+      try {
+        await db.collection('comments').doc(commentId).delete();
+        alert(`Comment ${commentId} deleted.`);
+        document.getElementById('commentSearchForm').requestSubmit();
+      } catch (error) {
+        console.error("Error deleting comment:", error);
+        alert(`Error deleting comment: ${error.message}`);
+      }
+    }
+  }
 
-                if (storyDoc.exists) {
-                    const storyData = { id: storyDoc.id, ...storyDoc.data() };
-                    displayResults('storySearchResults', { [storyId]: storyData }, 'story');
-                } else {
-                    resultsDiv.innerHTML = '<p>Story not found.</p>';
-                }
-            } catch (error) {
-                console.error("Error searching story:", error);
-                resultsDiv.innerHTML = `<p>Error searching story: ${error.message}</p>`;
-            }
-        });
+  // Review Modal Functions
+  function setupReviewModal() {
+    const storyReviewModal = document.getElementById('storyReviewModal');
+    const closeModalBtn = storyReviewModal.querySelector('.close-button');
+    const modalStoryTitle = document.getElementById('modalStoryTitle');
+    const modalStoryAuthor = document.getElementById('modalStoryAuthor');
+    const modalCreatorId = document.getElementById('modalCreatorId');
+    const modalStoryGenre = document.getElementById('modalStoryGenre');
+    const modalStoryThumbnail = document.getElementById('modalStoryThumbnail');
+    const modalStoryContent = document.getElementById('modalStoryContent');
+    const modalStoryId = document.getElementById('modalStoryId');
+    const approveStoryBtn = document.getElementById('approveStoryBtn');
+    const errorStoryBtn = document.getElementById('errorStoryBtn');
 
-        // Comment Search
-        document.getElementById('commentSearchForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const commentId = document.getElementById('searchCommentId').value.trim();
-            const resultsDiv = document.getElementById('commentSearchResults');
-            resultsDiv.innerHTML = 'Searching...';
+    let currentReviewStory = null;
 
-            try {
-                // Fetch comment data from 'comments' collection
-                const commentDoc = await db.collection('comments').doc(commentId).get();
+    // Open modal when a review item is clicked
+    document.getElementById('reviewQueueList').addEventListener('click', async (e) => {
+      const reviewItem = e.target.closest('.review-item');
+      if (reviewItem) {
+        const storyId = reviewItem.dataset.storyId;
+        console.log('Fetching story for review:', storyId);
 
-                if (commentDoc.exists) {
-                    const commentData = commentDoc.data();
-                    displayResults('commentSearchResults', { [commentId]: commentData }, 'comment');
-                } else {
-                    resultsDiv.innerHTML = '<p>Comment not found.</p>';
-                }
-            } catch (error) {
-                console.error("Error searching comment:", error);
-                resultsDiv.innerHTML = `<p>Error searching comment: ${error.message}</p>`;
-            }
-        });
+        try {
+          const storyDoc = await db.collection('stories_under_review').doc(storyId).get();
+          if (storyDoc.exists) {
+            currentReviewStory = { id: storyDoc.id, ...storyDoc.data() };
 
-        // Handle Creator Block/Unblock
-        async function handleCreatorBlock(creatorId, blockStatus) {
-            console.log(`Attempting to ${blockStatus ? 'block' : 'unblock'} creator: ${creatorId}`);
-            try {
-                await db.collection('creators').doc(creatorId).update({
-                    isBlocked: blockStatus
-                });
-                alert(`Creator ${creatorId} access ${blockStatus ? 'blocked' : 'unblocked'}.`);
-                document.getElementById('creatorSearchForm').requestSubmit(); // Re-submit search to refresh
-            } catch (error) {
-                console.error(`Error ${blockStatus ? 'blocking' : 'unblocking'} creator:`, error);
-                alert(`Error ${blockStatus ? 'blocking' : 'unblocking'} creator: ${error.message}`);
-            }
+            modalStoryTitle.textContent = currentReviewStory.title;
+            modalStoryAuthor.textContent = currentReviewStory.authorName;
+            modalCreatorId.textContent = currentReviewStory.creatorId;
+            modalStoryGenre.textContent = currentReviewStory.genre;
+            modalStoryThumbnail.src = currentReviewStory.thumbnailUrl || 'https://via.placeholder.com/800x450/ccc/555?text=No+Thumbnail';
+            modalStoryContent.innerHTML = currentReviewStory.content ? currentReviewStory.content.replace(/\n/g, '<p>') : 'No content available.';
+            modalStoryId.textContent = currentReviewStory.id;
+
+            storyReviewModal.style.display = 'flex';
+          } else {
+            alert('Story not found in review queue.');
+            console.error('Story not found:', storyId, 'in stories_under_review');
+          }
+        } catch (error) {
+          console.error("Error fetching story for review:", error);
+          alert("Error loading story for review: " + error.message);
         }
+      }
+    });
 
-        // Handle Delete Story
-        async function handleDeleteStory(storyId) {
-            if (confirm(`Are you sure you want to delete story: ${storyId}? This action cannot be undone!`)) {
-                console.log(`Deleting story: ${storyId}`);
-                try {
-                    // Get story data to delete thumbnail from storage
-                    const storyDoc = await db.collection('stories').doc(storyId).get();
-                    if (storyDoc.exists && storyDoc.data().thumbnailUrl) {
-                        const thumbnailUrl = storyDoc.data().thumbnailUrl;
-                        const storageRef = storage.refFromURL(thumbnailUrl);
-                        await storageRef.delete();
-                        console.log('Thumbnail deleted from storage.');
-                    }
+    // Close modal
+    closeModalBtn.addEventListener('click', () => {
+      storyReviewModal.style.display = 'none';
+      currentReviewStory = null;
+    });
 
-                    // Delete from main 'stories' collection
-                    await db.collection('stories').doc(storyId).delete();
+    window.addEventListener('click', (event) => {
+      if (event.target == storyReviewModal) {
+        storyReviewModal.style.display = 'none';
+        currentReviewStory = null;
+      }
+    });
 
-                    // Delete from 'stories_under_review' if it exists there
-                    await db.collection('stories_under_review').doc(storyId).delete().catch(e => console.warn("Story not found in review queue (or other error during delete):", e.message));
+    // Approve Story
+    approveStoryBtn.addEventListener('click', async () => {
+      if (!currentReviewStory) return;
 
-                    // Optionally, delete associated comments
-                    const commentsSnapshot = await db.collection('comments').where('storyId', '==', storyId).get();
-                    const batch = db.batch();
-                    commentsSnapshot.forEach(doc => {
-                        batch.delete(doc.ref);
-                    });
-                    await batch.commit();
-                    console.log('Associated comments deleted.');
+      if (confirm(`Are you sure you want to approve story: ${currentReviewStory.title} (${currentReviewStory.id})?`)) {
+        try {
+          await db.collection('stories').doc(currentReviewStory.id).set({
+            ...currentReviewStory,
+            status: 'published',
+            reviewStatus: 'approved',
+            publishedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
 
-                    alert(`Story ${storyId} and its associated data deleted.`);
-                    document.getElementById('storySearchForm').requestSubmit(); // Refresh
-                } catch (error) {
-                    console.error("Error deleting story:", error);
-                    alert(`Error deleting story: ${error.message}`);
-                }
-            }
+          await db.collection('stories_under_review').doc(currentReviewStory.id).delete();
+
+          alert(`Story "${currentReviewStory.title}" approved and published!`);
+          storyReviewModal.style.display = 'none';
+          loadReviewQueue();
+        } catch (error) {
+          console.error("Error approving story:", error);
+          alert("Error approving story: " + error.message);
         }
+      }
+    });
 
-        // Handle Delete Comment
-        async function handleDeleteComment(commentId) {
-            if (confirm(`Are you sure you want to delete comment: ${commentId}?`)) {
-                console.log(`Deleting comment: ${commentId}`);
-                try {
-                    await db.collection('comments').doc(commentId).delete();
-                    alert(`Comment ${commentId} deleted.`);
-                    document.getElementById('commentSearchForm').requestSubmit(); // Refresh
-                } catch (error) {
-                    console.error("Error deleting comment:", error);
-                    alert(`Error deleting comment: ${error.message}`);
-                }
-            }
+    // Mark Story as Error/Data Breach
+    errorStoryBtn.addEventListener('click', async () => {
+      if (!currentReviewStory) return;
+
+      const reason = prompt(`Reason for marking "${currentReviewStory.title}" as Error/Data Breach:`);
+      if (!reason) {
+        alert('Action cancelled. Reason is required.');
+        return;
+      }
+
+      if (confirm(`Are you sure you want to mark story: "${currentReviewStory.title}" (${currentReviewStory.id}) as Error/Data Breach?`)) {
+        try {
+          await db.collection('stories_under_review').doc(currentReviewStory.id).update({
+            status: 'error-data-breach',
+            reviewStatus: 'rejected',
+            rejectionReason: reason,
+            reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          alert(`Story "${currentReviewStory.title}" marked as Error/Data Breach. Creator will be notified. Reason: ${reason}`);
+          storyReviewModal.style.display = 'none';
+          loadReviewQueue();
+        } catch (error) {
+          console.error("Error marking story as error/data breach:", error);
+          alert("Error marking story as error/data breach: " + error.message);
         }
+      }
+    });
+  }
 
+  // Load Review Queue
+  async function loadReviewQueue() {
+    const reviewQueueList = document.getElementById('reviewQueueList');
+    reviewQueueList.innerHTML = 'Loading review queue...';
+    try {
+      const snapshot = await db.collection('stories_under_review').orderBy('timestamp', 'asc').get();
+      reviewQueueList.innerHTML = '';
 
-        // Story Review Modal Logic
-        const storyReviewModal = document.getElementById('storyReviewModal');
-        const closeModalBtn = storyReviewModal.querySelector('.close-button');
-        const modalStoryTitle = document.getElementById('modalStoryTitle');
-        const modalStoryAuthor = document.getElementById('modalStoryAuthor');
-        const modalCreatorId = document.getElementById('modalCreatorId');
-        const modalStoryGenre = document.getElementById('modalStoryGenre');
-        const modalStoryThumbnail = document.getElementById('modalStoryThumbnail');
-        const modalStoryContent = document.getElementById('modalStoryContent');
-        const modalStoryId = document.getElementById('modalStoryId');
-        const approveStoryBtn = document.getElementById('approveStoryBtn');
-        const errorStoryBtn = document.getElementById('errorStoryBtn');
+      if (snapshot.empty) {
+        reviewQueueList.innerHTML = '<p>No stories in review queue.</p>';
+        return;
+      }
 
-        let currentReviewStory = null; // To hold the data of the story being reviewed
+      snapshot.forEach(doc => {
+        const story = doc.data();
+        const reviewItem = document.createElement('div');
+        reviewItem.classList.add('review-item');
+        reviewItem.dataset.storyId = doc.id;
+        reviewItem.innerHTML = `
+          <h3>${story.title} (${doc.id})</h3>
+          <p>Author: ${story.authorName} (${story.creatorId})</p>
+          <p>Status: Under Review</p>
+        `;
+        reviewQueueList.appendChild(reviewItem);
+      });
+    } catch (error) {
+      console.error("Error loading review queue:", error);
+      reviewQueueList.innerHTML = `<p>Error loading review queue: ${error.message}</p>`;
+    }
+  }
 
-        // Function to load review queue
-        async function loadReviewQueue() {
-            const reviewQueueList = document.getElementById('reviewQueueList');
-            reviewQueueList.innerHTML = 'Loading review queue...';
-            try {
-                // Fetch stories with status 'under review'
-                const snapshot = await db.collection('stories_under_review').orderBy('timestamp', 'asc').get(); // Assuming a timestamp for ordering
-                reviewQueueList.innerHTML = ''; // Clear loading message
-
-                if (snapshot.empty) {
-                    reviewQueueList.innerHTML = '<p>No stories in review queue.</p>';
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const story = doc.data();
-                    const reviewItem = document.createElement('div');
-                    reviewItem.classList.add('review-item');
-                    reviewItem.dataset.storyId = doc.id;
-                    reviewItem.innerHTML = `
-                        <h3>${story.title} (${doc.id})</h3>
-                        <p>Author: ${story.authorName} (${story.creatorId})</p>
-                        <p>Status: Under Review</p>
-                    `;
-                    reviewQueueList.appendChild(reviewItem);
-                });
-
-            } catch (error) {
-                console.error("Error loading review queue:", error);
-                reviewQueueList.innerHTML = `<p>Error loading review queue: ${error.message}</p>`;
-            }
-        }
-
-        // Open modal when a review item is clicked
-        document.getElementById('reviewQueueList').addEventListener('click', async (e) => {
-            const reviewItem = e.target.closest('.review-item');
-            if (reviewItem) {
-                const storyId = reviewItem.dataset.storyId;
-                console.log('Fetching story for review:', storyId);
-
-                try {
-                    // Fetch comprehensive story data from 'stories_under_review'
-                    const storyDoc = await db.collection('stories_under_review').doc(storyId).get();
-
-                    if (storyDoc.exists) {
-                        currentReviewStory = { id: storyDoc.id, ...storyDoc.data() };
-
-                        modalStoryTitle.textContent = currentReviewStory.title;
-                        modalStoryAuthor.textContent = currentReviewStory.authorName;
-                        modalCreatorId.textContent = currentReviewStory.creatorId;
-                        modalStoryGenre.textContent = currentReviewStory.genre;
-                        modalStoryThumbnail.src = currentReviewStory.thumbnailUrl || 'https://via.placeholder.com/800x450/ccc/555?text=No+Thumbnail'; // Placeholder if no thumbnail
-                        modalStoryContent.innerHTML = currentReviewStory.content ? currentReviewStory.content.replace(/\n/g, '<p>') : 'No content available.';
-                        modalStoryId.textContent = currentReviewStory.id;
-
-                        storyReviewModal.style.display = 'flex';
-                    } else {
-                        alert('Story not found in review queue.');
-                        console.error('Story not found:', storyId, 'in stories_under_review');
-                    }
-                } catch (error) {
-                    console.error("Error fetching story for review:", error);
-                    alert("Error loading story for review: " + error.message);
-                }
-            }
-        });
-
-        // Close modal
-        closeModalBtn.addEventListener('click', () => {
-            storyReviewModal.style.display = 'none';
-            currentReviewStory = null; // Clear current story data
-        });
-
-        window.addEventListener('click', (event) => {
-            if (event.target == storyReviewModal) {
-                storyReviewModal.style.display = 'none';
-                currentReviewStory = null;
-            }
-        });
-
-        // Approve Story
-        approveStoryBtn.addEventListener('click', async () => {
-            if (!currentReviewStory) return;
-
-            if (confirm(`Are you sure you want to approve story: ${currentReviewStory.title} (${currentReviewStory.id})?`)) {
-                try {
-                    // 1. Add story to main 'stories' collection with status 'published'
-                    await db.collection('stories').doc(currentReviewStory.id).set({
-                        ...currentReviewStory,
-                        status: 'published',
-                        reviewStatus: 'approved', // Add a specific review status field if needed
-                        publishedAt: firebase.firestore.FieldValue.serverTimestamp() // Timestamp for publication
-                    });
-
-                    // 2. Remove story from 'stories_under_review' collection
-                    await db.collection('stories_under_review').doc(currentReviewStory.id).delete();
-
-                    alert(`Story "${currentReviewStory.title}" approved and published!`);
-                    storyReviewModal.style.display = 'none';
-                    loadReviewQueue(); // Refresh review queue
-                } catch (error) {
-                    console.error("Error approving story:", error);
-                    alert("Error approving story: " + error.message);
-                }
-            }
-        });
-
-        // Mark Story as Error/Data Breach
-        errorStoryBtn.addEventListener('click', async () => {
-            if (!currentReviewStory) return;
-
-            const reason = prompt(`Reason for marking "${currentReviewStory.title}" as Error/Data Breach:`);
-            if (!reason) {
-                alert('Action cancelled. Reason is required.');
-                return;
-            }
-
-            if (confirm(`Are you sure you want to mark story: "${currentReviewStory.title}" (${currentReviewStory.id}) as Error/Data Breach?`)) {
-                try {
-                    // 1. Update story status in 'stories_under_review' (or move to a 'rejected_stories' collection)
-                    await db.collection('stories_under_review').doc(currentReviewStory.id).update({
-                        status: 'error-data-breach',
-                        reviewStatus: 'rejected', // Add a specific review status field
-                        rejectionReason: reason,
-                        reviewedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    // Optionally, you might move it to a separate collection like 'rejected_stories' instead of just updating status in 'stories_under_review'
-                    // For simplicity, we'll just update status here.
-                    // const rejectedRef = db.collection('rejected_stories').doc(currentReviewStory.id);
-                    // await rejectedRef.set({...currentReviewStory, status: 'error-data-breach', rejectionReason: reason, reviewedAt: firebase.firestore.FieldValue.serverTimestamp()});
-                    // await db.collection('stories_under_review').doc(currentReviewStory.id).delete();
-
-
-                    // 2. Notify the creator (this would require Cloud Functions for actual notification, for now, just an alert)
-                    alert(`Story "${currentReviewStory.title}" marked as Error/Data Breach. Creator will be notified. Reason: ${reason}`);
-
-                    storyReviewModal.style.display = 'none';
-                    loadReviewQueue(); // Refresh review queue
-                } catch (error) {
-                    console.error("Error marking story as error/data breach:", error);
-                    alert("Error marking story as error/data breach: " + error.message);
-                }
-            }
-        });
-
-
-        // Initial load of review queue when the page loads
-        document.addEventListener('DOMContentLoaded', loadReviewQueue);
-    </script>
+  // Hide body until auth state is determined
+  document.body.style.display = 'none';
+</script>
 </body>
 </html>
