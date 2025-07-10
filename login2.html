@@ -110,51 +110,59 @@
     </form>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-      authDomain: "tamplatedoc.firebaseapp.com",
-      projectId: "tamplatedoc",
-      storageBucket: "tamplatedoc.appspot.com",
-      messagingSenderId: "264966107720",
-      appId: "1:264966107720:web:da19f6109e71390740de7d"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+    authDomain: "tamplatedoc.firebaseapp.com",
+    projectId: "tamplatedoc",
+    storageBucket: "tamplatedoc.appspot.com",
+    messagingSenderId: "264966107720",
+    appId: "1:264966107720:web:da19f6109e71390740de7d"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    const form = document.getElementById('login-form');
-    const alertBox = document.getElementById('alert');
+  // Cek status login saat halaman dimuat
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // Jika sudah login, redirect ke halaman staff
+      window.location.href = "/ESPSTMARD/staff.html";
+    }
+  });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
+  const form = document.getElementById('login-form');
+  const alertBox = document.getElementById('alert');
 
-      const email = username + "@amdf.group";
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
 
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alertBox.style.color = "#00ff88";
-        alertBox.innerText = "Login berhasil! Mengalihkan...";
-        setTimeout(() => {
-          window.location.href = "/ESPSTMARD/staff.html";
-        }, 1200);
-      } catch (error) {
-        alertBox.style.color = "#ff4d4d";
-        if (error.code === "auth/user-not-found") {
-          alertBox.innerText = "Akun tidak ditemukan.";
-        } else if (error.code === "auth/wrong-password") {
-          alertBox.innerText = "Password salah.";
-        } else {
-          alertBox.innerText = "Gagal login: " + error.code;
-        }
+    const email = username + "@amdf.group";
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alertBox.style.color = "#00ff88";
+      alertBox.innerText = "Login berhasil! Mengalihkan...";
+      setTimeout(() => {
+        window.location.href = "/ESPSTMARD/staff.html";
+      }, 1200);
+    } catch (error) {
+      alertBox.style.color = "#ff4d4d";
+      if (error.code === "auth/user-not-found") {
+        alertBox.innerText = "Akun tidak ditemukan.";
+      } else if (error.code === "auth/wrong-password") {
+        alertBox.innerText = "Password salah.";
+      } else {
+        alertBox.innerText = "Gagal login: " + error.code;
       }
-    });
-  </script>
+    }
+  });
+</script>
 
 </body>
 </html>
