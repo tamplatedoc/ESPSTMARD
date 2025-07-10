@@ -397,9 +397,11 @@
         overlay.classList.add('show');
     }
 
-    function hidePopup() {
-        document.getElementById('popup-overlay').classList.remove('show');
-    }
+ // Function to hide custom pop-up message
+function hidePopup() {
+    const overlay = document.getElementById('popup-overlay');
+    overlay.classList.remove('show');
+}
 
     // --- Form Display Logic ---
     window.showSection = function(sectionId) {
