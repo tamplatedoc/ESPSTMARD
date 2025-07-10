@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Staff - AMDF.GROUP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Staff - AMDF.GROUP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --background-start: #0a0a0f;
@@ -111,96 +111,86 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>AMDF Staff Login</h1>
-        </div>
-
-        <form action="/ESPSTMARD/staff.html" method="POST" class="login-form">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required placeholder="Masukkan username Anda">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required placeholder="Masukkan password Anda">
-            </div>
-
-            <button type="submit" class="login-button">Login</button>
-        </form>
+  <div class="login-container">
+    <div class="login-header">
+      <h1>AMDF Staff Login</h1>
     </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    <form class="login-form">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required placeholder="Masukkan username Anda">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required placeholder="Masukkan password Anda">
+      </div>
 
-  // Konfigurasi Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-    authDomain: "tamplatedoc.firebaseapp.com",
-    projectId: "tamplatedoc",
-    storageBucket: "tamplatedoc.firebasestorage.app",
-    messagingSenderId: "264966107720",
-    appId: "1:264966107720:web:da19f6109e71390740de7d",
-    measurementId: "G-PFK8VQBFCV"
-  };
+      <button type="submit" class="login-button">Login</button>
+    </form>
+  </div>
 
-  // Inisialisasi Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-  // Fungsi untuk menampilkan pesan error yang informatif
-  const getErrorMessage = (error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    
-    switch (errorCode) {
-      case 'auth/invalid-email':
-        return 'Email tidak valid. Pastikan format email benar.';
-      case 'auth/user-disabled':
-        return 'Akun Anda telah dinonaktifkan. Hubungi administrator.';
-      case 'auth/user-not-found':
-        return 'Akun tidak ditemukan. Pastikan username dan password benar.';
-      case 'auth/wrong-password':
-        return 'Password salah. Coba lagi.';
-      case 'auth/network-request-failed':
-        return 'Koneksi terputus. Periksa koneksi internet Anda.';
-      case 'auth/too-many-requests':
-        return 'Terlalu banyak percobaan login. Coba lagi nanti.';
-      default:
-        return `Terjadi kesalahan: ${errorMessage}`;
-    }
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+      authDomain: "tamplatedoc.firebaseapp.com",
+      projectId: "tamplatedoc",
+      storageBucket: "tamplatedoc.appspot.com",
+      messagingSenderId: "264966107720",
+      appId: "1:264966107720:web:da19f6109e71390740de7d",
+      measurementId: "G-PFK8VQBFCV"
+    };
 
-  // Menambahkan event listener untuk form login
-  document.querySelector('.login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Validasi input sebelum request
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    if (!username || !password) {
-      alert('Username dan password tidak boleh kosong');
-      return;
-    }
+    const getErrorMessage = (error) => {
+      switch (error.code) {
+        case 'auth/invalid-email':
+          return 'Email tidak valid. Pastikan format email benar.';
+        case 'auth/user-disabled':
+          return 'Akun Anda telah dinonaktifkan. Hubungi administrator.';
+        case 'auth/user-not-found':
+          return 'Akun tidak ditemukan. Pastikan username dan password benar.';
+        case 'auth/wrong-password':
+          return 'Password salah. Coba lagi.';
+        case 'auth/network-request-failed':
+          return 'Koneksi terputus. Periksa koneksi internet Anda.';
+        case 'auth/too-many-requests':
+          return 'Terlalu banyak percobaan login. Coba lagi nanti.';
+        default:
+          return `Terjadi kesalahan: ${error.message}`;
+      }
+    };
 
-    try {
-      // Lakukan autentikasi dengan Firebase
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        username + '@amdf.group',
-        password
-      );
+    document.querySelector('.login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-      // Setelah berhasil login, lakukan redirect dengan GET
-      window.location.href = '/ESPSTMARD/staff.html';
-    } catch (error) {
-      // Tampilkan pesan error yang informatif
-      alert(getErrorMessage(error));
-    }
-  });
-</script>
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        alert('Username dan password tidak boleh kosong');
+        return;
+      }
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          username + '@amdf.group', // Gabungkan ke bentuk email
+          password
+        );
+        // Login sukses
+        window.location.href = '/ESPSTMARD/staff.html';
+      } catch (error) {
+        alert(getErrorMessage(error));
+      }
+    });
+  </script>
 </body>
 </html>
+
