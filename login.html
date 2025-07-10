@@ -367,11 +367,23 @@
         sessionStorage.setItem('loggedInUserRole', role);
         if (creatorId) {
             sessionStorage.setItem('currentCreatorId', creatorId);
+            // Simpan ke Realtime Database
+            const rtUserRef = ref(dbRT, `artifacts/${appId}/loggedInUsers/${creatorId}`);
+            set(rtUserRef, {
+                role: role,
+                timestamp: new Date().toISOString()
+            });
         }
     }
 
     // Fungsi untuk menghapus status login (misal, saat logout)
     function clearLoginSession() {
+        const creatorId = sessionStorage.getItem('currentCreatorId');
+        if (creatorId) {
+            // Hapus dari Realtime Database
+            const rtUserRef = ref(dbRT, `artifacts/${appId}/loggedInUsers/${creatorId}`);
+            set(rtUserRef, null);
+        }
         sessionStorage.removeItem('loggedInUserRole');
         sessionStorage.removeItem('cachedUserId');
         sessionStorage.removeItem('currentCreatorId');
@@ -470,11 +482,18 @@
                     setLoginSession('creator', creatorId); // Simpan status login dan creatorId
                     showPopup('Login Berhasil!', `Selamat datang, ${userData.email}. Mengarahkan ke halaman creator...`, 'success');
                     
-                    // Update last login timestamp
+                    // Update last login timestamp di Firestore
                     const userRef = doc(dbFS, `artifacts/${appId}/users`, creatorId);
                     await setDoc(userRef, {
                         lastLogin: new Date().toISOString()
                     }, { merge: true });
+                    
+                    // Update last login timestamp di Realtime Database
+                    const rtLoginRef = ref(dbRT, `artifacts/${appId}/userLogins/${creatorId}`);
+                    await set(rtLoginRef, {
+                        email: email,
+                        lastLogin: new Date().toISOString()
+                    });
                     
                     setTimeout(() => window.location.href = '/ESPSTMARD/creator.html', 1500);
                 } else {
@@ -543,14 +562,15 @@
                 joinDate: registrationDate
             });
 
-            // Simpan ke Realtime Database (jika masih diperlukan)
-            const rtUserRef = child(ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`), creatorId);
+            // Simpan ke Realtime Database (users collection)
+            const rtUserRef = ref(dbRT, `artifacts/${appId}/users/${creatorId}`);
             await set(rtUserRef, {
                 email: email,
                 pin: pin,
                 whatsapp: whatsapp,
                 role: 'creator',
-                creatorId: creatorId
+                creatorId: creatorId,
+                registrationDate: registrationDate
             });
 
             showPopup('Registrasi Berhasil!', `Akun Creator Anda telah dibuat. ID Anda: ${creatorId}. Silakan login.`, 'success');
