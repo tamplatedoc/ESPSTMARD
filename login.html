@@ -324,23 +324,25 @@
 
         async function initializeAuthAndSession() {
             try {
-                if (initialAuthToken) {
-                    await signInAnonymously(auth); // Tetap gunakan anonymous untuk mendapatkan UID
-                    console.log("Signed in anonymously with initial token context.");
+                // Periksa apakah ada UID di sessionStorage terlebih dahulu
+                const cachedUserId = sessionStorage.getItem('cachedUserId');
+                if (cachedUserId) {
+                    currentUserId = cachedUserId;
+                    console.log("Using cached User ID:", currentUserId);
                 } else {
+                    // Jika tidak ada di cache, coba sign in anonymously untuk mendapatkan UID baru
                     await signInAnonymously(auth);
-                    console.log("Signed in anonymously.");
+                    currentUserId = auth.currentUser?.uid || crypto.randomUUID();
+                    sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID baru
+                    console.log("Signed in anonymously. Current User ID:", currentUserId);
                 }
-                currentUserId = auth.currentUser?.uid || sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
-                sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID untuk refresh
-                console.log("Current User ID:", currentUserId);
 
                 // Setelah inisialisasi auth, periksa status login
                 checkLoginStatus();
 
             } catch (error) {
                 console.error("Error during Firebase authentication:", error);
-                // Fallback jika auth gagal sepenuhnya
+                // Fallback jika auth gagal sepenuhnya, pastikan tetap ada currentUserId
                 currentUserId = sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
                 sessionStorage.setItem('cachedUserId', currentUserId);
                 console.log("Using cached or generated UUID as currentUserId due to auth error:", currentUserId);
@@ -356,9 +358,8 @@
                 window.location.href = '/ESPSTMARD/creator.html';
             } else if (loggedInRole === 'staff') {
                 // Jika staff login di halaman ini, beritahu untuk ke halaman staff_login.html
-                showPopup('Login Ditemukan', 'Anda terdeteksi sebagai Staff. Silakan login melalui portal Staff.', 'error');
-                // Optional: Clear session if they are on the wrong page
-                // sessionStorage.removeItem('loggedInUserRole');
+                // Optional: showPopup bisa dipertimbangkan atau cukup pesan di konsol
+                console.warn('Anda terdeteksi sebagai Staff. Silakan login melalui portal Staff.');
             }
         }
 
@@ -439,24 +440,31 @@
             }
 
             try {
-                // Path ke user_credentials di bawah UID saat ini
-                const usersCredentialsRef = ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`);
-                
-                // Query Realtime Database: cari entri dengan email yang cocok dan role 'creator'
-                const snapshot = await get(
-                    query(usersCredentialsRef, orderByChild('email'), equalTo(email))
-                );
+                // MODIFIKASI PENTING: Mencari di SELURUH 'users' node untuk menemukan kredensial
+                // Ini akan mengiterasi setiap UID (misal: 3S6hdqbzGabwfGQg0mnrPDGBFaz1, TctUZz4D8IRgfc5FQu58kZJzsS23)
+                // dan memeriksa user_credentials di dalamnya.
+                const allUsersRootRef = ref(dbRT, `artifacts/${appId}/users`);
+                const snapshot = await get(allUsersRootRef);
 
                 let userFound = false;
                 let userData = null;
 
                 if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const user = childSnapshot.val();
-                        if (user.email === email && user.pin === pin) {
-                            userData = user;
-                            userFound = true;
-                            return true; // Berhenti iterasi setelah ditemukan
+                    snapshot.forEach((uidSnapshot) => {
+                        const userCredentials = uidSnapshot.child('user_credentials').val();
+                        if (userCredentials) {
+                            // Iterasi setiap credential (misal: 9FDS, JLXD, PEUT, GUS7) di bawah UID ini
+                            for (const creatorId in userCredentials) {
+                                const user = userCredentials[creatorId];
+                                if (user.email === email && user.pin === pin) {
+                                    userData = user;
+                                    userFound = true;
+                                    // Set currentUserId menjadi UID di mana user ditemukan
+                                    currentUserId = uidSnapshot.key;
+                                    sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID yang benar
+                                    return true; // Berhenti iterasi UID setelah ditemukan
+                                }
+                            }
                         }
                     });
                 }
@@ -497,21 +505,34 @@
             }
 
             try {
-                // Cek email duplikat di bawah UID pengguna saat ini
-                const usersCredentialsRef = ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`);
-                const snapshot = await get(
-                    query(usersCredentialsRef, orderByChild('email'), equalTo(email))
-                );
-
-                if (snapshot.exists()) {
-                    showPopup('Registrasi Gagal', 'Email ini sudah terdaftar di bawah akun Anda.', 'error');
-                    return;
+                // MODIFIKASI PENTING: Mengecek email duplikat di SELURUH 'users' node
+                // sebelum registrasi, untuk menghindari duplikasi email antar UID.
+                const allUsersRootRef = ref(dbRT, `artifacts/${appId}/users`);
+                const allUsersSnapshot = await get(allUsersRootRef);
+                
+                if (allUsersSnapshot.exists()) {
+                    let emailExistsGlobally = false;
+                    allUsersSnapshot.forEach((uidSnapshot) => {
+                        const userCredentials = uidSnapshot.child('user_credentials').val();
+                        if (userCredentials) {
+                            for (const idKey in userCredentials) {
+                                if (userCredentials[idKey].email === email) {
+                                    emailExistsGlobally = true;
+                                    return true; // Berhenti iterasi UID
+                                }
+                            }
+                        }
+                    });
+                    if (emailExistsGlobally) {
+                        showPopup('Registrasi Gagal', 'Email ini sudah terdaftar di sistem. Gunakan email lain atau login.', 'error');
+                        return;
+                    }
                 }
-
+                
                 const creatorId = generateId(); // Generate unique 4-char ID
 
-                // Save to Realtime Database
-                const newCreatorRef = child(usersCredentialsRef, creatorId); // Use creatorId as key in RTDB for easy lookup
+                // Simpan ke Realtime Database di bawah currentUserId yang sedang aktif
+                const newCreatorRef = child(ref(dbRT, `artifacts/${appId}/users/${currentUserId}/user_credentials`), creatorId);
                 await set(newCreatorRef, {
                     email: email,
                     pin: pin,
@@ -520,7 +541,7 @@
                     creatorId: creatorId
                 });
 
-                // Save to Firestore (for public display)
+                // Simpan ke Firestore (untuk public display)
                 const authorDocRef = doc(dbFS, `artifacts/${appId}/public/data/authors`, creatorId);
                 await setDoc(authorDocRef, {
                     name: namaPenulis,
