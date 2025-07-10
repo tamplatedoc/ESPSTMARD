@@ -310,64 +310,51 @@
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const dbRT = getDatabase(app); // Realtime Database instance
-    const dbFS = getFirestore(app); // Firestore instance
-    const auth = getAuth(app); // Auth instance
+    const dbRT = getDatabase(app);
+    const dbFS = getFirestore(app);
+    const auth = getAuth(app);
 
-    // Global variables for Canvas environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-    let currentUserId = null; // UID dari Firebase Auth atau UUID fallback
+    let currentUserId = null;
 
     // --- AUTHENTICATION & SESSION MANAGEMENT ---
-
     async function initializeAuthAndSession() {
         try {
-            // Periksa apakah ada UID di sessionStorage terlebih dahulu
             const cachedUserId = sessionStorage.getItem('cachedUserId');
             if (cachedUserId) {
                 currentUserId = cachedUserId;
                 console.log("Using cached User ID:", currentUserId);
             } else {
-                // Jika tidak ada di cache, coba sign in anonymously untuk mendapatkan UID baru
                 await signInAnonymously(auth);
                 currentUserId = auth.currentUser?.uid || crypto.randomUUID();
-                sessionStorage.setItem('cachedUserId', currentUserId); // Cache UID baru
+                sessionStorage.setItem('cachedUserId', currentUserId);
                 console.log("Signed in anonymously. Current User ID:", currentUserId);
             }
-
-            // Setelah inisialisasi auth, periksa status login
             checkLoginStatus();
-
         } catch (error) {
             console.error("Error during Firebase authentication:", error);
-            // Fallback jika auth gagal sepenuhnya, pastikan tetap ada currentUserId
             currentUserId = sessionStorage.getItem('cachedUserId') || crypto.randomUUID();
             sessionStorage.setItem('cachedUserId', currentUserId);
             console.log("Using cached or generated UUID as currentUserId due to auth error:", currentUserId);
-            checkLoginStatus(); // Tetap coba cek status login
+            checkLoginStatus();
         }
     }
 
-    // Fungsi untuk mengecek status login dari sessionStorage
     function checkLoginStatus() {
         const loggedInRole = sessionStorage.getItem('loggedInUserRole');
         if (loggedInRole === 'creator') {
-            // Jika sudah login sebagai creator, langsung redirect
             window.location.href = '/ESPSTMARD/creator.html';
         } else if (loggedInRole === 'staff') {
-            // Jika staff login di halaman ini, beritahu untuk ke halaman staff_login.html
             console.warn('Anda terdeteksi sebagai Staff. Silakan login melalui portal Staff.');
         }
     }
 
-    // Fungsi untuk menyimpan status login
     function setLoginSession(role, creatorId = null) {
         sessionStorage.setItem('loggedInUserRole', role);
         if (creatorId) {
             sessionStorage.setItem('currentCreatorId', creatorId);
-            // Simpan ke Realtime Database
             const rtUserRef = ref(dbRT, `artifacts/${appId}/loggedInUsers/${creatorId}`);
             set(rtUserRef, {
                 role: role,
@@ -376,11 +363,9 @@
         }
     }
 
-    // Fungsi untuk menghapus status login (misal, saat logout)
     function clearLoginSession() {
         const creatorId = sessionStorage.getItem('currentCreatorId');
         if (creatorId) {
-            // Hapus dari Realtime Database
             const rtUserRef = ref(dbRT, `artifacts/${appId}/loggedInUsers/${creatorId}`);
             set(rtUserRef, null);
         }
@@ -390,8 +375,6 @@
     }
 
     // --- Utility Functions ---
-
-    // Function to generate a 4-character alphanumeric ID
     function generateId(length = 4) {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let result = '';
@@ -401,7 +384,6 @@
         return result;
     }
 
-    // Function to show custom pop-up message
     function showPopup(title, message, type) {
         const overlay = document.getElementById('popup-overlay');
         const content = document.getElementById('popup-content');
@@ -411,11 +393,10 @@
         popupTitle.textContent = title;
         popupMessage.textContent = message;
 
-        content.className = 'popup-content ' + type; // Add success or error class
+        content.className = 'popup-content ' + type;
         overlay.classList.add('show');
     }
 
-    // Function to hide custom pop-up message
     function hidePopup() {
         document.getElementById('popup-overlay').classList.remove('show');
     }
@@ -438,9 +419,7 @@
         });
     }
 
-    // --- Firebase Integration Logic (Hanya untuk Creator) ---
-
-    // Login Functionality
+    // --- Firebase Integration Logic ---
     document.getElementById('login-form').addEventListener('submit', async function(event) {
         event.preventDefault();
         const email = document.getElementById('login-email').value.trim();
@@ -452,7 +431,6 @@
         }
 
         try {
-            // Cari user di Firestore berdasarkan email
             const usersRef = collection(dbFS, `artifacts/${appId}/users`);
             const q = query(usersRef, where("email", "==", email));
             const querySnapshot = await getDocs(q);
@@ -479,16 +457,14 @@
 
             if (userFound) {
                 if (userData.role === 'creator') {
-                    setLoginSession('creator', creatorId); // Simpan status login dan creatorId
+                    setLoginSession('creator', creatorId);
                     showPopup('Login Berhasil!', `Selamat datang, ${userData.email}. Mengarahkan ke halaman creator...`, 'success');
                     
-                    // Update last login timestamp di Firestore
                     const userRef = doc(dbFS, `artifacts/${appId}/users`, creatorId);
                     await setDoc(userRef, {
                         lastLogin: new Date().toISOString()
                     }, { merge: true });
                     
-                    // Update last login timestamp di Realtime Database
                     const rtLoginRef = ref(dbRT, `artifacts/${appId}/userLogins/${creatorId}`);
                     await set(rtLoginRef, {
                         email: email,
@@ -508,7 +484,6 @@
         }
     });
 
-    // Creator Register Functionality
     document.getElementById('creator-register-form').addEventListener('submit', async function(event) {
         event.preventDefault();
         const email = document.getElementById('creator-email').value.trim();
@@ -526,7 +501,6 @@
         }
 
         try {
-            // Cek email duplikat di Firestore
             const usersRef = collection(dbFS, `artifacts/${appId}/users`);
             const q = query(usersRef, where("email", "==", email));
             const querySnapshot = await getDocs(q);
@@ -536,10 +510,10 @@
                 return;
             }
 
-            const creatorId = generateId(); // Generate unique 4-char ID
+            const creatorId = generateId();
             const registrationDate = new Date().toISOString();
 
-            // Simpan ke Firestore (users collection)
+            // Simpan ke users collection
             const userRef = doc(dbFS, `artifacts/${appId}/users`, creatorId);
             await setDoc(userRef, {
                 email: email,
@@ -554,15 +528,15 @@
                 status: 'active'
             });
 
-            // Simpan ke Firestore (public authors collection)
-            const authorRef = doc(dbFS, `artifacts/${appId}/public/authors`, creatorId);
+            // Simpan ke public authors collection dengan path yang benar
+            const authorRef = doc(dbFS, `artifacts/${appId}/public/data/authors`, creatorId);
             await setDoc(authorRef, {
                 name: namaPenulis,
                 creatorId: creatorId,
                 joinDate: registrationDate
             });
 
-            // Simpan ke Realtime Database (users collection)
+            // Simpan ke Realtime Database
             const rtUserRef = ref(dbRT, `artifacts/${appId}/users/${creatorId}`);
             await set(rtUserRef, {
                 email: email,
@@ -575,7 +549,6 @@
 
             showPopup('Registrasi Berhasil!', `Akun Creator Anda telah dibuat. ID Anda: ${creatorId}. Silakan login.`, 'success');
             
-            // Clear form and switch to login tab
             document.getElementById('creator-register-form').reset();
             setTimeout(() => showSection('login'), 2000);
 
@@ -587,8 +560,8 @@
 
     // --- Initial Setup ---
     document.addEventListener('DOMContentLoaded', async () => {
-        await initializeAuthAndSession(); // Inisialisasi Auth dan cek sesi
-        showSection('login'); // Tampilkan bagian login secara default jika belum redirect
+        await initializeAuthAndSession();
+        showSection('login');
     });
 </script>
 </head>
