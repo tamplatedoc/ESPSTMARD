@@ -534,21 +534,22 @@ window.toggleDarkMode = toggleDarkMode; // <--- Tambahkan ini
                         }
                     }
 
-                    const card = document.createElement('div');
-                    card.className = 'book-card';
-                    card.onclick = () => location.href = `web_story.html?id=${storyId}`;
-                    card.innerHTML = `
-                        <img src="${thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
-                        <div class="book-card-content">
-                            <h3>${storyData.title}</h3>
-                            <p>Author: ${storyData.authorName}</p>
-                            <div class="book-card-meta">
-                                <span><i class="fas fa-eye"></i> ${views} Views</span>
-                                <span class="rating"> ${generateStarRatingHtml(averageRating)} ${averageRating} (${ratingsCount} Ratings)</span>
-                            </div>
-                        </div>
-                    `;
-                    bookGrid.appendChild(card);
+const card = document.createElement('div');
+card.className = 'book-card';
+card.onclick = () => location.href = `web_story.html?id=${storyId}`;
+card.innerHTML = `
+    <img src="${thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
+    <div class="book-card-content">
+        <h3>${storyData.title}</h3>
+        <p>Author: ${storyData.authorName}</p>
+        <div class="book-card-meta">
+            <span class="rating">${generateStarRatingHtml(averageRating)} ${averageRating} (${ratingsCount} Ratings)</span>
+            <span><i class="fas fa-eye"></i> ${views} Views</span>
+        </div>
+    </div>
+`;
+bookGrid.appendChild(card);
+
                 }
             } catch (error) {
                 console.error("Error fetching stories:", error);
