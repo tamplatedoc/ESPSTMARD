@@ -8,35 +8,33 @@
     <h1>Login Tes Firebase</h1>
     <button id="login">Login Sekarang</button>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-        authDomain: "tamplatedoc.firebaseapp.com",
-        projectId: "tamplatedoc",
-        storageBucket: "tamplatedoc.appspot.com",
-        messagingSenderId: "264966107720",
-        appId: "1:264966107720:web:da19f6109e71390740de7d"
-      };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+    authDomain: "tamplatedoc.firebaseapp.com",
+    projectId: "tamplatedoc",
+    storageBucket: "tamplatedoc.appspot.com",
+    messagingSenderId: "264966107720",
+    appId: "1:264966107720:web:da19f6109e71390740de7d"
+  };
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-      document.getElementById("login").addEventListener("click", async () => {
-        const email = "admin1@amdf.group";
-        const password = "123456";
+  // Tes login langsung tanpa form
+  signInWithEmailAndPassword(auth, "admin1@amdf.group", "123456")
+    .then((userCredential) => {
+      alert("Login berhasil sebagai: " + userCredential.user.email);
+    })
+    .catch((error) => {
+      alert("Login GAGAL: " + error.code + " - " + error.message);
+      console.error(error);
+    });
+</script>
 
-        try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          alert("Berhasil login sebagai: " + userCredential.user.email);
-        } catch (error) {
-          console.error("Gagal login:", error.code, error.message);
-          alert("Gagal login: " + error.code + "\n" + error.message);
-        }
-      });
-    </script>
   </body>
 </html>
 
