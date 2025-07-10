@@ -131,21 +131,30 @@
         </form>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script>
-        // Initialize Firebase
-        firebase.initializeApp({
-            apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
-            authDomain: "tamplatedoc.firebaseapp.com",
-            projectId: "tamplatedoc",
-            storageBucket: "tamplatedoc.firebasestorage.app",
-            messagingSenderId: "264966107720",
-            appId: "1:264966107720:web:da19f6109e71390740de7d",
-            measurementId: "G-PFK8VQBFCV"
-        });
+ <!-- Hapus baris ini -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-        const auth = firebase.auth();
+<!-- Ganti dengan baris ini -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+  // Konfigurasi Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDeiLybtGc6evATj5O7M1FiJd1GPYd-rYc",
+    authDomain: "tamplatedoc.firebaseapp.com",
+    projectId: "tamplatedoc",
+    storageBucket: "tamplatedoc.firebasestorage.app",
+    messagingSenderId: "264966107720",
+    appId: "1:264966107720:web:da19f6109e71390740de7d",
+    measurementId: "G-PFK8VQBFCV"
+  };
+
+  // Inisialisasi Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+</script>
 
         document.querySelector('.login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
