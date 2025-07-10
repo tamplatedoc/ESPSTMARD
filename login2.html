@@ -150,7 +150,7 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Fungsi untuk menampilkan pesan error yang lebih informatif
+  // Fungsi untuk menampilkan pesan error yang informatif
   const getErrorMessage = (error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
@@ -177,37 +177,28 @@
   document.querySelector('.login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // Menampilkan loading state
-    const loginButton = document.querySelector('.login-button');
-    const originalText = loginButton.textContent;
-    loginButton.textContent = 'Sedang masuk...';
-    loginButton.disabled = true;
+    // Validasi input sebelum request
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      alert('Username dan password tidak boleh kosong');
+      return;
+    }
 
     try {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
-
-      // Validasi input
-      if (!username || !password) {
-        throw new Error('Username dan password tidak boleh kosong');
-      }
-
-      // Proses login
+      // Lakukan autentikasi dengan Firebase
       const userCredential = await signInWithEmailAndPassword(
         auth,
         username + '@amdf.group',
         password
       );
 
-      // Redirect ke halaman staff
+      // Setelah berhasil login, lakukan redirect dengan GET
       window.location.href = '/ESPSTMARD/staff.html';
     } catch (error) {
-      // Menampilkan pesan error yang lebih informatif
+      // Tampilkan pesan error yang informatif
       alert(getErrorMessage(error));
-    } finally {
-      // Mengembalikan state tombol
-      loginButton.textContent = originalText;
-      loginButton.disabled = false;
     }
   });
 </script>
