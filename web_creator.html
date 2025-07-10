@@ -570,6 +570,14 @@
             }
         }
         document.addEventListener('DOMContentLoaded', applyTheme);
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
+
+    const toggleButton = document.getElementById('darkModeToggle');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', toggleDarkMode);
+    }
+});
 
         const welcomeMessage = document.getElementById('welcomeMessage');
         const logoutButton = document.getElementById('logoutButton');
