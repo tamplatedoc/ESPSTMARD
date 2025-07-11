@@ -74,8 +74,6 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--header-border);
-            position: sticky;
-            top: 0;
             z-index: 1000;
             box-shadow: 0 2px 10px var(--card-shadow);
         }
@@ -262,17 +260,18 @@
         }
 
         .book-card-content h3 {
-            font-size: 1.4rem;
-            margin-bottom: 0.7rem;
-            color: var(--text-color);
-            flex-grow: 1;
-        }
+    font-size: 0.95rem; /* Mengubah ukuran font agar sama dengan p */
+    margin-bottom: 0.7rem;
+    color: var(--text-color);
+    flex-grow: 1;
+    font-weight: bold; /* Memastikan judul tetap bold */
+}
 
-        .book-card-content p {
-            font-size: 0.95rem;
-            color: var(--text-color);
-            margin-bottom: 0.4rem;
-        }
+.book-card-content p {
+    font-size: 0.95rem; /* Font penulis */
+    color: var(--text-color);
+    margin-bottom: 0.4rem;
+}
 
         .book-card-meta {
             display: flex;
