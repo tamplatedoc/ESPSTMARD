@@ -263,7 +263,7 @@
     .book-grid {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 12px; /* Jarak antar card */
         justify-content: center;
     }
 
@@ -277,11 +277,13 @@
         display: flex;
         flex-direction: column;
         cursor: pointer;
-        flex: 1 1 calc(25% - 12px); /* Default for larger screens (4 columns) */
+        /* Default for larger screens (4 columns) */
+        flex: 1 1 calc(25% - 12px);
         max-width: calc(25% - 12px);
         text-align: center;
         padding: 8px;
     }
+
     @media (min-width: 600px) and (max-width: 992px) { /* Tablet view: 3 columns */
         .book-card {
             flex: 1 1 calc(33.333% - 12px);
@@ -440,6 +442,14 @@
         .book-card {
             flex: 1 1 calc(50% - 12px); /* Mengatur 2 kolom dengan jarak 12px */
             max-width: calc(50% - 12px); /* Memastikan lebar maksimum 2 kolom */
+            margin: 0; /* Pastikan margin card individual direset jika ada */
+        }
+
+        /* Penting: Pastikan .book-grid memiliki padding atau margin horizontal */
+        .book-grid {
+            padding: 0 5%; /* Menambahkan padding horizontal agar card tidak menempel ke tepi layar */
+            justify-content: space-between; /* Untuk meratakan 2 kolom */
+            gap: 12px; /* Pastikan gap sudah terdefinisi */
         }
     }
 
@@ -448,7 +458,12 @@
         .book-card {
             flex: 1 1 calc(50% - 10px); /* Sedikit menyesuaikan gap untuk layar sangat kecil */
             max-width: calc(50% - 10px);
-            margin: 0 5px; /* Margin horizontal yang lebih kecil */
+            margin: 0; /* Pastikan margin card individual direset jika ada */
+        }
+        .book-grid {
+            padding: 0 4%; /* Sesuaikan padding untuk layar sangat kecil */
+            justify-content: space-between;
+            gap: 10px; /* Sesuaikan gap */
         }
         .logo {
             font-size: 1.5rem;
