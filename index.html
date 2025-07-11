@@ -26,6 +26,11 @@
             --toggle-shadow: rgba(0, 0, 0, 0.2);
             --footer-bg: #333;
             --footer-text: #eee;
+            --input-bg: #f9f9f9;
+            --input-border: #ccc;
+            --input-focus-border: #007bff;
+            --dropdown-bg: #f9f9f9;
+            --dropdown-border: #ccc;
         }
 
         body.dark-mode {
@@ -47,6 +52,11 @@
             --toggle-shadow: rgba(0, 0, 0, 0.4);
             --footer-bg: #111;
             --footer-text: #bbb;
+            --input-bg: #333;
+            --input-border: #555;
+            --input-focus-border: #8e2de2;
+            --dropdown-bg: #333;
+            --dropdown-border: #555;
         }
 
         * {
@@ -183,6 +193,50 @@
             margin: 0 auto 1.5rem;
         }
 
+        /* Styling for search and filter controls */
+        .search-filter-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-filter-controls input[type="text"],
+        .search-filter-controls select {
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%; /* Default for smaller screens */
+            max-width: 300px; /* Limit width on larger screens */
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .search-filter-controls input[type="text"]:focus,
+        .search-filter-controls select:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        .search-filter-controls select {
+            appearance: none; /* Remove default dropdown arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23777%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.6c-5%200-9.3%201.8-13.2%205.4A17.6%2017.6%200%200%200%200%2082.7c0%204.8%201.8%209.3%205.4%2013.2l130.4%20130.4c4%204%208.5%206.5%2013.2%206.5s9.2-2.5%2013.2-6.5L287%2095.9c3.9-3.9%205.9-8.4%205.9-13.2s-2-9.3-5.9-13.3z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.7em top 50%, 0 0;
+            background-size: 0.65em auto, 100%;
+            padding-right: 2.5em; /* Make space for the custom arrow */
+        }
+        body.dark-mode .search-filter-controls select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23bbb%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.6c-5%200-9.3%201.8-13.2%205.4A17.6%2017.6%200%200%200%200%2082.7c0%204.8%201.8%209.3%205.4%2013.2l130.4%20130.4c4%204%208.5%206.5%2013.2%206.5s9.2-2.5%2013.2-6.5L287%2095.9c3.9-3.9%205.9-8.4%205.9-13.2s-2-9.3-5.9-13.3z%22%2F%3E%3C%2Fsvg%3E');
+        }
+
+
         .creator-info {
             background-color: rgba(0, 123, 255, 0.1);
             border-left: 5px solid var(--link-color);
@@ -206,33 +260,33 @@
         }
 
         .book-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-}
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
 
-.book-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px var(--card-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-    flex: 1 1 calc(50% - 12px);
-    max-width: calc(50% - 12px);
-    text-align: center;
-    padding: 8px;
-}
+        .book-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            flex: 1 1 calc(50% - 12px);
+            max-width: calc(50% - 12px);
+            text-align: center;
+            padding: 8px;
+        }
         @media (min-width: 600px) {
-    .book-card {
-        flex: 1 1 calc(25% - 12px);
-        max-width: calc(25% - 12px);
-    }
-}
+            .book-card {
+                flex: 1 1 calc(25% - 12px);
+                max-width: calc(25% - 12px);
+            }
+        }
 
         .book-card:hover {
             transform: translateY(-8px);
@@ -240,16 +294,16 @@
         }
 
         .book-card-thumbnail {
-    width: 100%;
-    aspect-ratio: 3/4;
-    object-fit: cover;
-    border-radius: 8px;
-    background: #262626;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    margin-bottom: 8px;
-    border-bottom: none; /* opsional, biar lebih mirip */
-    height: auto; /* override nilai sebelumnya */
-}
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #262626;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+            border-bottom: none; /* opsional, biar lebih mirip */
+            height: auto; /* override nilai sebelumnya */
+        }
 
 
         .book-card-content {
@@ -260,18 +314,18 @@
         }
 
         .book-card-content h3 {
-    font-size: 0.95rem; /* Mengubah ukuran font agar sama dengan p */
-    margin-bottom: 0.7rem;
-    color: var(--text-color);
-    flex-grow: 1;
-    font-weight: bold; /* Memastikan judul tetap bold */
-}
+            font-size: 0.95rem; /* Mengubah ukuran font agar sama dengan p */
+            margin-bottom: 0.7rem;
+            color: var(--text-color);
+            flex-grow: 1;
+            font-weight: bold; /* Memastikan judul tetap bold */
+        }
 
-.book-card-content p {
-    font-size: 0.95rem; /* Font penulis */
-    color: var(--text-color);
-    margin-bottom: 0.4rem;
-}
+        .book-card-content p {
+            font-size: 0.95rem; /* Font penulis */
+            color: var(--text-color);
+            margin-bottom: 0.4rem;
+        }
 
         .book-card-meta {
             display: flex;
@@ -282,20 +336,20 @@
             color: var(--icon-color);
         }
         .book-card-meta.vertical-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;         /* Tengah horizontal */
-    text-align: center;          /* Tengah isi teks */
-    gap: 0.2rem;                 /* Jarak antar elemen */
-    margin-top: 0.5rem;
-}
+            display: flex;
+            flex-direction: column;
+            align-items: center;       /* Tengah horizontal */
+            text-align: center;        /* Tengah isi teks */
+            gap: 0.2rem;               /* Jarak antar elemen */
+            margin-top: 0.5rem;
+        }
 
-.book-card-meta.vertical-meta .rating,
-.book-card-meta.vertical-meta .views {
-    font-size: 0.85rem;          /* Ukuran teks sedikit kecil */
-    line-height: 1.2;            /* Jarak antar baris rapat */
-    letter-spacing: 0.2px;       /* Jarak antar huruf lebih rapat */
-}
+        .book-card-meta.vertical-meta .rating,
+        .book-card-meta.vertical-meta .views {
+            font-size: 0.85rem;        /* Ukuran teks sedikit kecil */
+            line-height: 1.2;          /* Jarak antar baris rapat */
+            letter-spacing: 0.2px;     /* Jarak antar huruf lebih rapat */
+        }
 
 
 
@@ -373,12 +427,19 @@
                 font-size: 1rem;
             }
 
-            .book-grid {
-                grid-template-columns: 1fr;
+            .search-filter-controls {
+                flex-direction: column;
+                align-items: center;
             }
 
-            .book-card-thumbnail {
-                height: 180px;
+            .search-filter-controls input[type="text"],
+            .search-filter-controls select {
+                max-width: 100%;
+            }
+
+            .book-card {
+                flex: 1 1 calc(100% - 12px); /* Full width on smaller screens */
+                max-width: calc(100% - 12px);
             }
         }
 
@@ -424,9 +485,32 @@
             </div>
         </section>
 
-        <section class="book-grid" id="bookGrid">
-            
+        <section class="search-filter-controls">
+            <input type="text" id="searchBar" placeholder="Search by title or author..." onkeyup="filterBooks()">
+            <select id="genreFilter" onchange="filterBooks()">
+                <option value="">All Genres</option>
+                <option value="Action">Action</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Comedy">Comedy</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Horror">Horror</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Romance">Romance</option>
+                <option value="Sci-Fi">Science Fiction</option>
+                <option value="Thriller">Thriller</option>
+                <option value="Historical">Historical</option>
+                <option value="Slice of Life">Slice of Life</option>
+                <option value="Supernatural">Supernatural</option>
+                <option value="Biography">Biography</option>
+                <option value="Young Adult">Young Adult</option>
+                <option value="Children">Children</option>
+                <option value="Poetry">Poetry</option>
+                </select>
         </section>
+
+        <section class="book-grid" id="bookGrid">
+            </section>
     </main>
 
     <footer>
@@ -450,7 +534,6 @@
             databaseURL: "https://tamplatedoc-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "tamplatedoc",
             storageBucket: "tamplatedoc.firebasestorage.app",
-            messagingSenderId: "264966107720",
             appId: "1:264966107720:web:868abe93cdff209040de7d",
             measurementId: "G-S5WTZ7S5PG"
         };
@@ -460,17 +543,17 @@
         const rtdb = getDatabase(app);
         const storage = getStorage(app);
 
-       function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    if (document.body.classList.contains('dark-mode')) {
-        localStorage.setItem('theme', 'dark');
-    } else {
-        localStorage.setItem('theme', 'light');
-    }
-}
+        let allStories = []; // Array to hold all fetched stories
 
-window.toggleDarkMode = toggleDarkMode; // <--- Tambahkan ini
-
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        window.toggleDarkMode = toggleDarkMode;
 
         function applyTheme() {
             if (localStorage.getItem('theme') === 'dark') {
@@ -497,85 +580,110 @@ window.toggleDarkMode = toggleDarkMode; // <--- Tambahkan ini
             return starsHtml;
         }
 
-        async function fetchAndDisplayBooks() {
+        // Function to display books based on a given array of stories
+        async function displayBooks(storiesToDisplay) {
             const bookGrid = document.getElementById('bookGrid');
-            bookGrid.innerHTML = '';
+            bookGrid.innerHTML = ''; // Clear existing books
+
+            if (storiesToDisplay.length === 0) {
+                bookGrid.innerHTML = '<p style="text-align: center; color: var(--text-color);">No stories found matching your criteria.</p>';
+                return;
+            }
+
+            for (const story of storiesToDisplay) {
+                let views = 0;
+                let averageRating = 0;
+                let ratingsCount = 0;
+                let thumbnailUrl = 'https://via.placeholder.com/300x200/eee/333?text=No+Thumbnail';
+
+                try {
+                    const viewsSnapshot = await rtdbGet(rtdbChild(rtdbRef(rtdb), `storyViews/${story.id}/views`));
+                    if (viewsSnapshot.exists()) {
+                        views = viewsSnapshot.val();
+                    }
+                } catch (error) {
+                    console.error("Error fetching views for story", story.id, error);
+                }
+
+                try {
+                    const ratingsSnapshot = await rtdbGet(rtdbChild(rtdbRef(rtdb), `storyRatings/${story.id}/ratings`));
+                    if (ratingsSnapshot.exists()) {
+                        const ratingData = ratingsSnapshot.val();
+                        ratingsCount = ratingData.count || 0;
+                        if (ratingsCount > 0) {
+                            averageRating = (ratingData.total / ratingsCount).toFixed(1);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching ratings for story", story.id, error);
+                }
+
+                if (story.thumbnailPath) {
+                    try {
+                        const imageRef = storageRef(storage, story.thumbnailPath);
+                        thumbnailUrl = await getDownloadURL(imageRef);
+                    } catch (error) {
+                        console.error("Error fetching thumbnail URL for story", story.id, error);
+                        thumbnailUrl = 'https://via.placeholder.com/300x200/eee/333?text=Image+Error';
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.onclick = () => location.href = `web_story.html?id=${story.id}`;
+                card.innerHTML = `
+                    <img src="${thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
+                    <div class="book-card-content">
+                        <h3>${story.title}</h3>
+                        <p>Author: ${story.authorName}</p>
+                        <p>Genre: ${story.genre || 'N/A'}</p> <div class="book-card-meta vertical-meta">
+                            <div class="rating">${generateStarRatingHtml(averageRating)} ${averageRating} (${ratingsCount} Ratings)</div>
+                            <div><i class="fas fa-eye"></i> ${views} Views</div>
+                        </div>
+                    </div>
+                `;
+                bookGrid.appendChild(card);
+            }
+        }
+
+        // Fetch all books once and store them
+        async function fetchAllStories() {
             const storiesCollectionRef = collection(db, "stories");
             const q = query(storiesCollectionRef);
 
             try {
                 const querySnapshot = await getDocs(q);
-                for (const docSnapshot of querySnapshot.docs) {
-                    const storyData = docSnapshot.data();
-                    const storyId = docSnapshot.id;
-
-                    if (storyData.status !== 'approved') {
-                        continue;
-                    }
-
-                    let views = 0;
-                    let averageRating = 0;
-                    let ratingsCount = 0;
-                    let thumbnailUrl = 'https://via.placeholder.com/300x200/eee/333?text=No+Thumbnail';
-
-                    try {
-                        const viewsSnapshot = await rtdbGet(rtdbChild(rtdbRef(rtdb), `storyViews/${storyId}/views`));
-                        if (viewsSnapshot.exists()) {
-                            views = viewsSnapshot.val();
-                        }
-                    } catch (error) {
-                        console.error("Error fetching views for story", storyId, error);
-                    }
-
-                    try {
-                        const ratingsSnapshot = await rtdbGet(rtdbChild(rtdbRef(rtdb), `storyRatings/${storyId}/ratings`));
-                        if (ratingsSnapshot.exists()) {
-                            const ratingData = ratingsSnapshot.val();
-                            ratingsCount = ratingData.count || 0;
-                            if (ratingsCount > 0) {
-                                averageRating = (ratingData.total / ratingsCount).toFixed(1);
-                            }
-                        }
-                    } catch (error) {
-                        console.error("Error fetching ratings for story", storyId, error);
-                    }
-
-                    if (storyData.thumbnailPath) {
-                        try {
-                            const imageRef = storageRef(storage, storyData.thumbnailPath);
-                            thumbnailUrl = await getDownloadURL(imageRef);
-                        } catch (error) {
-                            console.error("Error fetching thumbnail URL for story", storyId, error);
-                            thumbnailUrl = 'https://via.placeholder.com/300x200/eee/333?text=Image+Error';
-                        }
-                    }
-
-const card = document.createElement('div');
-card.className = 'book-card';
-card.onclick = () => location.href = `web_story.html?id=${storyId}`;
-card.innerHTML = `
-    <img src="${thumbnailUrl}" alt="Story Thumbnail" class="book-card-thumbnail">
-    <div class="book-card-content">
-        <h3>${storyData.title}</h3>
-        <p>Author: ${storyData.authorName}</p>
-        <div class="book-card-meta vertical-meta">
-            <div class="rating">${generateStarRatingHtml(averageRating)} ${averageRating} (${ratingsCount} Ratings)</div>
-            <div><i class="fas fa-eye"></i> ${views} Views</div>
-        </div>
-    </div>
-`;
-bookGrid.appendChild(card);
-
-                }
+                allStories = querySnapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .filter(story => story.status === 'approved'); // Filter approved stories initially
+                
+                displayBooks(allStories); // Display all approved books on initial load
             } catch (error) {
-                console.error("Error fetching stories:", error);
-                bookGrid.innerHTML = '<p style="text-align: center; color: var(--text-color);">Failed to load stories. Please try again later.</p>';
+                console.error("Error fetching all stories:", error);
+                document.getElementById('bookGrid').innerHTML = '<p style="text-align: center; color: var(--text-color);">Failed to load stories. Please try again later.</p>';
             }
         }
 
+        // Function to filter books based on search input and genre selection
+        function filterBooks() {
+            const searchInput = document.getElementById('searchBar').value.toLowerCase();
+            const selectedGenre = document.getElementById('genreFilter').value;
+
+            const filteredStories = allStories.filter(story => {
+                const matchesSearch = story.title.toLowerCase().includes(searchInput) ||
+                                      story.authorName.toLowerCase().includes(searchInput);
+                const matchesGenre = selectedGenre === "" || story.genre === selectedGenre;
+
+                return matchesSearch && matchesGenre;
+            });
+
+            displayBooks(filteredStories);
+        }
+        window.filterBooks = filterBooks; // Make it globally accessible for onkeyup/onchange
+
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme();
-            fetchAndDisplayBooks();
+            fetchAllStories(); // Fetch all stories on page load
         });
     </script>
 </body>
