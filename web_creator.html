@@ -369,6 +369,12 @@
             background-color: var(--status-rejected);
             color: #fff;
         }
+        .story-id {
+            font-size: 0.85rem;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
 
         .item-actions {
             display: flex;
@@ -570,14 +576,14 @@
             }
         }
         document.addEventListener('DOMContentLoaded', applyTheme);
-document.addEventListener('DOMContentLoaded', () => {
-    applyTheme();
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
 
-    const toggleButton = document.getElementById('darkModeToggle');
-    if (toggleButton) {
-        toggleButton.addEventListener('click', toggleDarkMode);
-    }
-});
+            const toggleButton = document.querySelector('.mode-toggle'); // Changed to class selector
+            if (toggleButton) {
+                toggleButton.addEventListener('click', toggleDarkMode);
+            }
+        });
 
         const welcomeMessage = document.getElementById('welcomeMessage');
         const logoutButton = document.getElementById('logoutButton');
@@ -595,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let currentAuthorName = '';
         let currentUserId = '';
+        let creatorStoryCount = 0; // To keep track of stories created by the current user
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -647,10 +654,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 await deleteObject(imageRef);
             } catch (error) {
                 if (error.code === 'storage/object-not-found') {
+                    // Ignore if the file doesn't exist, it means it was already deleted or never uploaded
                 } else {
                     console.error("Error deleting old thumbnail:", error);
                 }
             }
+        }
+
+        // Function to generate Story ID
+        function generateStoryId(creatorUid, storyCount) {
+            const now = new Date();
+            const year = String(now.getFullYear()).slice(2); // Last two digits of the year
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Month (01-12)
+            const day = String(now.getDate()).padStart(2, '0'); // Day (01-31)
+
+            // Simple hash of creator UID for the 4 digits
+            let creatorIdHash = 0;
+            for (let i = 0; i < Math.min(creatorUid.length, 4); i++) {
+                creatorIdHash += creatorUid.charCodeAt(i);
+            }
+            creatorIdHash = String(creatorIdHash % 10000).padStart(4, '0'); // Ensure 4 digits
+
+            const storyNum = String(storyCount).slice(-1); // Last digit of story count
+
+            return `${year}${month}${day}${creatorIdHash}${storyNum}`;
         }
 
         storyForm.addEventListener('submit', async (e) => {
@@ -669,6 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 if (storyId) {
+                    // Editing an existing story
                     const storyDocRef = doc(db, "stories", storyId);
                     const storyDocSnap = await getDoc(storyDocRef);
                     const oldThumbnailPath = storyDocSnap.exists() ? storyDocSnap.data().thumbnailPath : null;
@@ -687,12 +715,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         content,
                         thumbnailPath: newThumbnailPath,
                         lastModified: new Date(),
-                        status: 'pending'
+                        status: 'pending' // Status changes to pending upon edit
                     });
                     showMessage("Story updated successfully! Awaiting staff approval.", "success");
                 } else {
+                    // Creating a new story
+                    // Get the current number of stories for this creator to generate the ID
+                    const creatorStoriesQuery = query(collection(db, "stories"), where("authorUid", "==", currentUserId));
+                    const creatorStoriesSnapshot = await getDoc(creatorStoriesQuery);
+                    creatorStoryCount = creatorStoriesSnapshot.size;
+
+                    const newGeneratedStoryId = generateStoryId(currentUserId, creatorStoryCount + 1); // +1 for the new story
+
                     const newStoryRef = collection(db, "stories");
                     const addedDocRef = await addDoc(newStoryRef, {
+                        storyId: newGeneratedStoryId, // Add the generated story ID
                         authorUid: currentUserId,
                         authorName: currentAuthorName,
                         title,
@@ -702,12 +739,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         lastModified: new Date(),
                         status: 'pending'
                     });
-                    const newStoryId = addedDocRef.id;
+                    const newFirestoreDocId = addedDocRef.id;
 
                     let thumbnailPath = null;
                     if (thumbnailFile) {
-                        thumbnailPath = await uploadThumbnail(thumbnailFile, newStoryId);
-                        await updateDoc(doc(db, "stories", newStoryId), { thumbnailPath });
+                        thumbnailPath = await uploadThumbnail(thumbnailFile, newFirestoreDocId); // Use Firestore's doc ID for storage path
+                        await updateDoc(doc(db, "stories", newFirestoreDocId), { thumbnailPath });
                     }
                     showMessage("Story published successfully! Awaiting staff approval.", "success");
                 }
@@ -731,6 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const storiesQuery = query(collection(db, "stories"), where("authorUid", "==", authorUid));
             onSnapshot(storiesQuery, (snapshot) => {
                 storyListDiv.innerHTML = '';
+                creatorStoryCount = snapshot.size; // Update the creator's story count
                 if (snapshot.empty) {
                     storyListDiv.innerHTML = '<p style="text-align: center; color: var(--text-color);">You have not published any stories yet.</p>';
                     return;
@@ -741,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     storyItem.className = 'story-item';
                     storyItem.innerHTML = `
                         <h3>${story.title}</h3>
-                        <p>Genre: ${story.genre}</p>
+                        <p class="story-id">ID: ${story.storyId || 'N/A'}</p> <p>Genre: ${story.genre}</p>
                         <p>Status: <span class="status ${story.status}">${story.status.charAt(0).toUpperCase() + story.status.slice(1)}</span></p>
                         <div class="item-actions">
                             <button class="btn edit" data-id="${story.id}">Edit</button>
@@ -768,7 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         storyTitleInput.value = storyData.title;
                         storyGenreInput.value = storyData.genre;
                         storyContentInput.value = storyData.content;
-                        storyThumbnailInput.value = '';
+                        storyThumbnailInput.value = ''; // Clear file input for security/privacy reasons
                         storyFormTitle.textContent = 'Edit Story';
                         submitStoryBtn.textContent = 'Update Story';
                         cancelEditBtn.style.display = 'inline-block';
