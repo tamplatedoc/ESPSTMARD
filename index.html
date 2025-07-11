@@ -6,7 +6,7 @@
     <title>AMDF.GROUP E-Book Catalog</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
- <style>
+<style>
     :root {
         --background-start: #f0f2f5;
         --background-end: #e0e2e5;
@@ -176,7 +176,7 @@
 
     .catalog-header {
         text-align: center;
-        margin-bottom: 2rem; /* Adjusted margin */
+        margin-bottom: 2rem;
     }
 
     .catalog-header h1 {
@@ -288,12 +288,7 @@
             max-width: calc(33.333% - 12px);
         }
     }
-    @media (min-width: 481px) and (max-width: 599px) { /* Smaller Tablet/Large Mobile: 2 columns */
-        .book-card {
-            flex: 1 1 calc(50% - 12px);
-            max-width: calc(50% - 12px);
-        }
-    }
+    /* @media (min-width: 481px) and (max-width: 599px) { * Perlu di-merge dengan media query utama untuk mobile *} */
 
 
     .book-card:hover {
@@ -323,25 +318,24 @@
 
     .book-card-content h3 {
         font-size: 0.95rem;
-        line-height: 1.2; /* Merapatkan jarak antar baris */
-        margin-bottom: 0.3rem; /* Merapatkan jarak antar elemen */
+        line-height: 1.2;
+        margin-bottom: 0.3rem;
         color: var(--text-color);
-        /* flex-grow: 1; */ /* Hapus ini jika Anda tidak ingin judul memanjang */
         font-weight: bold;
     }
 
     .book-card-content p {
         font-size: 0.95rem;
-        line-height: 1.2; /* Merapatkan jarak antar baris */
+        line-height: 1.2;
         color: var(--text-color);
-        margin-bottom: 0.3rem; /* Merapatkan jarak antar elemen */
+        margin-bottom: 0.3rem;
     }
 
     .book-card-meta {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 0.5rem; /* Perbaikan typo dari 0,5rem */
+        margin-top: 0.5rem;
         font-size: 0.9rem;
         color: var(--icon-color);
     }
@@ -357,7 +351,7 @@
     .book-card-meta.vertical-meta .rating,
     .book-card-meta.vertical-meta .views {
         font-size: 0.85rem;
-        line-height: 1.1; /* Lebih merapatkan teks rating dan views */
+        line-height: 1.1;
         letter-spacing: 0.2px;
         margin-bottom: 0.1rem;
     }
@@ -446,19 +440,19 @@
             max-width: 100%;
         }
 
-        /* Penyesuaian untuk mobile: 2 kolom di layar tablet kecil/mobile besar */
+        /* **PENTING: Aturan ini membuat 2 kolom di ponsel** */
         .book-card {
-            flex: 1 1 calc(50% - 12px); /* Perbaikan typo dari 500% */
-            max-width: calc(50% - 12px); /* Perbaikan typo dari 500% */
-            margin: 0 6px; /* Menyesuaikan margin agar tetap ada sedikit jarak */
+            flex: 1 1 calc(50% - 12px); /* 50% lebar dikurangi gap */
+            max-width: calc(50% - 12px); /* Batasi lebar maksimum */
+            margin: 0 6px; /* Menambahkan margin horizontal agar ada jarak antar card dan tepi layar */
         }
     }
 
-    @media (max-width: 480px) { /* Untuk mobile yang lebih kecil: 1 kolom */
+    @media (max-width: 480px) { /* Untuk layar yang lebih kecil dari 480px, tetap 2 kolom */
         .book-card {
-            flex: 1 1 calc(100% - 24px); /* Menjadi 1 kolom dengan margin */
-            max-width: calc(100% - 24px);
-            margin: 0 12px;
+            flex: 1 1 calc(50% - 10px); /* 50% lebar dikurangi gap yang sedikit lebih kecil */
+            max-width: calc(50% - 10px);
+            margin: 0 5px; /* Margin horizontal yang lebih kecil */
         }
         .logo {
             font-size: 1.5rem;
