@@ -288,8 +288,6 @@
             max-width: calc(33.333% - 12px);
         }
     }
-    /* @media (min-width: 481px) and (max-width: 599px) { * Perlu di-merge dengan media query utama untuk mobile *} */
-
 
     .book-card:hover {
         transform: translateY(-8px);
@@ -312,8 +310,6 @@
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
-        /* Hapus flex-grow: 1; agar tidak memanjang ke bawah */
-        /* flex-grow: 1; */
     }
 
     .book-card-content h3 {
@@ -440,17 +436,17 @@
             max-width: 100%;
         }
 
-        /* **PENTING: Aturan ini membuat 2 kolom di ponsel** */
+        /* Aturan ini untuk ponsel (lebar maksimum 768px dan di bawahnya) */
         .book-card {
-            flex: 1 1 calc(50% - 12px); /* 50% lebar dikurangi gap */
-            max-width: calc(50% - 12px); /* Batasi lebar maksimum */
-            margin: 0 6px; /* Menambahkan margin horizontal agar ada jarak antar card dan tepi layar */
+            flex: 1 1 calc(50% - 12px); /* Mengatur 2 kolom dengan jarak 12px */
+            max-width: calc(50% - 12px); /* Memastikan lebar maksimum 2 kolom */
         }
     }
 
-    @media (max-width: 480px) { /* Untuk layar yang lebih kecil dari 480px, tetap 2 kolom */
+    @media (max-width: 480px) {
+        /* Untuk layar yang lebih kecil dari 480px, tetap 2 kolom */
         .book-card {
-            flex: 1 1 calc(50% - 10px); /* 50% lebar dikurangi gap yang sedikit lebih kecil */
+            flex: 1 1 calc(50% - 10px); /* Sedikit menyesuaikan gap untuk layar sangat kecil */
             max-width: calc(50% - 10px);
             margin: 0 5px; /* Margin horizontal yang lebih kecil */
         }
