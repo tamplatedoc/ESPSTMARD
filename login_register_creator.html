@@ -397,6 +397,7 @@
         import { getAuth, isSignInWithEmailLink, signInWithEmailLink, sendSignInLinkToEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
         import { getDatabase, ref as rtdbRef, set as rtdbSet, get as rtdbGet } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-functions.js";
 
         // GANTI DENGAN KONFIGURASI FIREBASE ANDA SENDIRI
         const firebaseConfig = {
@@ -411,6 +412,8 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const functions = getFunctions(app);
+        const verifyRecaptchaCallable = httpsCallable(functions, 'verifyRecaptcha');
         const auth = getAuth(app);
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
@@ -521,144 +524,149 @@
             handleCodeInApp: true,
         };
 
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('registerEmail').value;
-            const authorName = document.getElementById('registerAuthorName').value;
-            const whatsapp = document.getElementById('registerWhatsapp').value;
-            const recaptchaResponse = grecaptcha.getResponse();
+// --- UBAHAN PADA registerForm.addEventListener ---
+registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('registerEmail').value;
+    const authorName = document.getElementById('registerAuthorName').value;
+    const whatsapp = document.getElementById('registerWhatsapp').value;
+    const recaptchaResponse = grecaptcha.getResponse();
 
-            if (!recaptchaResponse) {
-                showMessage("Please complete the reCAPTCHA.", "error");
-                return;
-            }
+    if (!recaptchaResponse) {
+        showMessage("Please complete the reCAPTCHA.", "error");
+        return;
+    }
 
-            try {
-                // In a real application, you'd send recaptchaResponse to your server to verify with Google.
-                // For this example, we'll proceed assuming reCAPTCHA is completed.
-                // You CANNOT reliably verify reCAPTCHA on the client-side for production.
-                // Simulated server-side reCAPTCHA verification:
-                /*
-                const captchaVerify = await fetch('/your-server-recaptcha-verify-endpoint', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: recaptchaResponse })
-                });
-                const captchaResult = await captchaVerify.json();
-                if (!captchaResult.success) {
-                    showMessage("reCAPTCHA verification failed. Please try again.", "error");
-                    grecaptcha.reset();
-                    return;
-                }
-                */
+    try {
+        // --- BAGIAN INI DIGANTI UNTUK MEMANGGIL CLOUD FUNCTION ---
+        showMessage("Verifying reCAPTCHA...", "info");
+        const result = await verifyRecaptchaCallable({ token: recaptchaResponse });
 
-                // Check last OTP send time from Realtime Database
-                const lastOTPSendRef = rtdbRef(rtdb, `otp_timestamps/${btoa(email).replace(/\./g, '_')}`); // Encode email for Firebase key
-                const snapshot = await rtdbGet(lastOTPSendRef);
-                const lastSendTime = snapshot.val();
-                const currentTime = Date.now();
-                const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        // Hasil dari Cloud Function ada di properti .data
+        if (!result.data.success) {
+            showMessage("reCAPTCHA verification failed. Please try again.", "error");
+            grecaptcha.reset(); // Reset widget reCAPTCHA jika gagal
+            return;
+        }
+        // --- AKHIR BAGIAN PENGGANTIAN CLOUD FUNCTION ---
 
-                if (lastSendTime && (currentTime - lastSendTime < oneHour)) {
-                    showMessage("A magic link was sent recently. Please wait before requesting another one.", "error");
-                    grecaptcha.reset();
-                    return;
-                }
+        // Check last OTP send time from Realtime Database
+        const lastOTPSendRef = rtdbRef(rtdb, `otp_timestamps/${btoa(email).replace(/\./g, '_')}`); // Encode email for Firebase key
+        const snapshot = await rtdbGet(lastOTPSendRef);
+        const lastSendTime = snapshot.val();
+        const currentTime = Date.now();
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
 
-                // Send magic link for registration
-                await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-                window.localStorage.setItem('emailForSignIn', email);
-                
-                // Store registration data in a temporary state in RTDB
-                const creatorId = generateCreatorId();
-                await rtdbSet(rtdbRef(rtdb, `temp_registrations/${btoa(email).replace(/\./g, '_')}`), {
-                    authorName: authorName,
-                    whatsapp: whatsapp,
-                    creatorId: creatorId,
-                    timestamp: Date.now()
-                });
+        if (lastSendTime && (currentTime - lastSendTime < oneHour)) {
+            showMessage("A magic link was sent recently. Please wait before requesting another one.", "error");
+            grecaptcha.reset();
+            return;
+        }
 
-                // Update last OTP send time
-                await rtdbSet(lastOTPSendRef, currentTime);
+        // Send magic link for registration
+        await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+        window.localStorage.setItem('emailForSignIn', email);
 
-                showMessage(`A magic link has been sent to ${email}. Please check your inbox to complete registration. This link is valid for a short period and for this device.`, "success");
-                grecaptcha.reset(); // Reset reCAPTCHA after successful submission
-            } catch (error) {
-                console.error("Error during registration:", error);
-                let errorMessage = "Registration failed. Please try again.";
-                if (error.code === 'auth/invalid-email') {
-                    errorMessage = "Invalid email address.";
-                } else if (error.code === 'auth/too-many-requests') {
-                    errorMessage = "Too many requests. Please try again later.";
-                }
-                showMessage(errorMessage, "error");
-                grecaptcha.reset(); // Reset reCAPTCHA on error
-            }
+        // Store registration data in a temporary state in RTDB
+        const creatorId = generateCreatorId();
+        await rtdbSet(rtdbRef(rtdb, `temp_registrations/${btoa(email).replace(/\./g, '_')}`), {
+            authorName: authorName,
+            whatsapp: whatsapp,
+            creatorId: creatorId,
+            timestamp: Date.now()
         });
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const recaptchaResponse = grecaptcha.getResponse();
+        // Update last OTP send time
+        await rtdbSet(lastOTPSendRef, currentTime);
 
-            if (!recaptchaResponse) {
-                showMessage("Please complete the reCAPTCHA.", "error");
-                return;
-            }
+        showMessage(`A magic link has been sent to ${email}. Please check your inbox to complete registration. This link is valid for a short period and for this device.`, "success");
+        grecaptcha.reset(); // Reset reCAPTCHA after successful submission
+    } catch (error) {
+        console.error("Error during registration:", error);
+        let errorMessage = "Registration failed. Please try again.";
+        if (error.code === 'auth/invalid-email') {
+            errorMessage = "Invalid email address.";
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = "Too many requests. Please try again later.";
+        } else if (error.code === 'unauthenticated' && error.details) { // Error dari Cloud Function
+            errorMessage = `reCAPTCHA verification failed: ${error.details.join(', ')}`;
+        } else if (error.code === 'internal') { // Error dari Cloud Function
+            errorMessage = "A server error occurred during reCAPTCHA verification. Please try again.";
+        } else {
+             errorMessage = error.message || errorMessage; // Tangani error umum lainnya
+        }
+        showMessage(errorMessage, "error");
+        grecaptcha.reset(); // Reset reCAPTCHA on error
+    }
+});
 
-            try {
-                // In a real application, you'd send recaptchaResponse to your server to verify with Google.
-                // For this example, we'll proceed assuming reCAPTCHA is completed.
-                /*
-                const captchaVerify = await fetch('/your-server-recaptcha-verify-endpoint', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: recaptchaResponse })
-                });
-                const captchaResult = await captchaVerify.json();
-                if (!captchaResult.success) {
-                    showMessage("reCAPTCHA verification failed. Please try again.", "error");
-                    grecaptcha.reset();
-                    return;
-                }
-                */
 
-                // Check last OTP send time
-                const lastOTPSendRef = rtdbRef(rtdb, `otp_timestamps/${btoa(email).replace(/\./g, '_')}`);
-                const snapshot = await rtdbGet(lastOTPSendRef);
-                const lastSendTime = snapshot.val();
-                const currentTime = Date.now();
-                const oneHour = 60 * 60 * 1000; 
+// --- UBAHAN PADA loginForm.addEventListener ---
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const recaptchaResponse = grecaptcha.getResponse();
 
-                if (lastSendTime && (currentTime - lastSendTime < oneHour)) {
-                    showMessage("A magic link was sent recently. Please wait before requesting another one.", "error");
-                    grecaptcha.reset();
-                    return;
-                }
+    if (!recaptchaResponse) {
+        showMessage("Please complete the reCAPTCHA.", "error");
+        return;
+    }
 
-                // Send magic link for login
-                await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-                window.localStorage.setItem('emailForSignIn', email);
+    try {
+        // --- BAGIAN INI DIGANTI UNTUK MEMANGGIL CLOUD FUNCTION ---
+        showMessage("Verifying reCAPTCHA...", "info");
+        const result = await verifyRecaptchaCallable({ token: recaptchaResponse });
 
-                // Update last OTP send time
-                await rtdbSet(lastOTPSendRef, currentTime);
+        // Hasil dari Cloud Function ada di properti .data
+        if (!result.data.success) {
+            showMessage("reCAPTCHA verification failed. Please try again.", "error");
+            grecaptcha.reset(); // Reset widget reCAPTCHA jika gagal
+            return;
+        }
+        // --- AKHIR BAGIAN PENGGANTIAN CLOUD FUNCTION ---
 
-                showMessage(`A magic link has been sent to ${email}. Please check your inbox to log in. This link is valid for a short period and for this device.`, "success");
-                grecaptcha.reset(); // Reset reCAPTCHA after successful submission
-            } catch (error) {
-                console.error("Error during login:", error);
-                let errorMessage = "Login failed. Please try again.";
-                if (error.code === 'auth/user-not-found') {
-                    errorMessage = "No account found with that email. Please register first.";
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = "Invalid email address format.";
-                } else if (error.code === 'auth/too-many-requests') {
-                    errorMessage = "Too many requests. Please try again later.";
-                }
-                showMessage(errorMessage, "error");
-                grecaptcha.reset(); // Reset reCAPTCHA on error
-            }
-        });
+        // Check last OTP send time
+        const lastOTPSendRef = rtdbRef(rtdb, `otp_timestamps/${btoa(email).replace(/\./g, '_')}`);
+        const snapshot = await rtdbGet(lastOTPSendRef);
+        const lastSendTime = snapshot.val();
+        const currentTime = Date.now();
+        const oneHour = 60 * 60 * 1000;
+
+        if (lastSendTime && (currentTime - lastSendTime < oneHour)) {
+            showMessage("A magic link was sent recently. Please wait before requesting another one.", "error");
+            grecaptcha.reset();
+            return;
+        }
+
+        // Send magic link for login
+        await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+        window.localStorage.setItem('emailForSignIn', email);
+
+        // Update last OTP send time
+        await rtdbSet(lastOTPSendRef, currentTime);
+
+        showMessage(`A magic link has been sent to ${email}. Please check your inbox to log in. This link is valid for a short period and for this device.`, "success");
+        grecaptcha.reset(); // Reset reCAPTCHA after successful submission
+    } catch (error) {
+        console.error("Error during login:", error);
+        let errorMessage = "Login failed. Please try again.";
+        if (error.code === 'auth/user-not-found') {
+            errorMessage = "No account found with that email. Please register first.";
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = "Invalid email address format.";
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = "Too many requests. Please try again later.";
+        } else if (error.code === 'unauthenticated' && error.details) { // Error dari Cloud Function
+            errorMessage = `reCAPTCHA verification failed: ${error.details.join(', ')}`;
+        } else if (error.code === 'internal') { // Error dari Cloud Function
+            errorMessage = "A server error occurred during reCAPTCHA verification. Please try again.";
+        } else {
+             errorMessage = error.message || errorMessage; // Tangani error umum lainnya
+        }
+        showMessage(errorMessage, "error");
+        grecaptcha.reset(); // Reset reCAPTCHA on error
+    }
+});
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
