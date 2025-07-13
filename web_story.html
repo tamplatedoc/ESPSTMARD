@@ -187,14 +187,14 @@
             align-items: center;
             gap: 8px;
             padding: 0.8rem 1.5rem;
-            background: linear-gradient(45deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(45deg, #11998e 0%, #38ef7d 100%); /* Warna asli */
             color: white;
             border-radius: 8px;
             border: none;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease; /* Tambahkan transisi untuk background */
         }
 
         .speaker-button .btn:hover {
@@ -543,7 +543,6 @@
                         storyThumbnailElem.src = 'https://via.placeholder.com/600x400/eee/333?text=No+Thumbnail';
                     }
                     
-
                     const viewsRef = rtdbRef(rtdb, `storyViews/${storyId}/views`);
                     runTransaction(viewsRef, (currentViews) => {
                         return (currentViews || 0) + 1;
@@ -560,16 +559,51 @@
             }
         }
 
+        let currentUtterance = null; // Variabel untuk menyimpan instance SpeechSynthesisUtterance
+
         speakerButton.addEventListener('click', () => {
             const storyText = storyContentElem.textContent;
+
             if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(storyText);
-                utterance.lang = 'id-ID';
-                speechSynthesis.speak(utterance);
+                if (speechSynthesis.speaking) {
+                    // Jika sedang berbicara, hentikan
+                    speechSynthesis.cancel();
+                    speakerButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story';
+                    speakerButton.style.background = 'linear-gradient(45deg, #11998e 0%, #38ef7d 100%)'; // Kembalikan warna awal
+                } else {
+                    // Jika tidak berbicara, mulai TTS
+                    currentUtterance = new SpeechSynthesisUtterance(storyText);
+                    currentUtterance.lang = 'id-ID';
+
+                    currentUtterance.onend = () => {
+                        // Ketika TTS selesai, kembalikan teks tombol ke "Listen to Story"
+                        speakerButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story';
+                        speakerButton.style.background = 'linear-gradient(45deg, #11998e 0%, #38ef7d 100%)'; // Kembalikan warna awal
+                    };
+
+                    currentUtterance.onerror = (event) => {
+                        console.error('SpeechSynthesisUtterance error:', event);
+                        alert("Terjadi kesalahan saat memutar suara.");
+                        speakerButton.innerHTML = '<i class="fas fa-volume-up"></i> Listen to Story';
+                        speakerButton.style.background = 'linear-gradient(45deg, #11998e 0%, #38ef7d 100%)'; // Kembalikan warna awal
+                    };
+
+                    speechSynthesis.speak(currentUtterance);
+                    speakerButton.innerHTML = '<i class="fas fa-volume-mute"></i> Stop Speaking';
+                    speakerButton.style.background = 'linear-gradient(45deg, #ff6b6b 0%, #ee4d2d 100%)'; // Ubah warna tombol menjadi merah saat berbicara
+                }
             } else {
-                alert("Your browser does not support text-to-speech. Please try a different browser.");
+                alert("Browser Anda tidak mendukung text-to-speech. Silakan coba browser lain.");
             }
         });
+
+        // Tambahkan event listener untuk mengembalikan tombol ke keadaan awal jika pengguna menghentikan secara manual (misal dengan menutup tab)
+        window.addEventListener('beforeunload', () => {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+        });
+
 
         let userRating = 0;
 
